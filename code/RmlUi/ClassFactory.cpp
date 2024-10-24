@@ -13,6 +13,7 @@
 #include "RmlUi/ClassFactory.h"
 #include "RmlUi/RmlDocument.h"
 #include "RmlUi/RmlDocumentFactory.h"
+#include "RmlUi/Backend/RmlUi.h"
 
 namespace traktor::rmlui
 {
@@ -29,6 +30,10 @@ namespace traktor::rmlui
 		classRmlDocumentFactory->addConstructor();
 		classRmlDocumentFactory->addMethod("createRmlDocument", &RmlDocumentFactory::createRmlDocument);
 		registrar->registerClass(classRmlDocumentFactory);
+
+		// RmlUi
+		auto classRmlUi = new AutoRuntimeClass< RmlUi >();
+		registrar->registerClass(classRmlUi);
 	}
 
 }
