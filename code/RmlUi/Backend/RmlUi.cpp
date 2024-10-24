@@ -13,6 +13,10 @@
 
 namespace traktor::rmlui
 {
+	namespace {
+		const Rml::String DefaultContextName = "Default";
+	}
+
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlUi", 0, RmlUi, Object)
 
 		RmlUi& RmlUi::getInstance()
@@ -32,12 +36,25 @@ namespace traktor::rmlui
 		T_SAFE_RELEASE(this);
 	}
 
-	bool RmlUi::Initialize()
+	bool RmlUi::Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView)
 	{
 		if (m_initialized)
 			return true;
 
 		m_backendData = new BackendData();
+
+		m_backendData->m_fileInterface = new FileInterface();
+		m_backendData->m_systemInterface = new SystemInterface();
+		m_backendData->m_renderInterface = new RenderInterface();
+		m_backendData->m_renderInterface->Initialize(renderSystem, renderView);
+
+		Rml::SetFileInterface(m_backendData->m_fileInterface);
+		Rml::SetSystemInterface(m_backendData->m_systemInterface);
+		Rml::SetRenderInterface(m_backendData->m_renderInterface);
+
+		Rml::Initialise();
+
+		m_context = Rml::CreateContext(DefaultContextName, Rml::Vector2i(renderView->getWidth(), renderView->getHeight()));
 
 		m_initialized = true;
 
@@ -49,12 +66,20 @@ namespace traktor::rmlui
 		if (!m_initialized)
 			return;
 
+		Rml::RemoveContext(DefaultContextName);
+
+		delete m_backendData->m_fileInterface;
+		delete m_backendData->m_systemInterface;
+		delete m_backendData->m_renderInterface;
+
 		delete m_backendData;
+
+		Rml::Shutdown();
 
 		m_initialized = false;
 	}
 
-	Rml::SystemInterface* RmlUi::GetSystemInterface()
+	Rml::SystemInterface* RmlUi::GetSystemInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
@@ -62,7 +87,7 @@ namespace traktor::rmlui
 		return m_backendData->m_systemInterface;
 	}
 
-	Rml::RenderInterface* RmlUi::GetRenderInterface()
+	Rml::RenderInterface* RmlUi::GetRenderInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
@@ -70,11 +95,16 @@ namespace traktor::rmlui
 		return m_backendData->m_renderInterface;
 	}
 
-	Rml::FileInterface* RmlUi::GetFileInterface()
+	Rml::FileInterface* RmlUi::GetFileInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
 
 		return m_backendData->m_fileInterface;
+	}
+
+	Rml::Context* RmlUi::GetContext() const
+	{
+		return m_context;
 	}
 }

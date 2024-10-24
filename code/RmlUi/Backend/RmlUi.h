@@ -16,6 +16,8 @@
 #include "RmlUi/Backend/FileInterface.h"
 #include "RmlUi/Backend/RenderInterface.h"
 #include "RmlUi/Backend/SystemInterface.h"
+#include "Render/IRenderSystem.h"
+#include "Render/IRenderView.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -42,15 +44,17 @@ namespace traktor::rmlui
 
 		void destroy() override;
 
-		bool Initialize();
+		bool Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView);
 
 		void Shutdown();
 
-		Rml::SystemInterface* GetSystemInterface();
+		Rml::SystemInterface* GetSystemInterface() const;
 
-		Rml::RenderInterface* GetRenderInterface();
+		Rml::RenderInterface* GetRenderInterface() const;
 
-		Rml::FileInterface* GetFileInterface();
+		Rml::FileInterface* GetFileInterface() const;
+
+		Rml::Context* GetContext() const;
 
 	private:
 		struct BackendData
@@ -61,7 +65,8 @@ namespace traktor::rmlui
 		};
 
 		bool m_initialized = false;
-		BackendData* m_backendData;
+		BackendData* m_backendData = nullptr;
+		Rml::Context* m_context = nullptr;
 	};
 
 }

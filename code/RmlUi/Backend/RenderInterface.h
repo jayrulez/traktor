@@ -11,6 +11,8 @@
 #include "Core/Config.h"
 #include "Core/Object.h"
 #include "RmlUi/Core/RenderInterface.h"
+#include "Render/IRenderSystem.h"
+#include "Render/IRenderView.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -22,11 +24,15 @@
 
 namespace traktor::rmlui
 {
+	class RmlUi;
+
 	class T_DLLCLASS RenderInterface : public Rml::RenderInterface, public Object
 	{
 		T_RTTI_CLASS;
 
 	public:
+		RenderInterface() = default;
+
 		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
 		virtual void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
@@ -42,6 +48,14 @@ namespace traktor::rmlui
 		virtual void EnableScissorRegion(bool enable) override;
 
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
+
+	private:
+		friend class RmlUi;
+
+		void Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView);
+
+		render::IRenderSystem* m_renderSystem;
+		render::IRenderView* m_renderView;
 
 	};
 

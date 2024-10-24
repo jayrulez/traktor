@@ -11,6 +11,7 @@
 #if defined(T_STATIC)
 #	include "RmlUi/Runtime/RmlUiClassFactory.h"
 #	include "RmlUi/Runtime/RmlUiLayerData.h"
+#	include "RmlUi/Runtime/RuntimePlugin.h"
 
 namespace traktor::rmlui
 {
@@ -19,6 +20,7 @@ namespace traktor::rmlui
 	{
 		T_FORCE_LINK_REF(RmlUiClassFactory);
 		T_FORCE_LINK_REF(RmlUiLayerData);
+		T_FORCE_LINK_REF(RuntimePlugin);
 	}
 
 }
