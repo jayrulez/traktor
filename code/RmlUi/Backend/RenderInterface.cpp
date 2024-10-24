@@ -14,7 +14,13 @@ namespace traktor::rmlui
 {
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RenderInterface", 0, RenderInterface, Object)
 
-		Rml::CompiledGeometryHandle RenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
+		void RenderInterface::Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView)
+	{
+		m_renderSystem = renderSystem;
+		m_renderView = renderView;
+	}
+
+	Rml::CompiledGeometryHandle RenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
 	{
 		return { };
 	}
