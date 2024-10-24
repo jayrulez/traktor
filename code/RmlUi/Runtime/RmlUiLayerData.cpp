@@ -8,6 +8,7 @@
  */
 #include "Core/Serialization/ISerializer.h"
 #include "RmlUi/RmlDocument.h"
+#include "RmlUi/Backend/RmlUi.h"
 #include "RmlUi/Runtime/RmlUiLayer.h"
 #include "RmlUi/Runtime/RmlUiLayerData.h"
 #include "Resource/IResourceManager.h"
