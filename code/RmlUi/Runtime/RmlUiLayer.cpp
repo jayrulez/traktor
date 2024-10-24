@@ -26,6 +26,7 @@
 #include "Runtime/UpdateInfo.h"
 #include "Runtime/Engine/Stage.h"
 #include "RmlUi/RmlDocument.h"
+#include "RmlUi/Backend/RmlUi.h"
 #include "RmlUi/Runtime/RmlUiLayer.h"
 
 namespace traktor::rmlui
