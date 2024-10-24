@@ -41,6 +41,7 @@ set MINIMP3_SDK=%TRAKTOR_HOME%\3rdp\minimp3
 set MIMALLOC_SDK=%TRAKTOR_HOME%\3rdp\mimalloc
 set UFBX_SDK=%TRAKTOR_HOME%\3rdp\ufbx
 set JOLT_SDK=%TRAKTOR_HOME%\3rdp\JoltPhysics
+set RMLUI_SDK=%TRAKTOR_HOME%\3rdp\RmlUi
 
 :: Vulkan SDK
 set VULKAN_SDK=%TRAKTOR_HOME%\3rdp\vulkan-windows\vulkan-sdk
