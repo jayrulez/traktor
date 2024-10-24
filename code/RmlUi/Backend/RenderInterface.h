@@ -27,21 +27,21 @@ namespace traktor::rmlui
 		T_RTTI_CLASS;
 
 	public:
-		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override { return { }; }
+		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
-		virtual void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override {  }
+		virtual void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
 
-		virtual void ReleaseGeometry(Rml::CompiledGeometryHandle geometry) override {  }
+		virtual void ReleaseGeometry(Rml::CompiledGeometryHandle geometry) override;
 
-		virtual Rml::TextureHandle LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source) override { return { }; }
+		virtual Rml::TextureHandle LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source) override;
 
-		virtual Rml::TextureHandle GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions) override { return { }; }
+		virtual Rml::TextureHandle GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions) override;
 
-		virtual void ReleaseTexture(Rml::TextureHandle texture) override {  }
+		virtual void ReleaseTexture(Rml::TextureHandle texture) override;
 
-		virtual void EnableScissorRegion(bool enable) override {  }
+		virtual void EnableScissorRegion(bool enable) override;
 
-		virtual void SetScissorRegion(Rml::Rectanglei region) override {  }
+		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
 	};
 
