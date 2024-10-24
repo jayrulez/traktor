@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Core/Config.h"
+#include "Core/Ref.h"
 #include "Core/Object.h"
 #include "Core/Containers/SmallMap.h"
 #include "Core/Io/IStream.h"
@@ -30,16 +31,18 @@ namespace traktor::rmlui
 
 	public:
 
-		virtual Rml::FileHandle Open(const Rml::String& path) override { return {}; }
+		virtual Rml::FileHandle Open(const Rml::String& path) override;
 
-		virtual void Close(Rml::FileHandle file) override {  }
+		virtual void Close(Rml::FileHandle file) override;
 
-		virtual size_t Read(void* buffer, size_t size, Rml::FileHandle file) override { return {}; }
+		virtual size_t Read(void* buffer, size_t size, Rml::FileHandle file) override;
 
-		virtual bool Seek(Rml::FileHandle file, long offset, int origin) override { return {}; }
+		virtual bool Seek(Rml::FileHandle file, long offset, int origin) override;
 
-		virtual size_t Tell(Rml::FileHandle file) override { return {}; }
+		virtual size_t Tell(Rml::FileHandle file) override;
 
+	private:
+		SmallMap<size_t, Ref<IStream>> m_openFiles;
 	};
 
 }
