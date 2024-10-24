@@ -497,6 +497,14 @@ local PACKAGES =
 		url = "https://github.com/ufbx/ufbx.git",
 		license = "MIT"
 	},
+
+	-- RmlUi
+	{
+		type = "GIT",
+		name = "RmlUi",
+		url = "https://github.com/mikke89/RmlUi.git",
+		license = "MIT"
+	},
 }
 
 --[[
