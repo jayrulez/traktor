@@ -20,6 +20,7 @@
 #include "Render/ScreenRenderer.h"
 #include "Render/Shader.h"
 #include "Render/Context/RenderContext.h"
+#include "Render/VertexElement.h"
 #include "Render/Frame/RenderGraph.h"
 #include "RmlUi/RmlDocument.h"
 #include "RmlUi/Backend/RmlUi.h"
@@ -66,6 +67,14 @@ namespace traktor
 
 			// todo: get name from rml document
 			m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
+
+			/*m_vertexBuffer = renderSystem->createBuffer(render::BufferUsage::BuVertex, 0, true);
+			m_indexBuffer = renderSystem->createBuffer(render::BufferUsage::BuIndex, 0, true);
+
+			AlignedVector< render::VertexElement > vertexElements = {};
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, 0));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat3, 8));
+			m_vertexLayout = renderSystem->createVertexLayout(vertexElements);*/
 
 			// todo: remove
 			// temporary testing
@@ -114,6 +123,10 @@ namespace traktor
 
 			safeDestroy(m_renderGraph);
 			safeClose(m_renderView);
+
+			m_vertexBuffer.reset();
+			m_indexBuffer.reset();
+			m_vertexLayout.reset();
 
 			Widget::destroy();
 		}
@@ -176,11 +189,6 @@ namespace traktor
 
 			m_rmlContext->Update();
 
-			RmlUi::getInstance().GetRenderInterface()->beginRendering(m_renderView, m_renderGraph, m_renderContext);
-
-			m_rmlContext->Render();
-
-			RmlUi::getInstance().GetRenderInterface()->endRendering();
 
 			// Add passes to render graph.
 
@@ -195,6 +203,18 @@ namespace traktor
 			// Render frame.
 			if (m_renderView->beginFrame())
 			{
+				RmlUi::getInstance().GetRenderInterface()->beginRendering(
+					m_renderView,
+					m_renderGraph,
+					m_renderContext,
+					m_vertexBuffer,
+					m_indexBuffer,
+					m_vertexLayout);
+
+				m_rmlContext->Render();
+
+				RmlUi::getInstance().GetRenderInterface()->endRendering();
+
 				m_renderContext->render(m_renderView);
 				m_renderView->endFrame();
 				m_renderView->present();

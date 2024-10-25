@@ -12,6 +12,8 @@
 #include "Ui/Widget.h"
 #include "RmlUi/Core.h"
 #include "RmlUi/Core/Context.h"
+#include <Render/Buffer.h>
+#include <Render/IVertexLayout.h>
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -90,6 +92,10 @@ namespace traktor
 			Ref< render::RenderGraph > m_renderGraph;
 			Ref< RmlDocument > m_document;
 			Rml::Context* m_rmlContext = nullptr;
+
+			Ref< render::Buffer > m_vertexBuffer = nullptr;
+			Ref< render::Buffer > m_indexBuffer = nullptr;
+			Ref< render::IVertexLayout > m_vertexLayout = nullptr;
 
 			void eventSize(ui::SizeEvent* event);
 
