@@ -13,6 +13,8 @@
 #include "RmlUi/Core/RenderInterface.h"
 #include "Render/IRenderSystem.h"
 #include "Render/IRenderView.h"
+#include "Render/Frame/RenderGraph.h"
+#include "Render/Context/RenderContext.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -49,6 +51,11 @@ namespace traktor::rmlui
 
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
+	public:
+		void beginRendering(render::IRenderView* renderView, render::RenderGraph* renderGraph, render::RenderContext* renderContext);
+
+		void endRendering();
+
 	private:
 		friend class RmlUi;
 
@@ -56,6 +63,18 @@ namespace traktor::rmlui
 
 		render::IRenderSystem* m_renderSystem = nullptr;
 		//render::IRenderView* m_renderView;
+
+		struct GeometryView {
+			Rml::Span<const Rml::Vertex> vertices;
+			Rml::Span<const int> indices;
+		};
+
+		render::BlendOperation m_blendOp;
+		bool m_scissorRegionEnabled;
+
+		render::IRenderView* m_renderView;
+		render::RenderGraph* m_renderGraph;
+		render::RenderContext* m_renderContext;
 
 	};
 
