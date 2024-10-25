@@ -52,7 +52,12 @@ namespace traktor::rmlui
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
 	public:
-		void beginRendering(render::IRenderView* renderView, render::RenderGraph* renderGraph, render::RenderContext* renderContext);
+		void beginRendering(render::IRenderView* renderView, 
+			render::RenderGraph* renderGraph, 
+			render::RenderContext* renderContext,
+			Ref< render::Buffer > vertexBuffer,
+			Ref< render::Buffer > indexBuffer,
+			Ref <const render::IVertexLayout > vertexLayout);
 
 		void endRendering();
 
@@ -76,6 +81,9 @@ namespace traktor::rmlui
 		render::RenderGraph* m_renderGraph;
 		render::RenderContext* m_renderContext;
 
+		render::Buffer* m_vertexBuffer = nullptr;
+		render::Buffer* m_indexBuffer = nullptr;
+		const render::IVertexLayout* m_vertexLayout = nullptr;
 	};
 
 }
