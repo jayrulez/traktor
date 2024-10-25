@@ -130,6 +130,10 @@
 			<second>Resource bundle</second>
 		</item>
 		<item>
+			<first>TRAKTOR_RMLUI_RMLDOCUMENTASSET</first>
+			<second>Rml document</second>
+		</item>
+		<item>
 			<first>TRAKTOR_SCENE_SCENEASSET</first>
 			<second>Scene</second>
 		</item>
