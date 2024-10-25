@@ -31,7 +31,8 @@ namespace traktor::rmlui
 	struct Vertex
 	{
 		float position[2];
-		float color[3];
+		float color[4];
+		float uv[2];
 	};
 
 	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml::Vector2f translation, Rml::TextureHandle texture)
@@ -67,13 +68,19 @@ namespace traktor::rmlui
 		indexBuffer->unlock();
 
 		AlignedVector< render::VertexElement > vertexElements = {};
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, 0));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat3, 8));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, offsetof(Vertex, position)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, uv)));
 		auto vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 
-		render::IProgram* program = nullptr;// m_renderSystem->createProgram();
+		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+
+		render::IProgram* program = m_shader->getProgram(perm).program;
 
 		render::Clear clearValue;
+		clearValue.colors[0] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
+		clearValue.colors[1] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
+		clearValue.colors[2] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
 		m_renderView->beginPass(&clearValue, 0, 0);
 
 		m_renderView->draw(
@@ -82,7 +89,7 @@ namespace traktor::rmlui
 			indexBuffer->getBufferView(),
 			render::IndexType::UInt16,
 			program,
-			render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices / 3),
+			render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices, 0, num_indices -1),
 			1);
 
 		m_renderView->endPass();
@@ -142,7 +149,8 @@ namespace traktor::rmlui
 		render::RenderContext* renderContext,
 		Ref< render::Buffer > vertexBuffer,
 		Ref< render::Buffer > indexBuffer,
-		Ref <const render::IVertexLayout > vertexLayout)
+		Ref <const render::IVertexLayout > vertexLayout,
+		const resource::Proxy < render::Shader >& shader)
 	{
 		m_renderView = renderView;
 		m_renderGraph = renderGraph;
@@ -152,6 +160,7 @@ namespace traktor::rmlui
 		m_vertexBuffer = vertexBuffer;
 		m_indexBuffer = indexBuffer;
 		m_vertexLayout = vertexLayout;
+		m_shader = shader;
 	}
 	void RenderInterface::endRendering()
 	{
