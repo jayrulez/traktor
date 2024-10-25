@@ -26,9 +26,8 @@ namespace traktor
 
 		bool EditorPageFactory::needOutputResources(const TypeInfo& typeInfo, std::set< Guid >& outDependencies) const
 		{
-			// todo: create shader and update this guid
-			//outDependencies.insert(Guid(L"{14D6A2DB-796D-E54D-9D70-73DE4AE7C4E8}"));	// System/RmlUi/Shaders/RmlUiShaderAssets
-			return false;
+			outDependencies.insert(Guid(L"{7F092F0F-C5FB-834F-B9EE-C08E03A844B4}"));	// System/RmlUi/Shaders/ShaderAssets
+			return true;
 		}
 
 		Ref< editor::IEditorPage > EditorPageFactory::createEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document) const

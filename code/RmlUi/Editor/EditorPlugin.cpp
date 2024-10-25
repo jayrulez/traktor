@@ -25,25 +25,12 @@ namespace traktor::rmlui
 		m_editor = editor;
 
 		RmlUi::getInstance().Initialize(m_editor->getObjectStore()->get< render::IRenderSystem >());
-
-		//const PropertyGroup* settings = m_editor->getSettings();
-
-		//uint32_t mode = net::MdFindServices;
-		//if (settings->getProperty< bool >(L"Editor.Discoverable", true))
-		//	mode |= net::MdPublishServices;
-
-		//m_discoveryManager = new net::DiscoveryManager();
-		//m_discoveryManager->create(mode);
-
-		//m_editor->getObjectStore()->set(m_discoveryManager);
 		return true;
 	}
 
 	void EditorPlugin::destroy()
 	{
 		RmlUi::getInstance().Shutdown();
-		//m_editor->getObjectStore()->unset(m_discoveryManager);
-		//safeDestroy(m_discoveryManager);
 	}
 
 	int32_t EditorPlugin::getOrdinal() const
