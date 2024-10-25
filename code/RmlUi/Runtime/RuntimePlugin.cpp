@@ -22,7 +22,7 @@ namespace traktor::rmlui
 
 		bool RuntimePlugin::create(IEnvironment* environment)
 	{
-		return RmlUi::getInstance().Initialize(environment->getRender()->getRenderSystem(), environment->getRender()->getRenderView());
+		return RmlUi::getInstance().Initialize(environment->getRender()->getRenderSystem()/*, environment->getRender()->getRenderView()*/);
 	}
 
 	void RuntimePlugin::destroy(IEnvironment* environment)

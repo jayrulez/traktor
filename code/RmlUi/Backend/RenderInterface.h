@@ -52,10 +52,10 @@ namespace traktor::rmlui
 	private:
 		friend class RmlUi;
 
-		void Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView);
+		void Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/);
 
-		render::IRenderSystem* m_renderSystem;
-		render::IRenderView* m_renderView;
+		render::IRenderSystem* m_renderSystem = nullptr;
+		//render::IRenderView* m_renderView;
 
 	};
 
