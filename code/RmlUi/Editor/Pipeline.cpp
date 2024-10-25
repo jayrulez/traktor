@@ -85,7 +85,7 @@ namespace traktor::rmlui
 			//for (const auto& font : rmlDocumentAsset->getFonts())
 			//	pipelineDepends->addDependency(traktor::Path(m_assetPath), font.fileName.getOriginal());
 		}
-		pipelineDepends->addDependency(c_idRmlUiShaderAssets, editor::PdfBuild | editor::PdfResource);
+		//pipelineDepends->addDependency(c_idRmlUiShaderAssets, editor::PdfBuild | editor::PdfResource);
 		pipelineDepends->addDependency< render::TextureOutput >();
 		return true;
 	}
