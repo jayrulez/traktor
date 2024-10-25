@@ -9,6 +9,8 @@
 
 #include "Core/Rtti/ITypedObject.h"
 #include "RmlUi/Backend/RenderInterface.h"
+#include "Render/Buffer.h"
+#include "Render/VertexElement.h"
 
 namespace traktor::rmlui
 {
@@ -26,6 +28,12 @@ namespace traktor::rmlui
 		return reinterpret_cast<Rml::CompiledGeometryHandle>(data);
 	}
 
+	struct Vertex
+	{
+		float position[2];
+		float color[3];
+	};
+
 	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml::Vector2f translation, Rml::TextureHandle texture)
 	{
 		if (m_renderView == nullptr || m_renderGraph == nullptr || m_renderContext == nullptr)
@@ -36,6 +44,69 @@ namespace traktor::rmlui
 		const size_t num_vertices = geometry->vertices.size();
 		const int* indices = geometry->indices.data();
 		const size_t num_indices = geometry->indices.size();
+
+		Vertex* tVertices = new Vertex[num_vertices];
+		for (int i = 0; i < num_vertices; i++)
+		{
+			tVertices[i].position[0] = vertices[i].position.x + translation.x;
+			tVertices[i].position[1] = vertices[i].position.y + translation.y;
+			tVertices[i].color[0] = vertices[i].colour.red / 255.0f;
+			tVertices[i].color[1] = vertices[i].colour.green / 255.0f;
+			tVertices[i].color[2] = vertices[i].colour.blue / 255.0f;
+		}
+
+		auto vertexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuVertex, sizeof(Vertex) * num_vertices, true);
+		Vertex* vPtr = (Vertex*)vertexBuffer->lock();
+		std::memcpy(vPtr, tVertices, vertexBuffer->getBufferSize());
+		vertexBuffer->unlock();
+
+		auto indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int)*num_indices, true);
+
+		int* iPtr = (int*)indexBuffer->lock();
+		std::memcpy(iPtr, indices, indexBuffer->getBufferSize());
+		indexBuffer->unlock();
+
+		AlignedVector< render::VertexElement > vertexElements = {};
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, 0));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat3, 8));
+		auto vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+
+		render::IProgram* program = nullptr;// m_renderSystem->createProgram();
+
+		render::Clear clearValue;
+		m_renderView->beginPass(&clearValue, 0, 0);
+
+		m_renderView->draw(
+			vertexBuffer->getBufferView(),
+			vertexLayout,
+			indexBuffer->getBufferView(),
+			render::IndexType::UInt16,
+			program,
+			render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices / 3),
+			1);
+
+		m_renderView->endPass();
+
+		//auto programParams = m_renderContext->alloc< render::ProgramParameters >();
+		//programParams->beginParameters(m_renderContext);
+
+
+		//programParams->endParameters(m_renderContext);
+
+		//render::SimpleRenderBlock* renderBlock = m_renderContext->allocNamed< render::SimpleRenderBlock >(L"RmlUi");
+		//renderBlock->distance = 0;
+		//renderBlock->program = sp.program;
+		//renderBlock->programParams = programParams;
+		//renderBlock->indexBuffer = indexBuffer->getBufferView();
+		//renderBlock->indexType = render::IndexType::UInt16;
+		//renderBlock->vertexBuffer = vertexBuffer->getBufferView();
+		//renderBlock->vertexLayout = vertexLayout;
+		//renderBlock->primitives = render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices / 3);
+
+		//m_renderContext->draw(
+		//	sp.priority,
+		//	renderBlock
+		//);
 	}
 
 	void RenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
@@ -66,16 +137,29 @@ namespace traktor::rmlui
 	{
 	}
 
-	void RenderInterface::beginRendering(render::IRenderView* renderView, render::RenderGraph* renderGraph, render::RenderContext* renderContext)
+	void RenderInterface::beginRendering(render::IRenderView* renderView,
+		render::RenderGraph* renderGraph,
+		render::RenderContext* renderContext,
+		Ref< render::Buffer > vertexBuffer,
+		Ref< render::Buffer > indexBuffer,
+		Ref <const render::IVertexLayout > vertexLayout)
 	{
 		m_renderView = renderView;
 		m_renderGraph = renderGraph;
 		m_renderContext = renderContext;
+
+
+		m_vertexBuffer = vertexBuffer;
+		m_indexBuffer = indexBuffer;
+		m_vertexLayout = vertexLayout;
 	}
 	void RenderInterface::endRendering()
 	{
 		m_renderView = nullptr;
 		m_renderGraph = nullptr;
 		m_renderContext = nullptr;
+		m_vertexBuffer = nullptr;
+		m_indexBuffer = nullptr;
+		m_vertexLayout = nullptr;
 	}
 }
