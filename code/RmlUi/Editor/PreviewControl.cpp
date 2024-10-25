@@ -66,10 +66,43 @@ namespace traktor
 
 			// todo: get name from rml document
 			m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
-			
+
+			// todo: remove
+			// temporary testing
+			Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"(<rml>
+				<head>
+				<title>Example</title>
+				<style>
+					body
+					{
+						position: absolute;
+						top: 50px;
+						left: 50px;
+						width: 500px;
+						height: 500px;
+						background-color: #ccc;
+					}
+					div
+					{
+						display: block;
+						height: 150px;
+						width: 200px;
+						background-color: #f00;
+					}
+				</style>
+				</head>
+				<body>
+					<div/>
+				</body>
+				</rml>)");
+
+			document->Show();
+
 
 			addEventHandler< ui::SizeEvent >(this, &PreviewControl::eventSize);
 			addEventHandler< ui::PaintEvent >(this, &PreviewControl::eventPaint);
+
+			// todo: input events
 
 			m_database = database;
 			return true;
@@ -89,19 +122,19 @@ namespace traktor
 		{
 			m_document = document;
 
-			
+
 
 			const ui::Size sz = getInnerRect().getSize();
 
-			
+
 		}
 
-		
+
 
 		ui::Size PreviewControl::getPreferredSize(const ui::Size& hint) const
 		{
 			if (!m_document)
-				return ui::Size(400, 300);
+				return ui::Size(2631, 1117);
 
 			//Aabb2 bounds = {};//m_document->getFrameBounds();
 
@@ -111,22 +144,19 @@ namespace traktor
 			return ui::Size(width, height);
 		}
 
-		ui::Point PreviewControl::getTwips(const ui::Point& pt) const
-		{
-			ui::Size innerSize = getInnerRect().getSize();
-
-			float x = 1;// (pt.x * m_movie->getFrameBounds().mx.x) / float(innerSize.cx);
-			float y = 1;// (pt.y * m_movie->getFrameBounds().mx.y) / float(innerSize.cy);
-
-			return ui::Point(int(x), int(y));
-		}
-
 		void PreviewControl::eventSize(ui::SizeEvent* event)
 		{
 			ui::Size sz = event->getSize();
 
 			if (m_renderView)
+			{
 				m_renderView->reset(sz.cx, sz.cy);
+			}
+
+			if (m_rmlContext)
+			{
+				m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
+			}
 		}
 
 		void PreviewControl::eventPaint(ui::PaintEvent* event)
@@ -143,6 +173,14 @@ namespace traktor
 				if (re.type == render::RenderEventType::Lost)
 					m_renderView->reset(sz.cx, sz.cy);
 			}
+
+			m_rmlContext->Update();
+
+			RmlUi::getInstance().GetRenderInterface()->beginRendering(m_renderView, m_renderGraph, m_renderContext);
+
+			m_rmlContext->Render();
+
+			RmlUi::getInstance().GetRenderInterface()->endRendering();
 
 			// Add passes to render graph.
 

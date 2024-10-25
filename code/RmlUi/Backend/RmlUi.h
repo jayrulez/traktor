@@ -49,11 +49,11 @@ namespace traktor::rmlui
 
 		void Shutdown();
 
-		Rml::SystemInterface* GetSystemInterface() const;
+		SystemInterface* GetSystemInterface() const;
 
-		Rml::RenderInterface* GetRenderInterface() const;
+		RenderInterface* GetRenderInterface() const;
 
-		Rml::FileInterface* GetFileInterface() const;
+		FileInterface* GetFileInterface() const;
 
 		//Rml::Context* GetContext() const;
 
