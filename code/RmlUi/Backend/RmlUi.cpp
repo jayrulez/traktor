@@ -54,11 +54,9 @@ namespace traktor::rmlui
 		Rml::SetSystemInterface(m_backendData->m_systemInterface);
 		Rml::SetRenderInterface(m_backendData->m_renderInterface);
 
-		Rml::Initialise();
+		m_initialized = Rml::Initialise();
 
 		//m_context = Rml::CreateContext(DefaultContextName, Rml::Vector2i(renderView->getWidth(), renderView->getHeight()));
-
-		m_initialized = true;
 
 		return m_initialized;
 	}
@@ -81,7 +79,7 @@ namespace traktor::rmlui
 		m_initialized = false;
 	}
 
-	Rml::SystemInterface* RmlUi::GetSystemInterface() const
+	SystemInterface* RmlUi::GetSystemInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
@@ -89,7 +87,7 @@ namespace traktor::rmlui
 		return m_backendData->m_systemInterface;
 	}
 
-	Rml::RenderInterface* RmlUi::GetRenderInterface() const
+	RenderInterface* RmlUi::GetRenderInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
@@ -97,7 +95,7 @@ namespace traktor::rmlui
 		return m_backendData->m_renderInterface;
 	}
 
-	Rml::FileInterface* RmlUi::GetFileInterface() const
+	FileInterface* RmlUi::GetFileInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
