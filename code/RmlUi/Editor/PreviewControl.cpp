@@ -22,6 +22,7 @@
 #include "Render/Context/RenderContext.h"
 #include "Render/Frame/RenderGraph.h"
 #include "RmlUi/RmlDocument.h"
+#include "RmlUi/Backend/RmlUi.h"
 #include "RmlUi/Editor/PreviewControl.h"
 #include "Ui/Itf/IWidget.h"
 #include "Ui/Application.h"
@@ -54,7 +55,7 @@ namespace traktor
 			desc.multiSample = m_editor->getSettings()->getProperty< int32_t >(L"Editor.MultiSample", 4);
 			desc.multiSampleShading = m_editor->getSettings()->getProperty< float >(L"Editor.MultiSampleShading", 0.0f);
 			desc.waitVBlanks = 1;
-			//desc.syswin = getIWidget()->getSystemWindow();
+			desc.syswin = getIWidget()->getSystemWindow();
 
 			m_renderView = renderSystem->createRenderView(desc);
 			if (!m_renderView)
@@ -63,7 +64,8 @@ namespace traktor
 			m_renderContext = new render::RenderContext(4 * 1024 * 1024);
 			m_renderGraph = new render::RenderGraph(renderSystem, desc.multiSample);
 
-			
+			// todo: get name from rml document
+			m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
 			
 
 			addEventHandler< ui::SizeEvent >(this, &PreviewControl::eventSize);
