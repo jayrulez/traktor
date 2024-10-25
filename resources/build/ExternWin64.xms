@@ -6720,14 +6720,15 @@
 			<configurations>
 				<item type="Configuration" version="5">
 					<name>DebugShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
 						<item>$(RMLUI_SDK)/Include</item>
 					</includePaths>
 					<definitions>
-						<item>RMLUI_STATIC_LIB</item>
+						<item>RMLUI_FONT_ENGINE_FREETYPE</item>
+						<item>RMLUI_CORE_EXPORTS</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6751,6 +6752,7 @@
 					</includePaths>
 					<definitions>
 						<item>RMLUI_STATIC_LIB</item>
+						<item>RMLUI_FONT_ENGINE_FREETYPE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6774,6 +6776,7 @@
 					</includePaths>
 					<definitions>
 						<item>RMLUI_STATIC_LIB</item>
+						<item>RMLUI_FONT_ENGINE_FREETYPE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6806,6 +6809,7 @@
 					</includePaths>
 					<definitions>
 						<item>RMLUI_STATIC_LIB</item>
+						<item>RMLUI_FONT_ENGINE_FREETYPE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6891,18 +6895,8 @@
 										</item>
 									</items>
 								</item>
-								<item type="Filter">
-									<name>Debugger</name>
-									<items>
-										<item type="File" version="1">
-											<fileName>Include/RmlUi/Debugger/*.h</fileName>
-											<excludeFilter/>
-											<items/>
-										</item>
-									</items>
-								</item>
 								<item type="File" version="1">
-									<fileName>*.h</fileName>
+									<fileName>Core.h</fileName>
 									<excludeFilter/>
 									<items/>
 								</item>
@@ -6968,21 +6962,6 @@
 								</item>
 								<item type="File" version="1">
 									<fileName>Source/Core/*.cpp</fileName>
-									<excludeFilter/>
-									<items/>
-								</item>
-							</items>
-						</item>
-						<item type="Filter">
-							<name>Debugger</name>
-							<items>
-								<item type="File" version="1">
-									<fileName>Source/Debugger/*.h</fileName>
-									<excludeFilter/>
-									<items/>
-								</item>
-								<item type="File" version="1">
-									<fileName>Source/Debugger/*.cpp</fileName>
 									<excludeFilter/>
 									<items/>
 								</item>
