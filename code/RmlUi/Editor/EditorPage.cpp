@@ -16,12 +16,14 @@
 #include "Core/Settings/PropertyGroup.h"
 #include "Core/Settings/PropertyInteger.h"
 #include "Core/Settings/PropertyString.h"
+#include "Core/Settings/PropertyBoolean.h"
 #include "Database/Database.h"
 #include "Database/Instance.h"
 #include "I18N/Text.h"
 #include "Editor/IDocument.h"
 #include "Editor/IEditor.h"
 #include "RmlUi/RmlDocument.h"
+#include "RmlUi/RmlDocumentFactory.h"
 #include "RmlUi/Editor/EditorPage.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 #include "RmlUi/Editor/PreviewControl.h"
@@ -63,14 +65,17 @@ namespace traktor
 				return false;
 
 			Ref< db::Database > database = m_editor->getOutputDatabase();
-
-			// Read rml document from output database.
-			m_RmlDocument = database->getObjectReadOnly< RmlDocument >(m_document->getInstance(0)->getGuid());
-			if (!m_RmlDocument)
+			if (!database)
 				return false;
 
-			m_resourceManager = new resource::ResourceManager(database, true);
+			// Read rml document from output database.
+			//m_RmlDocument = database->getObjectReadOnly< RmlDocument >(m_document->getInstance(0)->getGuid());
+			//if (!m_RmlDocument)
+			//	return false;
+
+			m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
 			m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
+			//m_resourceManager->addFactory(new rmlui::RmlDocumentFactory());
 
 			Ref< ui::Container > container = new ui::Container();
 			container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
