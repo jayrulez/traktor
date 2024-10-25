@@ -10,6 +10,7 @@
 
 #include "Core/Config.h"
 #include "Core/Object.h"
+#include "Core/Math//Vector2i.h"
 #include "Core/Singleton/ISingleton.h"
 #include "RmlUi/Core/Core.h"
 #include "RmlUi/Core/Input.h"
@@ -44,7 +45,7 @@ namespace traktor::rmlui
 
 		void destroy() override;
 
-		bool Initialize(render::IRenderSystem* renderSystem, render::IRenderView* renderView);
+		bool Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/);
 
 		void Shutdown();
 
@@ -54,7 +55,11 @@ namespace traktor::rmlui
 
 		Rml::FileInterface* GetFileInterface() const;
 
-		Rml::Context* GetContext() const;
+		//Rml::Context* GetContext() const;
+
+		Rml::Context* CreateContext(const std::wstring& name, traktor::Vector2i size);
+
+		void DestroyContext(Rml::Context* context);
 
 	private:
 		struct BackendData
@@ -66,7 +71,8 @@ namespace traktor::rmlui
 
 		bool m_initialized = false;
 		BackendData* m_backendData = nullptr;
-		Rml::Context* m_context = nullptr;
+		//Rml::Context* m_context = nullptr;
+		AlignedVector<Rml::Context*> m_rmlContexts;
 	};
 
 }
