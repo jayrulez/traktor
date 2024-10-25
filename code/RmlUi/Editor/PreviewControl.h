@@ -14,6 +14,8 @@
 #include "RmlUi/Core/Context.h"
 #include <Render/Buffer.h>
 #include <Render/IVertexLayout.h>
+#include <Render/Shader.h>
+#include "Resource/Proxy.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -96,6 +98,7 @@ namespace traktor
 			Ref< render::Buffer > m_vertexBuffer = nullptr;
 			Ref< render::Buffer > m_indexBuffer = nullptr;
 			Ref< render::IVertexLayout > m_vertexLayout = nullptr;
+			resource::Proxy< render::Shader > m_rmlUiShader;
 
 			void eventSize(ui::SizeEvent* event);
 
