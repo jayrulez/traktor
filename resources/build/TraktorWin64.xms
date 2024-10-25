@@ -21482,12 +21482,6 @@
 					<link>LnkYes</link>
 					<project ref="/object/projects/item[106]"/>
 				</item>
-				<item type="ExternalDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<solutionFileName>ExternWin64.xms</solutionFileName>
-					<projectName>Extern.freetype</projectName>
-				</item>
 				<item type="ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
@@ -21497,6 +21491,12 @@
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[1]/project"/>
+				</item>
+				<item type="ExternalDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<solutionFileName>ExternWin64.xms</solutionFileName>
+					<projectName>Extern.RmlUi</projectName>
 				</item>
 			</dependencies>
 		</item>
