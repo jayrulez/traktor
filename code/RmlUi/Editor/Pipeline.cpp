@@ -34,7 +34,7 @@ namespace traktor::rmlui
 	namespace
 	{
 
-		const Guid c_idRmlUiShaderAssets(L"{14D6A2DB-796D-E54D-9D70-73DE4AE7C4E8}");
+		const Guid c_idRmlUiShaderAssets(L"{7F092F0F-C5FB-834F-B9EE-C08E03A844B4}");
 
 	}
 
@@ -85,7 +85,7 @@ namespace traktor::rmlui
 			//for (const auto& font : rmlDocumentAsset->getFonts())
 			//	pipelineDepends->addDependency(traktor::Path(m_assetPath), font.fileName.getOriginal());
 		}
-		//pipelineDepends->addDependency(c_idRmlUiShaderAssets, editor::PdfBuild | editor::PdfResource);
+		pipelineDepends->addDependency(c_idRmlUiShaderAssets, editor::PdfBuild | editor::PdfResource);
 		pipelineDepends->addDependency< render::TextureOutput >();
 		return true;
 	}
@@ -115,13 +115,7 @@ namespace traktor::rmlui
 				return false;
 			}
 
-			const std::wstring extension = toLower(rmlDocumentAsset->getFileName().getExtension());
-			//if (extension == L"swf")
-			//	rmlDocument = convertSwf(sourceInstance, sourceStream);
-			//else if (extension == L"svg")
-			//	rmlDocument = convertSvg(traktor::Path(m_assetPath), rmlDocumentAsset, sourceInstance, sourceStream);
-			//else
-			//	rmlDocument = convertImage(sourceInstance, sourceStream, extension);
+			//const std::wstring extension = toLower(rmlDocumentAsset->getFileName().getExtension());
 			rmlDocument = RmlDocumentFactory().createRmlDocument(traktor::Path(m_assetPath), sourceInstance, sourceStream);
 
 			safeClose(sourceStream);
