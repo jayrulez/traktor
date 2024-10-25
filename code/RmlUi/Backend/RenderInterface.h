@@ -15,6 +15,8 @@
 #include "Render/IRenderView.h"
 #include "Render/Frame/RenderGraph.h"
 #include "Render/Context/RenderContext.h"
+#include "Render/Shader.h"
+#include "Resource/Proxy.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -52,12 +54,13 @@ namespace traktor::rmlui
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
 	public:
-		void beginRendering(render::IRenderView* renderView, 
-			render::RenderGraph* renderGraph, 
+		void beginRendering(render::IRenderView* renderView,
+			render::RenderGraph* renderGraph,
 			render::RenderContext* renderContext,
 			Ref< render::Buffer > vertexBuffer,
 			Ref< render::Buffer > indexBuffer,
-			Ref <const render::IVertexLayout > vertexLayout);
+			Ref <const render::IVertexLayout > vertexLayout,
+			const resource::Proxy < render::Shader >& shader);
 
 		void endRendering();
 
@@ -84,6 +87,7 @@ namespace traktor::rmlui
 		render::Buffer* m_vertexBuffer = nullptr;
 		render::Buffer* m_indexBuffer = nullptr;
 		const render::IVertexLayout* m_vertexLayout = nullptr;
+		resource::Proxy < render::Shader > m_shader;
 	};
 
 }
