@@ -11,6 +11,7 @@
 #include "Core/Timer/Timer.h"
 #include "Ui/Widget.h"
 #include "RmlUi/Core.h"
+#include "RmlUi/Core/Context.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -89,8 +90,6 @@ namespace traktor
 			Ref< render::RenderGraph > m_renderGraph;
 			Ref< RmlDocument > m_document;
 			Rml::Context* m_rmlContext = nullptr;
-
-			ui::Point getTwips(const ui::Point& pt) const;
 
 			void eventSize(ui::SizeEvent* event);
 
