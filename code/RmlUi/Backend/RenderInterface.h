@@ -17,6 +17,7 @@
 #include "Render/Context/RenderContext.h"
 #include "Render/Shader.h"
 #include "Resource/Proxy.h"
+#include "Core/Math/Vector2.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -30,12 +31,10 @@ namespace traktor::rmlui
 {
 	class RmlUi;
 
-	class T_DLLCLASS RenderInterface : public Rml::RenderInterface, public Object
+	class T_DLLCLASS RenderInterface : public Rml::RenderInterface
 	{
-		T_RTTI_CLASS;
-
 	public:
-		RenderInterface() = default;
+		RenderInterface(render::IRenderSystem* renderSystem);
 
 		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
@@ -54,9 +53,33 @@ namespace traktor::rmlui
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
 	public:
+
+		struct Vertex
+		{
+			float position[3];
+			float texCoord[2];
+			Color4ub color;
+		};
+
+		struct CompiledGeometry
+		{
+			uint32_t triangleCount;
+			Ref < render::Buffer > vertexBuffer;
+			Ref < render::Buffer > indexBuffer;
+		};
+
+		struct Batch
+		{
+			Matrix44 transform = Matrix44::identity();
+			Vector2 translation = Vector2(0, 0);
+			CompiledGeometry* compiledGeometry;
+			Ref < render::ITexture > texture;
+			int32_t scissorRegion[4];
+			bool scissorRegionEnabled;
+			// transform scissor rect
+		};
+
 		void beginRendering(render::IRenderView* renderView,
-			render::RenderGraph* renderGraph,
-			render::RenderContext* renderContext,
 			Ref< render::Buffer > vertexBuffer,
 			Ref< render::Buffer > indexBuffer,
 			Ref <const render::IVertexLayout > vertexLayout,
@@ -65,24 +88,16 @@ namespace traktor::rmlui
 		void endRendering();
 
 	private:
-		friend class RmlUi;
-
-		void Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/);
-
 		render::IRenderSystem* m_renderSystem = nullptr;
-		//render::IRenderView* m_renderView;
-
-		struct GeometryView {
-			Rml::Span<const Rml::Vertex> vertices;
-			Rml::Span<const int> indices;
-		};
+		Ref< render::IVertexLayout > m_vertexLayout;
+		AlignedVector<CompiledGeometry> m_compiledGeometry;
+		AlignedVector<Batch> m_batches;
 
 		render::BlendOperation m_blendOp;
 		bool m_scissorRegionEnabled;
+		int32_t m_scissorRegion[4];
 
 		render::IRenderView* m_renderView;
-		render::RenderGraph* m_renderGraph;
-		render::RenderContext* m_renderContext;
 
 		render::Buffer* m_vertexBuffer = nullptr;
 		render::Buffer* m_indexBuffer = nullptr;

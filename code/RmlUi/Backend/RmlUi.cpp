@@ -21,6 +21,12 @@ namespace traktor::rmlui
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlUi", 0, RmlUi, Object)
 
+		RmlUi::BackendData::BackendData(render::IRenderSystem* renderSystem)
+		: m_renderInterface(renderSystem)
+	{
+
+	}
+
 		RmlUi& RmlUi::getInstance()
 	{
 		static RmlUi* s_instance = nullptr;
@@ -38,25 +44,18 @@ namespace traktor::rmlui
 		T_SAFE_RELEASE(this);
 	}
 
-	bool RmlUi::Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/)
+	bool RmlUi::Initialize(render::IRenderSystem* renderSystem)
 	{
 		if (m_initialized)
 			return true;
 
-		m_backendData = new BackendData();
+		m_backendData = new BackendData(renderSystem);
 
-		m_backendData->m_fileInterface = new FileInterface();
-		m_backendData->m_systemInterface = new SystemInterface();
-		m_backendData->m_renderInterface = new RenderInterface();
-		m_backendData->m_renderInterface->Initialize(renderSystem/*, renderView*/);
-
-		Rml::SetFileInterface(m_backendData->m_fileInterface);
-		Rml::SetSystemInterface(m_backendData->m_systemInterface);
-		Rml::SetRenderInterface(m_backendData->m_renderInterface);
+		Rml::SetFileInterface(&m_backendData->m_fileInterface);
+		Rml::SetSystemInterface(&m_backendData->m_systemInterface);
+		Rml::SetRenderInterface(&m_backendData->m_renderInterface);
 
 		m_initialized = Rml::Initialise();
-
-		//m_context = Rml::CreateContext(DefaultContextName, Rml::Vector2i(renderView->getWidth(), renderView->getHeight()));
 
 		return m_initialized;
 	}
@@ -68,12 +67,6 @@ namespace traktor::rmlui
 
 		Rml::Shutdown();
 
-		//Rml::RemoveContext(DefaultContextName);
-
-		delete m_backendData->m_fileInterface;
-		delete m_backendData->m_systemInterface;
-		delete m_backendData->m_renderInterface;
-
 		delete m_backendData;
 
 		m_initialized = false;
@@ -84,7 +77,7 @@ namespace traktor::rmlui
 		if (!m_initialized)
 			return nullptr;
 
-		return m_backendData->m_systemInterface;
+		return &m_backendData->m_systemInterface;
 	}
 
 	RenderInterface* RmlUi::GetRenderInterface() const
@@ -92,7 +85,7 @@ namespace traktor::rmlui
 		if (!m_initialized)
 			return nullptr;
 
-		return m_backendData->m_renderInterface;
+		return &m_backendData->m_renderInterface;
 	}
 
 	FileInterface* RmlUi::GetFileInterface() const
@@ -100,13 +93,8 @@ namespace traktor::rmlui
 		if (!m_initialized)
 			return nullptr;
 
-		return m_backendData->m_fileInterface;
+		return &m_backendData->m_fileInterface;
 	}
-
-	//Rml::Context* RmlUi::GetContext() const
-	//{
-	//	return m_context;
-	//}
 
 	Rml::Context* RmlUi::CreateContext(const std::wstring& name, traktor::Vector2i size)
 	{

@@ -14,111 +14,102 @@
 
 namespace traktor::rmlui
 {
-	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RenderInterface", 0, RenderInterface, Object)
-
-		void RenderInterface::Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/)
+	RenderInterface::RenderInterface(render::IRenderSystem* renderSystem)
+		: m_renderSystem(renderSystem)
 	{
-		m_renderSystem = renderSystem;
-		//m_renderView = renderView;
+		AlignedVector< render::VertexElement > vertexElements = {};
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
+
+		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 	}
 
 	Rml::CompiledGeometryHandle RenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
 	{
-		GeometryView* data = new GeometryView{ vertices, indices };
-		return reinterpret_cast<Rml::CompiledGeometryHandle>(data);
-	}
+		CompiledGeometry* geometry = new CompiledGeometry();
+		geometry->triangleCount = indices.size() / 3;
 
-	struct Vertex
-	{
-		float position[2];
-		float color[4];
-		float uv[2];
-	};
-
-	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml::Vector2f translation, Rml::TextureHandle texture)
-	{
-		if (m_renderView == nullptr || m_renderGraph == nullptr || m_renderContext == nullptr)
-			return;
-
-		const GeometryView* geometry = reinterpret_cast<GeometryView*>(handle);
-		const Rml::Vertex* vertices = geometry->vertices.data();
-		const size_t num_vertices = geometry->vertices.size();
-		const int* indices = geometry->indices.data();
-		const size_t num_indices = geometry->indices.size();
-
-		Vertex* tVertices = new Vertex[num_vertices];
-		for (int i = 0; i < num_vertices; i++)
+		// vertices
 		{
-			tVertices[i].position[0] = vertices[i].position.x + translation.x;
-			tVertices[i].position[1] = vertices[i].position.y + translation.y;
-			tVertices[i].color[0] = vertices[i].colour.red / 255.0f;
-			tVertices[i].color[1] = vertices[i].colour.green / 255.0f;
-			tVertices[i].color[2] = vertices[i].colour.blue / 255.0f;
+			AlignedVector<Vertex> vertexStorage;
+			vertexStorage.resize(vertices.size());
+
+			for (size_t i = 0; i < vertexStorage.size(); i++)
+			{
+				const Rml::Vertex& sourceVertex = vertices[i];
+				Vertex& destVertex = vertexStorage[i];
+
+				destVertex.position[0] = sourceVertex.position.x;
+				destVertex.position[1] = sourceVertex.position.y;
+				destVertex.position[2] = 0.0f;
+
+				destVertex.texCoord[0] = sourceVertex.tex_coord.x;
+				destVertex.texCoord[1] = sourceVertex.tex_coord.y;
+
+				destVertex.color = Color4ub(sourceVertex.colour.red, sourceVertex.colour.green, sourceVertex.colour.blue, sourceVertex.colour.alpha);
+			}
+
+			geometry->vertexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuVertex, sizeof(Vertex) * vertexStorage.size(), true);
+
+			std::memcpy(geometry->vertexBuffer->lock(), vertexStorage.ptr(), geometry->vertexBuffer->getBufferSize());
+
+			geometry->vertexBuffer->unlock();
 		}
 
-		auto vertexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuVertex, sizeof(Vertex) * num_vertices, true);
-		Vertex* vPtr = (Vertex*)vertexBuffer->lock();
-		std::memcpy(vPtr, tVertices, vertexBuffer->getBufferSize());
-		vertexBuffer->unlock();
+		// indices
+		{
+			geometry->indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int) * indices.size(), true);
 
-		auto indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int)*num_indices, true);
+			std::memcpy(geometry->indexBuffer->lock(), indices.data(), geometry->indexBuffer->getBufferSize());
 
-		int* iPtr = (int*)indexBuffer->lock();
-		std::memcpy(iPtr, indices, indexBuffer->getBufferSize());
-		indexBuffer->unlock();
+			geometry->indexBuffer->unlock();
+		}
 
-		AlignedVector< render::VertexElement > vertexElements = {};
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, offsetof(Vertex, position)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, uv)));
-		auto vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+		return reinterpret_cast<Rml::CompiledGeometryHandle>(geometry);
+	}
+
+	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture)
+	{
+		if (m_renderView == nullptr)
+			return;
+
+		Batch batch;
+
+		//batch.transform = ; // todo
+		batch.translation = Vector2(translation.x, translation.y);
+		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
+		//batch.texture = texture; // todo
+		batch.scissorRegionEnabled = m_scissorRegionEnabled;
+		batch.scissorRegion = m_scissorRegion;
+
+		m_batches.push_back(std::move(batch));
 
 		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
 
 		render::IProgram* program = m_shader->getProgram(perm).program;
 
-		render::Clear clearValue;
-		clearValue.colors[0] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
-		clearValue.colors[1] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
-		clearValue.colors[2] = Color4f(0.5f, 0.3f, 0.8f, 1.0f);
-		m_renderView->beginPass(&clearValue, 0, 0);
+		render::Clear cl;
+		cl.mask = render::CfColor;
+		cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
+		if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
+		{
+			m_renderView->draw(
+				vertexBuffer->getBufferView(),
+				m_vertexLayout,
+				indexBuffer->getBufferView(),
+				render::IndexType::UInt32,
+				program,
+				render::Primitives(render::PrimitiveType::Triangles, 0, num_indices / 3),
+				1);
 
-		m_renderView->draw(
-			vertexBuffer->getBufferView(),
-			vertexLayout,
-			indexBuffer->getBufferView(),
-			render::IndexType::UInt16,
-			program,
-			render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices, 0, num_indices -1),
-			1);
-
-		m_renderView->endPass();
-
-		//auto programParams = m_renderContext->alloc< render::ProgramParameters >();
-		//programParams->beginParameters(m_renderContext);
-
-
-		//programParams->endParameters(m_renderContext);
-
-		//render::SimpleRenderBlock* renderBlock = m_renderContext->allocNamed< render::SimpleRenderBlock >(L"RmlUi");
-		//renderBlock->distance = 0;
-		//renderBlock->program = sp.program;
-		//renderBlock->programParams = programParams;
-		//renderBlock->indexBuffer = indexBuffer->getBufferView();
-		//renderBlock->indexType = render::IndexType::UInt16;
-		//renderBlock->vertexBuffer = vertexBuffer->getBufferView();
-		//renderBlock->vertexLayout = vertexLayout;
-		//renderBlock->primitives = render::Primitives(render::PrimitiveType::Triangles, 0, num_vertices / 3);
-
-		//m_renderContext->draw(
-		//	sp.priority,
-		//	renderBlock
-		//);
+			m_renderView->endPass();
+		}
 	}
 
 	void RenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
 	{
-		delete reinterpret_cast<GeometryView*>(geometry);
+		delete reinterpret_cast<CompiledGeometry*>(geometry);
 	}
 
 	Rml::TextureHandle RenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
@@ -142,19 +133,19 @@ namespace traktor::rmlui
 
 	void RenderInterface::SetScissorRegion(Rml::Rectanglei region)
 	{
+		m_scissorRegion[0] = region.Position().x;
+		m_scissorRegion[1] = region.Position().y;
+		m_scissorRegion[2] = region.Size().x;
+		m_scissorRegion[3] = region.Size().y;
 	}
 
 	void RenderInterface::beginRendering(render::IRenderView* renderView,
-		render::RenderGraph* renderGraph,
-		render::RenderContext* renderContext,
 		Ref< render::Buffer > vertexBuffer,
 		Ref< render::Buffer > indexBuffer,
 		Ref <const render::IVertexLayout > vertexLayout,
 		const resource::Proxy < render::Shader >& shader)
 	{
 		m_renderView = renderView;
-		m_renderGraph = renderGraph;
-		m_renderContext = renderContext;
 
 
 		m_vertexBuffer = vertexBuffer;
@@ -165,8 +156,6 @@ namespace traktor::rmlui
 	void RenderInterface::endRendering()
 	{
 		m_renderView = nullptr;
-		m_renderGraph = nullptr;
-		m_renderContext = nullptr;
 		m_vertexBuffer = nullptr;
 		m_indexBuffer = nullptr;
 		m_vertexLayout = nullptr;

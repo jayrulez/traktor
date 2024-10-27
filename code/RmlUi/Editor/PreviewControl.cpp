@@ -67,9 +67,6 @@ namespace traktor::rmlui
 		if (!m_renderView)
 			return false;
 
-		m_renderContext = new render::RenderContext(4 * 1024 * 1024);
-		m_renderGraph = new render::RenderGraph(renderSystem, desc.multiSample);
-
 		// todo: get name from rml document
 		m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
 
@@ -136,7 +133,6 @@ namespace traktor::rmlui
 
 		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
 
-		safeDestroy(m_renderGraph);
 		safeClose(m_renderView);
 
 		m_vertexBuffer.reset();
@@ -146,9 +142,9 @@ namespace traktor::rmlui
 		Widget::destroy();
 	}
 
-	void PreviewControl::setRmlDocument(RmlDocument* document)
+	void PreviewControl::setRmlDocument(RmlDocument* rmlDocument)
 	{
-		m_document = document;
+		m_rmlDocument = rmlDocument;
 
 
 
@@ -161,7 +157,7 @@ namespace traktor::rmlui
 
 	ui::Size PreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
-		if (!m_document)
+		if (!m_rmlDocument)
 			return ui::Size(2631, 1117);
 
 		//Aabb2 bounds = {};//m_document->getFrameBounds();
@@ -204,27 +200,12 @@ namespace traktor::rmlui
 
 		m_rmlContext->Update();
 
-
-		// Add passes to render graph.
-
-		// Validate render graph.
-		if (!m_renderGraph->validate())
-			return;
-
-		// Build render context.
-		m_renderContext->flush();
-		m_renderGraph->build(m_renderContext, sz.cx, sz.cy);
-
 		// Render frame.
 		if (m_renderView->beginFrame())
 		{
-			m_renderContext->render(m_renderView);
-
 			{
 				RmlUi::getInstance().GetRenderInterface()->beginRendering(
 					m_renderView,
-					m_renderGraph,
-					m_renderContext,
 					m_vertexBuffer,
 					m_indexBuffer,
 					m_vertexLayout,

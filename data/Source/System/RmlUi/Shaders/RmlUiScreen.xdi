@@ -35,7 +35,7 @@
 			<name>TexCoord</name>
 			<usage>Custom</usage>
 			<type>DtFloat2</type>
-			<index>2</index>
+			<index>0</index>
 		</item>
 		<item type="traktor.render.Add" version="traktor.render.Node:1">
 			<id>{F1884C13-083F-B548-A9B7-C0A01E2E6430}</id>
