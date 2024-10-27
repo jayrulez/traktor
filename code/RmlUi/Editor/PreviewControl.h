@@ -81,7 +81,7 @@ namespace traktor
 
 			virtual void destroy() override final;
 
-			void setRmlDocument(RmlDocument* document);
+			void setRmlDocument(RmlDocument* rmlDocument);
 
 			virtual ui::Size getPreferredSize(const ui::Size& hint) const override final;
 
@@ -90,9 +90,7 @@ namespace traktor
 			Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
 			Ref< db::Database > m_database;
 			Ref< render::IRenderView > m_renderView;
-			Ref< render::RenderContext > m_renderContext;
-			Ref< render::RenderGraph > m_renderGraph;
-			Ref< RmlDocument > m_document;
+			Ref< RmlDocument > m_rmlDocument;
 			Rml::Context* m_rmlContext = nullptr;
 
 			Ref< render::Buffer > m_vertexBuffer = nullptr;
