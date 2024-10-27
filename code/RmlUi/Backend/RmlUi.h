@@ -64,9 +64,11 @@ namespace traktor::rmlui
 	private:
 		struct BackendData
 		{
-			FileInterface* m_fileInterface;
-			RenderInterface* m_renderInterface;
-			SystemInterface* m_systemInterface;
+			BackendData(render::IRenderSystem* renderSystem);
+
+			FileInterface m_fileInterface;
+			RenderInterface m_renderInterface;
+			SystemInterface m_systemInterface;
 		};
 
 		bool m_initialized = false;

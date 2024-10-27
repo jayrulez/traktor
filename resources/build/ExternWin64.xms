@@ -6741,7 +6741,7 @@
 				</item>
 				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
@@ -7146,8 +7146,9 @@
 						<item>$(RMLUI_SDK)/Include</item>
 					</includePaths>
 					<definitions>
-						<item>RMLUI_STATIC_LIB</item>
 						<item>RMLUI_FONT_ENGINE_FREETYPE</item>
+						<item>RMLUI_CORE_EXPORTS</item>
+						<item>RMLUI_CUSTOM_RTTI</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
