@@ -22,6 +22,12 @@ namespace traktor::rmlui
 
 		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
 		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
+	
+		size_t allocateTextureId()
+		{
+			static size_t s_fileId = 0;
+			return ++s_fileId;
+		}
 	}
 
 	RenderInterface::RenderInterface(
@@ -115,16 +121,39 @@ namespace traktor::rmlui
 
 	Rml::TextureHandle RenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
 	{
+		// todo: can I use resource manager to load from a path?
+
 		return { };
 	}
 
 	Rml::TextureHandle RenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
 	{
-		return { };
+		render::SimpleTextureCreateDesc desc;
+		desc.width = source_dimensions.x;
+		desc.height = source_dimensions.y;
+		desc.format = render::TextureFormat::TfR32G32B32A32F;
+		desc.immutable = true;
+		render::TextureInitialData initialData;
+		initialData.data = source.data();
+		initialData.pitch = 4 * 4 * desc.width;
+		initialData.slicePitch = 4 * 4 * desc.width * desc.height;
+		desc.initialData[0] = initialData;
+		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, L"RmlUi");
+		
+		size_t textureId = allocateTextureId();
+		m_textures.insert(textureId, texture);
+		return static_cast<Rml::TextureHandle>(textureId);
 	}
 
 	void RenderInterface::ReleaseTexture(Rml::TextureHandle texture)
 	{
+		size_t textureId = static_cast<size_t>(texture);
+
+		if (m_textures.find(textureId) != m_textures.end())
+		{
+			m_textures[textureId].reset();
+			m_textures.remove(textureId);
+		}
 	}
 
 	void RenderInterface::EnableScissorRegion(bool enable)
