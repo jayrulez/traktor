@@ -50,36 +50,31 @@ namespace traktor::rmlui
 
 		bool isInitialized() const;
 
-		void Shutdown();
+		void shutdown();
 
-		SystemInterface* GetSystemInterface() const;
+		SystemInterface* getSystemInterface() const;
 
-		RenderInterface* GetRenderInterface() const;
+		RenderInterface* getRenderInterface() const;
 
-		FileInterface* GetFileInterface() const;
+		FileInterface* getFileInterface() const;
 
-		//Rml::Context* GetContext() const;
+		Rml::Context* createContext(const std::wstring& name, traktor::Vector2i size);
 
-		Rml::Context* CreateContext(const std::wstring& name, traktor::Vector2i size);
-
-		void DestroyContext(Rml::Context* context);
+		void destroyContext(Rml::Context* context);
 
 	private:
 		struct BackendData
 		{
 			BackendData(
-				const resource::Proxy< render::Shader >& rmlUiShader,
-				const resource::Proxy< render::Shader >& rmlUiShaderWithTexture, 
+				resource::IResourceManager* resourceManager, 
 				render::IRenderSystem* renderSystem);
 
-			FileInterface m_fileInterface;
-			RenderInterface m_renderInterface;
-			SystemInterface m_systemInterface;
+			FileInterface fileInterface;
+			RenderInterface renderInterface;
+			SystemInterface systemInterface;
 		};
 
 		bool m_initialized = false;
-		resource::Proxy< render::Shader > m_rmlUiShader;
-		resource::Proxy< render::Shader > m_rmlUiShaderWithTexture;
 		BackendData* m_backendData = nullptr;
 		AlignedVector<Rml::Context*> m_rmlContexts;
 	};

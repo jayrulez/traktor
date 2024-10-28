@@ -9,5 +9,9 @@
 			<id>{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}</id>
 			<editorDeployOnly>false</editorDeployOnly>
 		</item>
+		<item>
+			<id>{FC000CC8-9193-CA47-9B2C-2EDAE705FCBD}</id>
+			<editorDeployOnly>false</editorDeployOnly>
+		</item>
 	</dependencies>
 </object>

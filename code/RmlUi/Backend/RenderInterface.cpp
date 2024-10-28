@@ -16,20 +16,20 @@
 
 namespace traktor::rmlui
 {
+	namespace
+	{
+		const Rml::String DefaultContextName = "Default";
+
+		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
+		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
+	}
+
 	RenderInterface::RenderInterface(
-		const resource::Proxy< render::Shader >& rmlUiShader,
-		const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+		resource::IResourceManager* resourceManager,
 		render::IRenderSystem* renderSystem)
-		: m_rmlUiShader(rmlUiShader)
-		, m_rmlUiShaderWithTexture(rmlUiShaderWithTexture)
+		: m_resourceManager(resourceManager)
 		, m_renderSystem(renderSystem)
 	{
-		AlignedVector< render::VertexElement > vertexElements = {};
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4, offsetof(Vertex, color)));
-
-		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 	}
 
 	Rml::CompiledGeometryHandle RenderInterface::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
@@ -96,13 +96,13 @@ namespace traktor::rmlui
 		if (texture)
 		{
 			batch.program = m_rmlUiShaderWithTexture->getProgram(perm).program;
-			// todo batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
+			// todo: batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
 		}
 		else
 		{
 			batch.program = m_rmlUiShader->getProgram(perm).program;
 		}
-		batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
+		// todo: batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
 		batch.program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(translation.x, translation.y, 0, 0));
 
 		m_batches.push_back(std::move(batch));
@@ -157,5 +157,39 @@ namespace traktor::rmlui
 	void RenderInterface::endRendering()
 	{
 		m_batches.clear();
+	}
+
+	bool RenderInterface::loadResources()
+	{
+		{
+			AlignedVector< render::VertexElement > vertexElements = {};
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position), 4));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
+			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+		}
+
+		{
+			if (!m_resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
+				return false;
+
+			if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
+				return false;
+		}
+
+		return true;
+	}
+
+	bool RenderInterface::reloadResources()
+	{
+		unloadResources();
+		return loadResources();
+	}
+
+	void RenderInterface::unloadResources()
+	{
+		m_rmlUiShader.clear();
+		m_rmlUiShaderWithTexture.clear();
+		m_vertexLayout.reset();
 	}
 }
