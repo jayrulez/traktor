@@ -26,18 +26,11 @@ namespace traktor::rmlui
 	{
 		m_editor = editor;
 
-		render::IRenderSystem* renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
-
-		m_resourceManager = new resource::ResourceManager(m_editor->getOutputDatabase(), true);
-		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
-
-		return RmlUi::getInstance().initialize(m_resourceManager, renderSystem);
+		return true;
 	}
 
 	void RmlUiEditorPlugin::destroy()
 	{
-		RmlUi::getInstance().Shutdown();
-		delete m_resourceManager;
 	}
 
 	int32_t RmlUiEditorPlugin::getOrdinal() const
@@ -60,10 +53,19 @@ namespace traktor::rmlui
 
 	void RmlUiEditorPlugin::handleWorkspaceOpened()
 	{
+		render::IRenderSystem* renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
+
+		m_resourceManager = new resource::ResourceManager(m_editor->getOutputDatabase(), true);
+		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
+
+		RmlUi::getInstance().initialize(m_resourceManager, renderSystem);
 	}
 
 	void RmlUiEditorPlugin::handleWorkspaceClosed()
 	{
+		if (RmlUi::getInstance().isInitialized())
+			RmlUi::getInstance().shutdown();
+		delete m_resourceManager;
 	}
 
 	void RmlUiEditorPlugin::handleEditorClosed()
