@@ -7,13 +7,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include "RmlUi/RmlDocument.h"
+#include "RmlUi/RmlDocumentResource.h"
 
 namespace traktor::rmlui
 {
-	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlDocument", 0, RmlDocument, ISerializable)
+	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlDocumentResource", 0, RmlDocumentResource, ISerializable)
 
-	void RmlDocument::serialize(ISerializer& s)
+	void RmlDocumentResource::serialize(ISerializer& s)
 	{
 	}
 

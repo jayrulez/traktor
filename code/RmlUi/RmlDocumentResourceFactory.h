@@ -21,7 +21,7 @@
 namespace traktor::rmlui
 {
 
-	/*! RmlDocument resource factory.
+	/*! RmlDocumentResource resource factory.
 	 * \ingroup RmlUi
 	 */
 	class T_DLLCLASS RmlDocumentResourceFactory : public resource::IResourceFactory
