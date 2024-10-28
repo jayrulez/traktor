@@ -7,7 +7,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "Database/Instance.h"
-#include "RmlUi/RmlDocument.h"
+#include "RmlUi/RmlDocumentResource.h"
 #include "RmlUi/RmlDocumentResourceFactory.h"
 
 namespace traktor::rmlui
@@ -22,12 +22,12 @@ namespace traktor::rmlui
 
 	const TypeInfoSet RmlDocumentResourceFactory::getResourceTypes() const
 	{
-		return makeTypeInfoSet< RmlDocument >();
+		return makeTypeInfoSet< RmlDocumentResource >();
 	}
 
 	const TypeInfoSet RmlDocumentResourceFactory::getProductTypes(const TypeInfo& resourceType) const
 	{
-		return makeTypeInfoSet< RmlDocument >();
+		return makeTypeInfoSet< RmlDocumentResource >();
 	}
 
 	bool RmlDocumentResourceFactory::isCacheable(const TypeInfo& productType) const
@@ -37,7 +37,7 @@ namespace traktor::rmlui
 
 	Ref< Object > RmlDocumentResourceFactory::create(resource::IResourceManager* resourceManager, const db::Database* database, const db::Instance* instance, const TypeInfo& productType, const Object* current) const
 	{
-		return instance->getObject< RmlDocument >();
+		return instance->getObject< RmlDocumentResource >();
 	}
 
 }

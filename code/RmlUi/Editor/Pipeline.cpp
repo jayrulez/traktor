@@ -24,8 +24,7 @@
 #include "Render/Shader.h"
 #include "Render/Editor/Texture/TextureOutput.h"
 #include "Resource/Id.h"
-#include "RmlUi/RmlDocument.h"
-#include "RmlUi/RmlDocumentFactory.h"
+#include "RmlUi/RmlDocumentResource.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 #include "RmlUi/Editor/Pipeline.h"
 
@@ -102,7 +101,7 @@ namespace traktor::rmlui
 		uint32_t reason
 	) const
 	{
-		Ref< RmlDocument > rmlDocument;
+		Ref< RmlDocumentResource > rmlDocument;
 		bool optimize = false;
 
 		if (const RmlDocumentAsset* rmlDocumentAsset = dynamic_type_cast<const RmlDocumentAsset*>(sourceAsset))
@@ -115,8 +114,7 @@ namespace traktor::rmlui
 				return false;
 			}
 
-			//const std::wstring extension = toLower(rmlDocumentAsset->getFileName().getExtension());
-			rmlDocument = RmlDocumentFactory().createRmlDocument(traktor::Path(m_assetPath), sourceInstance, sourceStream);
+			rmlDocument = new RmlDocumentResource();// RmlDocumentFactory().createRmlDocument(traktor::Path(m_assetPath), sourceInstance, sourceStream);
 
 			safeClose(sourceStream);
 		}
