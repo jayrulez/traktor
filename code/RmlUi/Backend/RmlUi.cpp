@@ -18,18 +18,14 @@ namespace traktor::rmlui
 	namespace
 	{
 		const Rml::String DefaultContextName = "Default";
-
-		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
-		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
 	}
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlUi", 0, RmlUi, Object)
 
 		RmlUi::BackendData::BackendData(
-			const resource::Proxy< render::Shader >& rmlUiShader,
-			const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+			resource::IResourceManager* resourceManager,
 			render::IRenderSystem* renderSystem)
-		: m_renderInterface(rmlUiShader, rmlUiShaderWithTexture, renderSystem)
+		: renderInterface(resourceManager, renderSystem)
 	{
 
 	}
@@ -56,19 +52,15 @@ namespace traktor::rmlui
 		if (m_initialized)
 			return true;
 
-		if (!resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
-			return false;
+		m_backendData = new BackendData(resourceManager, renderSystem);
 
-		if (!resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
-			return false;
-
-		m_backendData = new BackendData(m_rmlUiShader, m_rmlUiShaderWithTexture, renderSystem);
-
-		Rml::SetFileInterface(&m_backendData->m_fileInterface);
-		Rml::SetSystemInterface(&m_backendData->m_systemInterface);
-		Rml::SetRenderInterface(&m_backendData->m_renderInterface);
+		Rml::SetFileInterface(&m_backendData->fileInterface);
+		Rml::SetSystemInterface(&m_backendData->systemInterface);
+		Rml::SetRenderInterface(&m_backendData->renderInterface);
 
 		m_initialized = Rml::Initialise();
+
+		m_backendData->renderInterface.loadResources();
 
 		return m_initialized;
 	}
@@ -78,46 +70,45 @@ namespace traktor::rmlui
 		return m_initialized;
 	}
 
-	void RmlUi::Shutdown()
+	void RmlUi::shutdown()
 	{
 		if (!m_initialized)
 			return;
 
 		Rml::Shutdown();
 
-		delete m_backendData;
+		m_backendData->renderInterface.unloadResources();
 
-		m_rmlUiShader.clear();
-		m_rmlUiShaderWithTexture.clear();
+		delete m_backendData;
 
 		m_initialized = false;
 	}
 
-	SystemInterface* RmlUi::GetSystemInterface() const
+	SystemInterface* RmlUi::getSystemInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
 
-		return &m_backendData->m_systemInterface;
+		return &m_backendData->systemInterface;
 	}
 
-	RenderInterface* RmlUi::GetRenderInterface() const
+	RenderInterface* RmlUi::getRenderInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
 
-		return &m_backendData->m_renderInterface;
+		return &m_backendData->renderInterface;
 	}
 
-	FileInterface* RmlUi::GetFileInterface() const
+	FileInterface* RmlUi::getFileInterface() const
 	{
 		if (!m_initialized)
 			return nullptr;
 
-		return &m_backendData->m_fileInterface;
+		return &m_backendData->fileInterface;
 	}
 
-	Rml::Context* RmlUi::CreateContext(const std::wstring& name, traktor::Vector2i size)
+	Rml::Context* RmlUi::createContext(const std::wstring& name, traktor::Vector2i size)
 	{
 		if (!m_initialized)
 			return nullptr;
@@ -127,7 +118,7 @@ namespace traktor::rmlui
 		return context;
 	}
 
-	void RmlUi::DestroyContext(Rml::Context* context)
+	void RmlUi::destroyContext(Rml::Context* context)
 	{
 		if (!m_initialized)
 			return;
