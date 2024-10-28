@@ -52,7 +52,7 @@ namespace traktor::rmlui
 
 			geometry->vertexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuVertex, sizeof(Vertex) * vertexStorage.size(), true);
 
-			std::memcpy(geometry->vertexBuffer->lock(), vertexStorage.ptr(), geometry->vertexBuffer->getBufferSize());
+			std::memcpy(static_cast<Vertex*>(geometry->vertexBuffer->lock()), vertexStorage.ptr(), geometry->vertexBuffer->getBufferSize());
 
 			geometry->vertexBuffer->unlock();
 		}
@@ -61,7 +61,7 @@ namespace traktor::rmlui
 		{
 			geometry->indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int) * indices.size(), false);
 
-			std::memcpy(geometry->indexBuffer->lock(), indices.data(), geometry->indexBuffer->getBufferSize());
+			std::memcpy(static_cast<int32_t*>(geometry->indexBuffer->lock()), indices.data(), geometry->indexBuffer->getBufferSize());
 
 			geometry->indexBuffer->unlock();
 		}
