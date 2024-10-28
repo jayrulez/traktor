@@ -22,8 +22,7 @@
 #include "I18N/Text.h"
 #include "Editor/IDocument.h"
 #include "Editor/IEditor.h"
-#include "RmlUi/RmlDocument.h"
-#include "RmlUi/RmlDocumentFactory.h"
+#include "RmlUi/RmlDocumentResource.h"
 #include "RmlUi/Editor/RmlDocumentEditorPage.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 #include "RmlUi/Editor/RmlDocumentPreviewControl.h"
@@ -69,12 +68,12 @@ namespace traktor
 				return false;
 
 			// Read rml document from output database.
-			//m_RmlDocument = database->getObjectReadOnly< RmlDocument >(m_document->getInstance(0)->getGuid());
+			//m_RmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());
 			//if (!m_RmlDocument)
 			//	return false;
 
 			m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
-			//m_resourceManager->addFactory(new rmlui::RmlDocumentFactory());
+			//m_resourceManager->addFactory(new rmlui::RmlDocumentResourceFactory());
 
 			Ref< ui::Container > container = new ui::Container();
 			container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
@@ -135,7 +134,7 @@ namespace traktor
 
 			if (eventId == m_document->getInstance(0)->getGuid())
 			{
-				Ref< RmlDocument > rmlDocument = database->getObjectReadOnly< RmlDocument >(m_document->getInstance(0)->getGuid());
+				Ref< RmlDocumentResource > rmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());
 				if (rmlDocument)
 				{
 					m_RmlDocument = rmlDocument;

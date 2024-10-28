@@ -54,7 +54,7 @@ namespace traktor
 	namespace rmlui
 	{
 		class RmlDocumentPreviewControl;
-		class RmlDocument;
+		class RmlDocumentResource;
 
 		class T_DLLCLASS RmlDocumentEditorPage : public editor::IEditorPage
 		{
@@ -81,7 +81,7 @@ namespace traktor
 			Ref< RmlDocumentPreviewControl > m_previewControl;
 			Ref< ui::ToolBar > m_toolBarPlay;
 			Ref< resource::IResourceManager > m_resourceManager;
-			Ref< RmlDocument > m_RmlDocument;
+			Ref< RmlDocumentResource > m_RmlDocument;
 		};
 
 	}

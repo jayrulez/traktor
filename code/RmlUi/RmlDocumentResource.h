@@ -20,15 +20,15 @@
 
 namespace traktor::rmlui
 {
-	/*! RmlDocument
+	/*! RmlDocumentResource
 	 * \ingroup RmlUi
 	 */
-	class T_DLLCLASS RmlDocument : public ISerializable
+	class T_DLLCLASS RmlDocumentResource : public ISerializable
 	{
 		T_RTTI_CLASS;
 
 	public:
-		RmlDocument() = default;
+		RmlDocumentResource() = default;
 
 		virtual void serialize(ISerializer& s) override final;
 

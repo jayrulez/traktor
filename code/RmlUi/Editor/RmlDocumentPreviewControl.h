@@ -62,7 +62,7 @@ namespace traktor
 
 	namespace rmlui
 	{
-		class RmlDocument;
+		class RmlDocumentResource;
 
 		class T_DLLCLASS RmlDocumentPreviewControl : public ui::Widget
 		{
@@ -81,7 +81,7 @@ namespace traktor
 
 			virtual void destroy() override final;
 
-			void setRmlDocument(RmlDocument* rmlDocument);
+			void setRmlDocument(RmlDocumentResource* rmlDocument);
 
 			virtual ui::Size getPreferredSize(const ui::Size& hint) const override final;
 
@@ -91,7 +91,7 @@ namespace traktor
 			Ref< db::Database > m_database;
 			Ref< render::IRenderView > m_renderView;
 			Rml::Context* m_rmlContext = nullptr;
-			Ref< RmlDocument > m_rmlDocument;
+			Ref< RmlDocumentResource > m_rmlDocument;
 
 			void eventSize(ui::SizeEvent* event);
 
