@@ -11,11 +11,18 @@
 #include "RmlUi/Backend/RenderInterface.h"
 #include "Render/Buffer.h"
 #include "Render/VertexElement.h"
+#include "Resource/Id.h"
+#include "Render/IProgram.h"
 
 namespace traktor::rmlui
 {
-	RenderInterface::RenderInterface(render::IRenderSystem* renderSystem)
-		: m_renderSystem(renderSystem)
+	RenderInterface::RenderInterface(
+		const resource::Proxy< render::Shader >& rmlUiShader,
+		const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+		render::IRenderSystem* renderSystem)
+		: m_rmlUiShader(rmlUiShader)
+		, m_rmlUiShaderWithTexture(rmlUiShaderWithTexture)
+		, m_renderSystem(renderSystem)
 	{
 		AlignedVector< render::VertexElement > vertexElements = {};
 		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
@@ -77,16 +84,26 @@ namespace traktor::rmlui
 	{
 		Batch batch;
 
-		batch.transform = Matrix44::identity();
-		batch.translation = Vector2(translation.x, translation.y);
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
-		//batch.texture = texture; // todo
 		batch.scissorRegion[0] = m_scissorRegion[0];
 		batch.scissorRegion[1] = m_scissorRegion[1];
 		batch.scissorRegion[2] = m_scissorRegion[2];
 		batch.scissorRegion[3] = m_scissorRegion[3];
 		batch.scissorRegionEnabled = m_scissorRegionEnabled;
 		batch.transformScissorRegion = false;
+
+		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+		if (texture)
+		{
+			batch.program = m_rmlUiShaderWithTexture->getProgram(perm).program;
+			// todo batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
+		}
+		else
+		{
+			batch.program = m_rmlUiShader->getProgram(perm).program;
+		}
+		batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
+		batch.program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(translation.x, translation.y, 0, 0));
 
 		m_batches.push_back(std::move(batch));
 	}

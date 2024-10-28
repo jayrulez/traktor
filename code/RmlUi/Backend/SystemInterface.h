@@ -22,10 +22,8 @@
 
 namespace traktor::rmlui
 {
-	class T_DLLCLASS SystemInterface : public Rml::SystemInterface, public Object
+	class T_DLLCLASS SystemInterface : public Rml::SystemInterface
 	{
-		T_RTTI_CLASS;
-
 	public:
 
 	};

@@ -25,10 +25,8 @@
 
 namespace traktor::rmlui
 {
-	class T_DLLCLASS FileInterface : public Rml::FileInterface, public Object
+	class T_DLLCLASS FileInterface : public Rml::FileInterface
 	{
-		T_RTTI_CLASS;
-
 	public:
 
 		virtual Rml::FileHandle Open(const Rml::String& path) override;

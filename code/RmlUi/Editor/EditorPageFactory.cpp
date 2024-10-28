@@ -7,7 +7,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "Core/Serialization/DeepClone.h"
-#include "RmlUi/Editor/EditorPage.h"
+#include "RmlUi/Editor/RmlDocumentEditorPage.h"
 #include "RmlUi/Editor/EditorPageFactory.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 #include "Ui/Command.h"
@@ -32,7 +32,7 @@ namespace traktor
 
 		Ref< editor::IEditorPage > EditorPageFactory::createEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document) const
 		{
-			return new EditorPage(editor, site, document);
+			return new RmlDocumentEditorPage(editor, site, document);
 		}
 
 		void EditorPageFactory::getCommands(std::list< ui::Command >& outCommands) const
