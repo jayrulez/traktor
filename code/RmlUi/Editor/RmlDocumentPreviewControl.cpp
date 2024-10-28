@@ -68,7 +68,7 @@ namespace traktor::rmlui
 		}
 
 		// todo: get name from rml document
-		m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
+		m_rmlContext = RmlUi::getInstance().createContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
 
 		// todo: remove
 		// temporary testing
@@ -113,7 +113,7 @@ namespace traktor::rmlui
 
 	void RmlDocumentPreviewControl::destroy()
 	{
-		RmlUi::getInstance().DestroyContext(m_rmlContext);
+		RmlUi::getInstance().destroyContext(m_rmlContext);
 
 		m_rmlContext = nullptr;
 
@@ -153,6 +153,8 @@ namespace traktor::rmlui
 		if (m_renderView)
 		{
 			m_renderView->reset(sz.cx, sz.cy);
+			if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
+				return;
 		}
 
 		if (m_rmlContext)
@@ -173,17 +175,21 @@ namespace traktor::rmlui
 		while (m_renderView->nextEvent(re))
 		{
 			if (re.type == render::RenderEventType::Lost)
+			{
 				m_renderView->reset(sz.cx, sz.cy);
+				if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
+					return;
+			}
 		}
 
 		// Render frame.
 		if (m_renderView->beginFrame())
 		{
-			RmlUi::getInstance().GetRenderInterface()->beginRendering();
+			RmlUi::getInstance().getRenderInterface()->beginRendering();
 
 			m_rmlContext->Render();
 
-			auto& batches = RmlUi::getInstance().GetRenderInterface()->getBatches();
+			auto& batches = RmlUi::getInstance().getRenderInterface()->getBatches();
 
 			render::Clear cl;
 			cl.mask = render::CfColor;
@@ -194,7 +200,7 @@ namespace traktor::rmlui
 				{
 					m_renderView->draw(
 						batch.compiledGeometry->vertexBuffer->getBufferView(),
-						RmlUi::getInstance().GetRenderInterface()->getVertexLayout(),
+						RmlUi::getInstance().getRenderInterface()->getVertexLayout(),
 						batch.compiledGeometry->indexBuffer->getBufferView(),
 						render::IndexType::UInt32,
 						batch.program,
@@ -208,7 +214,7 @@ namespace traktor::rmlui
 			m_renderView->endFrame();
 			m_renderView->present();
 
-			RmlUi::getInstance().GetRenderInterface()->endRendering();
+			RmlUi::getInstance().getRenderInterface()->endRendering();
 		}
 
 		event->consume();
