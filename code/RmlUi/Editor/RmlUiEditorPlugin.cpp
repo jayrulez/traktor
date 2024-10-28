@@ -15,6 +15,7 @@
 #include "RmlUi/Backend/RmlUi.h"
 #include "Resource/ResourceManager.h"
 #include "Render/Resource/ShaderFactory.h"
+#include "Render/Resource/TextureFactory.h"
 
 namespace traktor::rmlui
 {
@@ -57,6 +58,7 @@ namespace traktor::rmlui
 
 		m_resourceManager = new resource::ResourceManager(m_editor->getOutputDatabase(), true);
 		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
+		m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
 
 		RmlUi::getInstance().initialize(m_resourceManager, renderSystem);
 	}
