@@ -37,8 +37,7 @@ namespace traktor::rmlui
 	{
 	public:
 		RenderInterface(
-			const resource::Proxy< render::Shader >& rmlUiShader,
-			const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+			resource::IResourceManager* resourceManager,
 			render::IRenderSystem* renderSystem);
 
 		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
@@ -91,12 +90,18 @@ namespace traktor::rmlui
 
 		void endRendering();
 
+		bool loadResources();
+
+		bool reloadResources();
+
+		void unloadResources();
+
 	private:
 		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< const render::IVertexLayout > m_vertexLayout;
-		const resource::Proxy< render::Shader >& m_rmlUiShader;
-		const resource::Proxy< render::Shader >& m_rmlUiShaderWithTexture;
+		resource::Proxy< render::Shader > m_rmlUiShader;
+		resource::Proxy< render::Shader > m_rmlUiShaderWithTexture;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
 		render::BlendOperation m_blendOp;
