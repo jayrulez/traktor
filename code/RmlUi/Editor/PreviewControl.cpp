@@ -28,6 +28,7 @@
 #include "Ui/Itf/IWidget.h"
 #include "Ui/Application.h"
 #include "Resource/IResourceManager.h"
+#include "Render/IProgram.h"
 
 namespace traktor::rmlui
 {
@@ -73,16 +74,6 @@ namespace traktor::rmlui
 		if (!resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
 			return false;
 
-		//resourceManager->reload(type_of< render::Shader >(), false);
-
-		/*m_vertexBuffer = renderSystem->createBuffer(render::BufferUsage::BuVertex, 0, true);
-		m_indexBuffer = renderSystem->createBuffer(render::BufferUsage::BuIndex, 0, true);
-
-		AlignedVector< render::VertexElement > vertexElements = {};
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat2, 0));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat3, 8));
-		m_vertexLayout = renderSystem->createVertexLayout(vertexElements);*/
-
 		// todo: remove
 		// temporary testing
 		Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"(<rml>
@@ -96,14 +87,14 @@ namespace traktor::rmlui
 						left: 50px;
 						width: 500px;
 						height: 500px;
-						background-color: #ccc;
+						background-color: #fff;
 					}
 					div
 					{
 						display: block;
-						height: 150px;
+						height: 200px;
 						width: 200px;
-						background-color: #f00;
+						background-color: #ff0;
 					}
 				</style>
 				</head>
@@ -118,7 +109,7 @@ namespace traktor::rmlui
 		addEventHandler< ui::SizeEvent >(this, &PreviewControl::eventSize);
 		addEventHandler< ui::PaintEvent >(this, &PreviewControl::eventPaint);
 
-		// todo: input events
+		m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &PreviewControl::eventIdle);
 
 		m_database = database;
 		return true;
@@ -127,30 +118,23 @@ namespace traktor::rmlui
 	void PreviewControl::destroy()
 	{
 		RmlUi::getInstance().DestroyContext(m_rmlContext);
-		m_rmlContext = nullptr;
 
-		m_rmlUiShader.clear();
+		m_rmlContext = nullptr;
 
 		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
 
 		safeClose(m_renderView);
 
-		m_vertexBuffer.reset();
-		m_indexBuffer.reset();
-		m_vertexLayout.reset();
-
 		Widget::destroy();
+
+		m_rmlUiShader.clear();
 	}
 
 	void PreviewControl::setRmlDocument(RmlDocument* rmlDocument)
 	{
 		m_rmlDocument = rmlDocument;
 
-
-
 		const ui::Size sz = getInnerRect().getSize();
-
-
 	}
 
 
@@ -198,29 +182,58 @@ namespace traktor::rmlui
 				m_renderView->reset(sz.cx, sz.cy);
 		}
 
-		m_rmlContext->Update();
-
 		// Render frame.
 		if (m_renderView->beginFrame())
 		{
+			RmlUi::getInstance().GetRenderInterface()->beginRendering();
+
+			m_rmlContext->Render();
+
+			auto& batches = RmlUi::getInstance().GetRenderInterface()->getBatches();
+
+			const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+
+			render::IProgram* program = m_rmlUiShader->getProgram(perm).program;
+
+			render::Clear cl;
+			cl.mask = render::CfColor;
+			cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
+			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
 			{
-				RmlUi::getInstance().GetRenderInterface()->beginRendering(
-					m_renderView,
-					m_vertexBuffer,
-					m_indexBuffer,
-					m_vertexLayout,
-					m_rmlUiShader);
+				for (auto& batch : batches)
+				{
+					program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
 
-				m_rmlContext->Render();
+					m_renderView->draw(
+						batch.compiledGeometry->vertexBuffer->getBufferView(),
+						RmlUi::getInstance().GetRenderInterface()->getVertexLayout(),
+						batch.compiledGeometry->indexBuffer->getBufferView(),
+						render::IndexType::UInt32,
+						program,
+						render::Primitives(render::PrimitiveType::Triangles, 0, batch.compiledGeometry->triangleCount, 0, 0),
+						1);
+				}
 
-				RmlUi::getInstance().GetRenderInterface()->endRendering();
+				m_renderView->endPass();
 			}
 
 			m_renderView->endFrame();
 			m_renderView->present();
+
+			RmlUi::getInstance().GetRenderInterface()->endRendering();
 		}
 
 		event->consume();
+	}
+
+	void PreviewControl::eventIdle(ui::IdleEvent* event)
+	{
+		if (!m_rmlContext)
+			return;
+
+		m_rmlContext->Update();
+
+		event->requestMore();
 	}
 
 }

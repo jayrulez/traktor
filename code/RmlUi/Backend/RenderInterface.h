@@ -18,6 +18,7 @@
 #include "Render/Shader.h"
 #include "Resource/Proxy.h"
 #include "Core/Math/Vector2.h"
+#include "Core/Thread/Mutex.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -76,33 +77,26 @@ namespace traktor::rmlui
 			Ref < render::ITexture > texture;
 			int32_t scissorRegion[4];
 			bool scissorRegionEnabled;
-			// transform scissor rect
+			bool transformScissorRegion = false;
 		};
 
-		void beginRendering(render::IRenderView* renderView,
-			Ref< render::Buffer > vertexBuffer,
-			Ref< render::Buffer > indexBuffer,
-			Ref <const render::IVertexLayout > vertexLayout,
-			const resource::Proxy < render::Shader >& shader);
+		const AlignedVector<Batch>& getBatches() const;
+
+		const Ref< const render::IVertexLayout >& getVertexLayout() const;
+
+		void beginRendering();
 
 		void endRendering();
 
 	private:
 		render::IRenderSystem* m_renderSystem = nullptr;
-		Ref< render::IVertexLayout > m_vertexLayout;
+		Ref< const render::IVertexLayout > m_vertexLayout;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
-
 		render::BlendOperation m_blendOp;
 		bool m_scissorRegionEnabled;
 		int32_t m_scissorRegion[4];
-
-		render::IRenderView* m_renderView;
-
-		render::Buffer* m_vertexBuffer = nullptr;
-		render::Buffer* m_indexBuffer = nullptr;
-		const render::IVertexLayout* m_vertexLayout = nullptr;
-		resource::Proxy < render::Shader > m_shader;
+		Mutex m_batchMutex;
 	};
 
 }
