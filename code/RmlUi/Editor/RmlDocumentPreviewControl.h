@@ -64,12 +64,12 @@ namespace traktor
 	{
 		class RmlDocument;
 
-		class T_DLLCLASS PreviewControl : public ui::Widget
+		class T_DLLCLASS RmlDocumentPreviewControl : public ui::Widget
 		{
 			T_RTTI_CLASS;
 
 		public:
-			explicit PreviewControl(editor::IEditor* editor);
+			explicit RmlDocumentPreviewControl(editor::IEditor* editor);
 
 			bool create(
 				ui::Widget* parent,
@@ -92,7 +92,6 @@ namespace traktor
 			Ref< render::IRenderView > m_renderView;
 			Rml::Context* m_rmlContext = nullptr;
 			Ref< RmlDocument > m_rmlDocument;
-			resource::Proxy< render::Shader > m_rmlUiShader;
 
 			void eventSize(ui::SizeEvent* event);
 

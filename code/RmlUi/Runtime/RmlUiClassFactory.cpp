@@ -8,9 +8,7 @@
  */
 #include "Core/Class/AutoRuntimeClass.h"
 #include "Core/Class/IRuntimeClassRegistrar.h"
-#include "RmlUi/RmlDocument.h"
 #include "RmlUi/Runtime/RmlUiClassFactory.h"
-#include "RmlUi/Runtime/RmlUiLayer.h"
 
 namespace traktor::rmlui
 {
@@ -19,9 +17,6 @@ namespace traktor::rmlui
 
 		void RmlUiClassFactory::createClasses(IRuntimeClassRegistrar* registrar) const
 	{
-		auto classRmlUiLayer = new AutoRuntimeClass< RmlUiLayer >();
-		classRmlUiLayer->addProperty< bool >("visible", &RmlUiLayer::setVisible, &RmlUiLayer::isVisible);
-		registrar->registerClass(classRmlUiLayer);
 	}
 
 }
