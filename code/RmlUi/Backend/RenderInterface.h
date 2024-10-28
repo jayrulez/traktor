@@ -19,6 +19,7 @@
 #include "Resource/Proxy.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Thread/Mutex.h"
+#include "Resource/IResourceManager.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -35,7 +36,10 @@ namespace traktor::rmlui
 	class T_DLLCLASS RenderInterface : public Rml::RenderInterface
 	{
 	public:
-		RenderInterface(render::IRenderSystem* renderSystem);
+		RenderInterface(
+			const resource::Proxy< render::Shader >& rmlUiShader,
+			const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+			render::IRenderSystem* renderSystem);
 
 		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
@@ -71,13 +75,12 @@ namespace traktor::rmlui
 
 		struct Batch
 		{
-			Matrix44 transform = Matrix44::identity();
-			Vector2 translation = Vector2(0, 0);
 			CompiledGeometry* compiledGeometry;
 			Ref < render::ITexture > texture;
 			int32_t scissorRegion[4];
 			bool scissorRegionEnabled;
 			bool transformScissorRegion = false;
+			render::IProgram* program = nullptr;
 		};
 
 		const AlignedVector<Batch>& getBatches() const;
@@ -89,14 +92,16 @@ namespace traktor::rmlui
 		void endRendering();
 
 	private:
+		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< const render::IVertexLayout > m_vertexLayout;
+		const resource::Proxy< render::Shader >& m_rmlUiShader;
+		const resource::Proxy< render::Shader >& m_rmlUiShaderWithTexture;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
 		render::BlendOperation m_blendOp;
-		bool m_scissorRegionEnabled;
-		int32_t m_scissorRegion[4];
-		Mutex m_batchMutex;
+		bool m_scissorRegionEnabled = false;
+		int32_t m_scissorRegion[4] = { 0,0,0,0 };
 	};
 
 }

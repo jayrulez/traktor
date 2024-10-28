@@ -10,6 +10,7 @@
 
 #include "Core/Ref.h"
 #include "Editor/IEditorPlugin.h"
+#include "Resource/IResourceManager.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -21,7 +22,7 @@
 
 namespace traktor::rmlui
 {
-	class T_DLLCLASS EditorPlugin : public editor::IEditorPlugin
+	class T_DLLCLASS RmlUiEditorPlugin : public editor::IEditorPlugin
 	{
 		T_RTTI_CLASS;
 
@@ -46,6 +47,7 @@ namespace traktor::rmlui
 
 	private:
 		editor::IEditor* m_editor = nullptr;
+		resource::IResourceManager* m_resourceManager;
 	};
 
 }

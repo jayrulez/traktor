@@ -24,7 +24,7 @@
 #include "Render/Frame/RenderGraph.h"
 #include "RmlUi/RmlDocument.h"
 #include "RmlUi/Backend/RmlUi.h"
-#include "RmlUi/Editor/PreviewControl.h"
+#include "RmlUi/Editor/RmlDocumentPreviewControl.h"
 #include "Ui/Itf/IWidget.h"
 #include "Ui/Application.h"
 #include "Resource/IResourceManager.h"
@@ -32,20 +32,14 @@
 
 namespace traktor::rmlui
 {
-	namespace
-	{
-		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
-		//const resource::Id< render::Shader > c_idShaderRmlUiShaderTexture(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
-	}
+	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlDocumentPreviewControl", RmlDocumentPreviewControl, ui::Widget)
 
-	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.PreviewControl", PreviewControl, ui::Widget)
-
-		PreviewControl::PreviewControl(editor::IEditor* editor)
+		RmlDocumentPreviewControl::RmlDocumentPreviewControl(editor::IEditor* editor)
 		: m_editor(editor)
 	{
 	}
 
-	bool PreviewControl::create(
+	bool RmlDocumentPreviewControl::create(
 		ui::Widget* parent,
 		int style,
 		db::Database* database,
@@ -68,11 +62,13 @@ namespace traktor::rmlui
 		if (!m_renderView)
 			return false;
 
+		if (!RmlUi::getInstance().isInitialized())
+		{
+			return false;
+		}
+
 		// todo: get name from rml document
 		m_rmlContext = RmlUi::getInstance().CreateContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
-
-		if (!resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
-			return false;
 
 		// todo: remove
 		// temporary testing
@@ -106,16 +102,16 @@ namespace traktor::rmlui
 		document->Show();
 
 
-		addEventHandler< ui::SizeEvent >(this, &PreviewControl::eventSize);
-		addEventHandler< ui::PaintEvent >(this, &PreviewControl::eventPaint);
+		addEventHandler< ui::SizeEvent >(this, &RmlDocumentPreviewControl::eventSize);
+		addEventHandler< ui::PaintEvent >(this, &RmlDocumentPreviewControl::eventPaint);
 
-		m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &PreviewControl::eventIdle);
+		m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &RmlDocumentPreviewControl::eventIdle);
 
 		m_database = database;
 		return true;
 	}
 
-	void PreviewControl::destroy()
+	void RmlDocumentPreviewControl::destroy()
 	{
 		RmlUi::getInstance().DestroyContext(m_rmlContext);
 
@@ -126,11 +122,9 @@ namespace traktor::rmlui
 		safeClose(m_renderView);
 
 		Widget::destroy();
-
-		m_rmlUiShader.clear();
 	}
 
-	void PreviewControl::setRmlDocument(RmlDocument* rmlDocument)
+	void RmlDocumentPreviewControl::setRmlDocument(RmlDocument* rmlDocument)
 	{
 		m_rmlDocument = rmlDocument;
 
@@ -139,7 +133,7 @@ namespace traktor::rmlui
 
 
 
-	ui::Size PreviewControl::getPreferredSize(const ui::Size& hint) const
+	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
 		if (!m_rmlDocument)
 			return ui::Size(2631, 1117);
@@ -152,7 +146,7 @@ namespace traktor::rmlui
 		return ui::Size(width, height);
 	}
 
-	void PreviewControl::eventSize(ui::SizeEvent* event)
+	void RmlDocumentPreviewControl::eventSize(ui::SizeEvent* event)
 	{
 		ui::Size sz = event->getSize();
 
@@ -167,7 +161,7 @@ namespace traktor::rmlui
 		}
 	}
 
-	void PreviewControl::eventPaint(ui::PaintEvent* event)
+	void RmlDocumentPreviewControl::eventPaint(ui::PaintEvent* event)
 	{
 		if (!m_renderView)
 			return;
@@ -191,10 +185,6 @@ namespace traktor::rmlui
 
 			auto& batches = RmlUi::getInstance().GetRenderInterface()->getBatches();
 
-			const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
-
-			render::IProgram* program = m_rmlUiShader->getProgram(perm).program;
-
 			render::Clear cl;
 			cl.mask = render::CfColor;
 			cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
@@ -202,14 +192,12 @@ namespace traktor::rmlui
 			{
 				for (auto& batch : batches)
 				{
-					program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
-
 					m_renderView->draw(
 						batch.compiledGeometry->vertexBuffer->getBufferView(),
 						RmlUi::getInstance().GetRenderInterface()->getVertexLayout(),
 						batch.compiledGeometry->indexBuffer->getBufferView(),
 						render::IndexType::UInt32,
-						program,
+						batch.program,
 						render::Primitives(render::PrimitiveType::Triangles, 0, batch.compiledGeometry->triangleCount, 0, 0),
 						1);
 				}
@@ -226,7 +214,7 @@ namespace traktor::rmlui
 		event->consume();
 	}
 
-	void PreviewControl::eventIdle(ui::IdleEvent* event)
+	void RmlDocumentPreviewControl::eventIdle(ui::IdleEvent* event)
 	{
 		if (!m_rmlContext)
 			return;

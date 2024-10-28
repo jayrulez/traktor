@@ -19,6 +19,7 @@
 #include "RmlUi/Backend/SystemInterface.h"
 #include "Render/IRenderSystem.h"
 #include "Render/IRenderView.h"
+#include "Resource/IResourceManager.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -45,7 +46,9 @@ namespace traktor::rmlui
 
 		void destroy() override;
 
-		bool Initialize(render::IRenderSystem* renderSystem/*, render::IRenderView* renderView*/);
+		bool initialize(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem);
+
+		bool isInitialized() const;
 
 		void Shutdown();
 
@@ -64,7 +67,10 @@ namespace traktor::rmlui
 	private:
 		struct BackendData
 		{
-			BackendData(render::IRenderSystem* renderSystem);
+			BackendData(
+				const resource::Proxy< render::Shader >& rmlUiShader,
+				const resource::Proxy< render::Shader >& rmlUiShaderWithTexture, 
+				render::IRenderSystem* renderSystem);
 
 			FileInterface m_fileInterface;
 			RenderInterface m_renderInterface;
@@ -72,8 +78,9 @@ namespace traktor::rmlui
 		};
 
 		bool m_initialized = false;
+		resource::Proxy< render::Shader > m_rmlUiShader;
+		resource::Proxy< render::Shader > m_rmlUiShaderWithTexture;
 		BackendData* m_backendData = nullptr;
-		//Rml::Context* m_context = nullptr;
 		AlignedVector<Rml::Context*> m_rmlContexts;
 	};
 
