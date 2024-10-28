@@ -53,15 +53,15 @@ namespace traktor
 
 	namespace rmlui
 	{
-		class PreviewControl;
+		class RmlDocumentPreviewControl;
 		class RmlDocument;
 
-		class T_DLLCLASS EditorPage : public editor::IEditorPage
+		class T_DLLCLASS RmlDocumentEditorPage : public editor::IEditorPage
 		{
 			T_RTTI_CLASS;
 
 		public:
-			explicit EditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document);
+			explicit RmlDocumentEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document);
 
 			virtual bool create(ui::Container* parent) override final;
 
@@ -78,7 +78,7 @@ namespace traktor
 			editor::IEditorPageSite* m_site;
 			editor::IDocument* m_document;
 			Ref< ui::TreeView > m_treeMovie;
-			Ref< PreviewControl > m_previewControl;
+			Ref< RmlDocumentPreviewControl > m_previewControl;
 			Ref< ui::ToolBar > m_toolBarPlay;
 			Ref< resource::IResourceManager > m_resourceManager;
 			Ref< RmlDocument > m_RmlDocument;

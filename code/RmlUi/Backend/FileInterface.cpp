@@ -24,9 +24,7 @@ namespace traktor::rmlui
 		}
 	}
 
-	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.FileInterface", 0, FileInterface, Object)
-
-		Rml::FileHandle FileInterface::Open(const Rml::String& path)
+	Rml::FileHandle FileInterface::Open(const Rml::String& path)
 	{
 		Ref< IStream > stream = FileSystem::getInstance().open(Path(mbstows(path)), File::FmRead);
 		size_t fileId = allocateFileId();

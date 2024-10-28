@@ -704,7 +704,6 @@
 				<second type="traktor.PropertyStringSet">
 					<value>
 						<item>Traktor.RmlUi.Editor</item>
-						<item>Traktor.RmlUi.Runtime.Editor</item>
 					</value>
 				</second>
 			</item>
@@ -712,36 +711,8 @@
 				<first>ShaderPipeline.IncludeOnlyTechniques</first>
 				<second type="traktor.PropertyStringSet">
 					<value>
-						<item>DropShadow</item>
-						<item>Glow</item>
-						<item>Spark_Add</item>
-						<item>Spark_Alpha</item>
-						<item>Spark_Darken</item>
-						<item>Spark_Default</item>
-						<item>Spark_Difference</item>
-						<item>Spark_Erase</item>
-						<item>Spark_Hardlight</item>
-						<item>Spark_Invert</item>
-						<item>Spark_Layer</item>
-						<item>Spark_Lighten</item>
-						<item>Spark_Multiply</item>
-						<item>Spark_Opaque</item>
-						<item>Spark_Overlay</item>
-						<item>Spark_Screen</item>
-						<item>Spark_Subtract</item>
+						<item>RmlUi_Default</item>
 					</value>
-				</second>
-			</item>
-			<item>
-				<first>SparkPipeline.GenerateMips</first>
-				<second type="traktor.PropertyBoolean">
-					<value>true</value>
-				</second>
-			</item>
-			<item>
-				<first>SparkPipeline.SharpenStrength</first>
-				<second type="traktor.PropertyFloat">
-					<value>1</value>
 				</second>
 			</item>
 		</value>

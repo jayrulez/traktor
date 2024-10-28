@@ -5,5 +5,9 @@
 			<id>{20046EBD-5DC4-494B-AF59-8F89AFFCC107}</id>
 			<editorDeployOnly>false</editorDeployOnly>
 		</item>
+		<item>
+			<id>{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}</id>
+			<editorDeployOnly>false</editorDeployOnly>
+		</item>
 	</dependencies>
 </object>

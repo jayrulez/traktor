@@ -25,7 +25,7 @@ namespace traktor::rmlui
 /*! RmlUi runtime plugin.
  * \ingroup RmlUi
  */
-class T_DLLCLASS RuntimePlugin : public runtime::IRuntimePlugin
+class T_DLLCLASS RmlUiRuntimePlugin : public runtime::IRuntimePlugin
 {
 	T_RTTI_CLASS;
 

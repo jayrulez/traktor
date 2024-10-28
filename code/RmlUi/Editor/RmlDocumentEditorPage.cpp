@@ -24,9 +24,9 @@
 #include "Editor/IEditor.h"
 #include "RmlUi/RmlDocument.h"
 #include "RmlUi/RmlDocumentFactory.h"
-#include "RmlUi/Editor/EditorPage.h"
+#include "RmlUi/Editor/RmlDocumentEditorPage.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
-#include "RmlUi/Editor/PreviewControl.h"
+#include "RmlUi/Editor/RmlDocumentPreviewControl.h"
 #include "Render/IRenderSystem.h"
 #include "Render/Resource/ShaderFactory.h"
 #include "Resource/ResourceManager.h"
@@ -49,16 +49,16 @@ namespace traktor
 	namespace rmlui
 	{
 
-		T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.EditorPage", EditorPage, editor::IEditorPage)
+		T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlDocumentEditorPage", RmlDocumentEditorPage, editor::IEditorPage)
 
-			EditorPage::EditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document)
+			RmlDocumentEditorPage::RmlDocumentEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document)
 			: m_editor(editor)
 			, m_site(site)
 			, m_document(document)
 		{
 		}
 
-		bool EditorPage::create(ui::Container* parent)
+		bool RmlDocumentEditorPage::create(ui::Container* parent)
 		{
 			Ref< render::IRenderSystem > renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
 			if (!renderSystem)
@@ -74,7 +74,6 @@ namespace traktor
 			//	return false;
 
 			m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
-			m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
 			//m_resourceManager->addFactory(new rmlui::RmlDocumentFactory());
 
 			Ref< ui::Container > container = new ui::Container();
@@ -93,7 +92,7 @@ namespace traktor
 			m_treeMovie = new ui::TreeView();
 			m_treeMovie->create(splitter, ui::TreeView::WsTreeButtons | ui::TreeView::WsTreeLines | ui::WsDoubleBuffer);
 
-			m_previewControl = new PreviewControl(m_editor);
+			m_previewControl = new RmlDocumentPreviewControl(m_editor);
 			if (!m_previewControl->create(splitter, ui::WsNone, database, m_resourceManager, renderSystem))
 				return false;
 
@@ -103,17 +102,17 @@ namespace traktor
 			return true;
 		}
 
-		void EditorPage::destroy()
+		void RmlDocumentEditorPage::destroy()
 		{
 			safeDestroy(m_previewControl);
 		}
 
-		bool EditorPage::dropInstance(db::Instance* instance, const ui::Point& position)
+		bool RmlDocumentEditorPage::dropInstance(db::Instance* instance, const ui::Point& position)
 		{
 			return false;
 		}
 
-		bool EditorPage::handleCommand(const ui::Command& command)
+		bool RmlDocumentEditorPage::handleCommand(const ui::Command& command)
 		{
 			bool result = true;
 
@@ -127,7 +126,7 @@ namespace traktor
 			return result;
 		}
 
-		void EditorPage::handleDatabaseEvent(db::Database* database, const Guid& eventId)
+		void RmlDocumentEditorPage::handleDatabaseEvent(db::Database* database, const Guid& eventId)
 		{
 			bool shouldRedraw = false;
 

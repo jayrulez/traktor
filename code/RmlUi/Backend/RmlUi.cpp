@@ -15,19 +15,26 @@
 
 namespace traktor::rmlui
 {
-	namespace {
+	namespace
+	{
 		const Rml::String DefaultContextName = "Default";
+
+		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
+		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
 	}
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlUi", 0, RmlUi, Object)
 
-		RmlUi::BackendData::BackendData(render::IRenderSystem* renderSystem)
-		: m_renderInterface(renderSystem)
+		RmlUi::BackendData::BackendData(
+			const resource::Proxy< render::Shader >& rmlUiShader,
+			const resource::Proxy< render::Shader >& rmlUiShaderWithTexture,
+			render::IRenderSystem* renderSystem)
+		: m_renderInterface(rmlUiShader, rmlUiShaderWithTexture, renderSystem)
 	{
 
 	}
 
-		RmlUi& RmlUi::getInstance()
+	RmlUi& RmlUi::getInstance()
 	{
 		static RmlUi* s_instance = nullptr;
 		if (!s_instance)
@@ -44,12 +51,18 @@ namespace traktor::rmlui
 		T_SAFE_RELEASE(this);
 	}
 
-	bool RmlUi::Initialize(render::IRenderSystem* renderSystem)
+	bool RmlUi::initialize(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem)
 	{
 		if (m_initialized)
 			return true;
 
-		m_backendData = new BackendData(renderSystem);
+		if (!resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
+			return false;
+
+		if (!resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
+			return false;
+
+		m_backendData = new BackendData(m_rmlUiShader, m_rmlUiShaderWithTexture, renderSystem);
 
 		Rml::SetFileInterface(&m_backendData->m_fileInterface);
 		Rml::SetSystemInterface(&m_backendData->m_systemInterface);
@@ -57,6 +70,11 @@ namespace traktor::rmlui
 
 		m_initialized = Rml::Initialise();
 
+		return m_initialized;
+	}
+
+	bool RmlUi::isInitialized() const
+	{
 		return m_initialized;
 	}
 
@@ -68,6 +86,9 @@ namespace traktor::rmlui
 		Rml::Shutdown();
 
 		delete m_backendData;
+
+		m_rmlUiShader.clear();
+		m_rmlUiShaderWithTexture.clear();
 
 		m_initialized = false;
 	}
@@ -98,13 +119,19 @@ namespace traktor::rmlui
 
 	Rml::Context* RmlUi::CreateContext(const std::wstring& name, traktor::Vector2i size)
 	{
+		if (!m_initialized)
+			return nullptr;
+
 		Rml::Context* context = Rml::CreateContext(wstombs(name), Rml::Vector2i(size.x, size.y));
 		m_rmlContexts.push_back(context);
 		return context;
 	}
 
-	void RmlUi::DestroyContext(Rml::Context* context) 
+	void RmlUi::DestroyContext(Rml::Context* context)
 	{
+		if (!m_initialized)
+			return;
+
 		auto it = std::find(m_rmlContexts.begin(), m_rmlContexts.end(), context);
 		if (it != m_rmlContexts.end())
 		{
