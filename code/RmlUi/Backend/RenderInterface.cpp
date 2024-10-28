@@ -20,7 +20,7 @@ namespace traktor::rmlui
 		AlignedVector< render::VertexElement > vertexElements = {};
 		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
 		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4, offsetof(Vertex, color)));
 
 		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 	}
@@ -59,7 +59,7 @@ namespace traktor::rmlui
 
 		// indices
 		{
-			geometry->indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int) * indices.size(), true);
+			geometry->indexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuIndex, sizeof(int) * indices.size(), false);
 
 			std::memcpy(geometry->indexBuffer->lock(), indices.data(), geometry->indexBuffer->getBufferSize());
 
@@ -71,40 +71,20 @@ namespace traktor::rmlui
 
 	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture)
 	{
-		if (m_renderView == nullptr)
-			return;
-
 		Batch batch;
 
-		//batch.transform = ; // todo
+		batch.transform = Matrix44::identity();
 		batch.translation = Vector2(translation.x, translation.y);
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
 		//batch.texture = texture; // todo
+		batch.scissorRegion[0] = m_scissorRegion[0];
+		batch.scissorRegion[1] = m_scissorRegion[1];
+		batch.scissorRegion[2] = m_scissorRegion[2];
+		batch.scissorRegion[3] = m_scissorRegion[3];
 		batch.scissorRegionEnabled = m_scissorRegionEnabled;
-		batch.scissorRegion = m_scissorRegion;
+		batch.transformScissorRegion = false;
 
 		m_batches.push_back(std::move(batch));
-
-		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
-
-		render::IProgram* program = m_shader->getProgram(perm).program;
-
-		render::Clear cl;
-		cl.mask = render::CfColor;
-		cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
-		if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
-		{
-			m_renderView->draw(
-				vertexBuffer->getBufferView(),
-				m_vertexLayout,
-				indexBuffer->getBufferView(),
-				render::IndexType::UInt32,
-				program,
-				render::Primitives(render::PrimitiveType::Triangles, 0, num_indices / 3),
-				1);
-
-			m_renderView->endPass();
-		}
 	}
 
 	void RenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
@@ -139,25 +119,22 @@ namespace traktor::rmlui
 		m_scissorRegion[3] = region.Size().y;
 	}
 
-	void RenderInterface::beginRendering(render::IRenderView* renderView,
-		Ref< render::Buffer > vertexBuffer,
-		Ref< render::Buffer > indexBuffer,
-		Ref <const render::IVertexLayout > vertexLayout,
-		const resource::Proxy < render::Shader >& shader)
+	const AlignedVector<RenderInterface::Batch>& RenderInterface::getBatches() const
 	{
-		m_renderView = renderView;
-
-
-		m_vertexBuffer = vertexBuffer;
-		m_indexBuffer = indexBuffer;
-		m_vertexLayout = vertexLayout;
-		m_shader = shader;
+		return m_batches;
 	}
+
+	const Ref< const render::IVertexLayout >& RenderInterface::getVertexLayout() const
+	{
+		return m_vertexLayout;
+	}
+
+	void RenderInterface::beginRendering()
+	{
+	}
+
 	void RenderInterface::endRendering()
 	{
-		m_renderView = nullptr;
-		m_vertexBuffer = nullptr;
-		m_indexBuffer = nullptr;
-		m_vertexLayout = nullptr;
+		m_batches.clear();
 	}
 }

@@ -90,17 +90,15 @@ namespace traktor
 			Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
 			Ref< db::Database > m_database;
 			Ref< render::IRenderView > m_renderView;
-			Ref< RmlDocument > m_rmlDocument;
 			Rml::Context* m_rmlContext = nullptr;
-
-			Ref< render::Buffer > m_vertexBuffer = nullptr;
-			Ref< render::Buffer > m_indexBuffer = nullptr;
-			Ref< render::IVertexLayout > m_vertexLayout = nullptr;
+			Ref< RmlDocument > m_rmlDocument;
 			resource::Proxy< render::Shader > m_rmlUiShader;
 
 			void eventSize(ui::SizeEvent* event);
 
 			void eventPaint(ui::PaintEvent* event);
+
+			void eventIdle(ui::IdleEvent* event);
 		};
 
 	}
