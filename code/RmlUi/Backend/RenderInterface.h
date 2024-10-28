@@ -107,6 +107,8 @@ namespace traktor::rmlui
 		render::BlendOperation m_blendOp;
 		bool m_scissorRegionEnabled = false;
 		int32_t m_scissorRegion[4] = { 0,0,0,0 };
+
+		SmallMap<size_t, Ref< render::ITexture> > m_textures;
 	};
 
 }
