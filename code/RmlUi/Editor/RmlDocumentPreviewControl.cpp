@@ -22,7 +22,7 @@
 #include "Render/Context/RenderContext.h"
 #include "Render/VertexElement.h"
 #include "Render/Frame/RenderGraph.h"
-#include "RmlUi/RmlDocument.h"
+#include "RmlUi/RmlDocumentResource.h"
 #include "RmlUi/Backend/RmlUi.h"
 #include "RmlUi/Editor/RmlDocumentPreviewControl.h"
 #include "Ui/Itf/IWidget.h"
@@ -124,7 +124,7 @@ namespace traktor::rmlui
 		Widget::destroy();
 	}
 
-	void RmlDocumentPreviewControl::setRmlDocument(RmlDocument* rmlDocument)
+	void RmlDocumentPreviewControl::setRmlDocument(RmlDocumentResource* rmlDocument)
 	{
 		m_rmlDocument = rmlDocument;
 

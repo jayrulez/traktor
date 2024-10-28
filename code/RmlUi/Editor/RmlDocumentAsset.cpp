@@ -7,7 +7,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "Core/Serialization/ISerializer.h"
-#include "RmlUi/RmlDocument.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 
 namespace traktor::rmlui

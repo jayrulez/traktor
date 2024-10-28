@@ -11,8 +11,7 @@
 #include "Core/Class/IRuntimeDelegate.h"
 #include "Core/Io/IStream.h"
 #include "RmlUi/ClassFactory.h"
-#include "RmlUi/RmlDocument.h"
-#include "RmlUi/RmlDocumentFactory.h"
+#include "RmlUi/RmlDocumentResource.h"
 #include "RmlUi/Backend/RmlUi.h"
 
 namespace traktor::rmlui
@@ -21,15 +20,9 @@ namespace traktor::rmlui
 
 		void ClassFactory::createClasses(IRuntimeClassRegistrar* registrar) const
 	{
-		// RmlDocument
-		auto classRmlDocument = new AutoRuntimeClass< RmlDocument >();
+		// RmlDocumentResource
+		auto classRmlDocument = new AutoRuntimeClass< RmlDocumentResource >();
 		registrar->registerClass(classRmlDocument);
-
-		// RmlDocumentFactory
-		auto classRmlDocumentFactory = new AutoRuntimeClass< RmlDocumentFactory >();
-		classRmlDocumentFactory->addConstructor();
-		classRmlDocumentFactory->addMethod("createRmlDocument", &RmlDocumentFactory::createRmlDocument);
-		registrar->registerClass(classRmlDocumentFactory);
 
 		// RmlUi
 		auto classRmlUi = new AutoRuntimeClass< RmlUi >();
