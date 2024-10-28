@@ -12,5 +12,4 @@
 
 namespace traktor::rmlui
 {
-	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.SystemInterface", 0, SystemInterface, Object)
 }
