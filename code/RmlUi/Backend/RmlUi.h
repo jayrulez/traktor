@@ -62,6 +62,8 @@ namespace traktor::rmlui
 
 		void destroyContext(Rml::Context* context);
 
+		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context);
+
 	private:
 		struct BackendData
 		{
@@ -72,6 +74,7 @@ namespace traktor::rmlui
 			FileInterface fileInterface;
 			RenderInterface renderInterface;
 			SystemInterface systemInterface;
+			Mutex renderMutex;
 		};
 
 		bool m_initialized = false;
