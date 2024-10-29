@@ -185,14 +185,10 @@ namespace traktor::rmlui
 		// Render frame.
 		if (m_renderView->beginFrame())
 		{
-			RmlUi::getInstance().getRenderInterface()->beginRendering();
-
-			m_rmlContext->Render();
-
-			auto& batches = RmlUi::getInstance().getRenderInterface()->getBatches();
+			const auto& batches = RmlUi::getInstance().renderContext(m_rmlContext);
 
 			render::Clear cl;
-			cl.mask = render::CfColor;
+			cl.mask = render::CfColor | render::CfDepth | render::CfStencil;
 			cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
 			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
 			{
@@ -213,8 +209,6 @@ namespace traktor::rmlui
 
 			m_renderView->endFrame();
 			m_renderView->present();
-
-			RmlUi::getInstance().getRenderInterface()->endRendering();
 		}
 
 		event->consume();
