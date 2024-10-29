@@ -130,4 +130,24 @@ namespace traktor::rmlui
 		}
 		Rml::RemoveContext(context->GetName());
 	}
+
+	AlignedVector<RenderInterface::Batch> RmlUi::renderContext(Rml::Context* context)
+	{
+		m_backendData->renderMutex.wait();
+		AlignedVector<RenderInterface::Batch> batches = {};
+		if (context != nullptr)
+		{
+			m_backendData->renderInterface.beginRendering();
+
+			context->Render();
+
+			batches = m_backendData->renderInterface.getBatches();
+
+			m_backendData->renderInterface.endRendering();
+		}
+
+		m_backendData->renderMutex.release();
+
+		return batches;
+	}
 }
