@@ -82,13 +82,7 @@ namespace traktor::rmlui
 			render::IProgram* program = nullptr;
 		};
 
-		const AlignedVector<Batch>& getBatches() const;
-
 		const Ref< const render::IVertexLayout >& getVertexLayout() const;
-
-		void beginRendering();
-
-		void endRendering();
 
 		bool loadResources();
 
@@ -97,6 +91,14 @@ namespace traktor::rmlui
 		void unloadResources();
 
 	private:
+		friend class RmlUi;
+
+		void beginRendering();
+
+		void endRendering();
+
+		const AlignedVector<Batch>& getBatches() const;
+
 		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< const render::IVertexLayout > m_vertexLayout;
