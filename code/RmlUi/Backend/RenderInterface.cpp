@@ -192,7 +192,7 @@ namespace traktor::rmlui
 	{
 		{
 			AlignedVector< render::VertexElement > vertexElements = {};
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position), 4));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
 			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
