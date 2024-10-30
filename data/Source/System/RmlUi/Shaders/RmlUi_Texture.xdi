@@ -2,11 +2,11 @@
 <object type="traktor.render.ShaderGraph" version="traktor.render.Graph:1">
 	<nodes>
 		<item type="traktor.render.PixelOutput" version="10,traktor.render.Node:1">
-			<id>{B3D199EB-AEF0-9A40-9E2C-407FEC3765A4}</id>
+			<id>{FD6AE40E-B82A-7742-9D44-38F86FDB28D1}</id>
 			<comment/>
 			<position>
-				<first>1680</first>
-				<second>389</second>
+				<first>1290</first>
+				<second>35</second>
 			</position>
 			<technique>Default</technique>
 			<priority>
@@ -15,13 +15,13 @@
 				<postOpaque>false</postOpaque>
 				<alphaBlend>false</alphaBlend>
 				<postAlphaBlend>false</postAlphaBlend>
-				<overlay>true</overlay>
+				<overlay>false</overlay>
 			</priority>
-			<cullMode>CounterClockWise</cullMode>
+			<cullMode>Never</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
-			<blendColorSource>BfOne</blendColorSource>
-			<blendColorDestination>BfZero</blendColorDestination>
+			<blendColorSource>BfSourceAlpha</blendColorSource>
+			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
 			<blendAlphaOperation>BoAdd</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
 			<blendAlphaDestination>BfOne</blendAlphaDestination>
@@ -31,29 +31,41 @@
 				<blue>true</blue>
 				<alpha>true</alpha>
 			</colorWriteMask>
-			<depthEnable>true</depthEnable>
-			<depthWriteEnable>true</depthWriteEnable>
+			<depthEnable>false</depthEnable>
+			<depthWriteEnable>false</depthWriteEnable>
 			<depthFunction>CfLessEqual</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
 			<alphaToCoverageEnable>false</alphaToCoverageEnable>
 			<wireframe>false</wireframe>
-			<stencilEnable>false</stencilEnable>
+			<stencilEnable>true</stencilEnable>
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
-			<stencilFunction>CfAlways</stencilFunction>
+			<stencilFunction>CfEqual</stencilFunction>
 			<stencilReference>0</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>
-		<item type="traktor.render.Sampler" version="5,traktor.render.Node:1">
-			<id>{8AF24F3E-E559-DF42-A7E1-8ADBD8DAD15B}</id>
+		<item type="traktor.render.Uniform" version="4,traktor.render.Node:1">
+			<id>{0CEF77D9-23BC-4647-96E3-899D1840B6FB}</id>
 			<comment/>
 			<position>
-				<first>1161</first>
-				<second>92</second>
+				<first>461</first>
+				<second>13</second>
+			</position>
+			<declaration>{1FF41897-77F0-A24B-A040-9325E56779BB}</declaration>
+			<parameterName>RmlUi_Texture</parameterName>
+			<type>Texture2D</type>
+			<frequency>Draw</frequency>
+		</item>
+		<item type="traktor.render.Sampler" version="5,traktor.render.Node:1">
+			<id>{36AB61DE-8BAD-1A41-B7E3-81A4DD6A2EED}</id>
+			<comment/>
+			<position>
+				<first>823</first>
+				<second>85</second>
 			</position>
 			<minFilter>FtLinear</minFilter>
 			<mipFilter>FtLinear</mipFilter>
@@ -66,35 +78,23 @@
 			<ignoreMips>false</ignoreMips>
 			<useAnisotropic>false</useAnisotropic>
 		</item>
-		<item type="traktor.render.Uniform" version="4,traktor.render.Node:1">
-			<id>{CFB9EBF8-2372-AB4E-A94A-61E12D94BE87}</id>
-			<comment/>
-			<position>
-				<first>692</first>
-				<second>-36</second>
-			</position>
-			<declaration>{1FF41897-77F0-A24B-A040-9325E56779BB}</declaration>
-			<parameterName/>
-			<type>Scalar</type>
-			<frequency>Frame</frequency>
-		</item>
 		<item type="traktor.render.External" version="2,traktor.render.Node:1">
-			<id>{3AA3EEE4-08D0-2649-8B9D-F712A49ADCAE}</id>
+			<id>{953024DD-939F-9B49-999E-48C1E469F578}</id>
 			<comment/>
 			<position>
-				<first>518</first>
-				<second>241</second>
+				<first>430</first>
+				<second>174</second>
 			</position>
-			<fragmentGuid>{FC000CC8-9193-CA47-9B2C-2EDAE705FCBD}</fragmentGuid>
+			<fragmentGuid>{48FE642A-4759-AB4E-AD9C-7F75657295BE}</fragmentGuid>
 			<inputPins/>
 			<outputPins>
 				<item>
-					<id>{7341ADE6-2363-F745-8474-F888A90320A6}</id>
+					<id>{6A9B232B-3FA6-5D4C-93CE-E7F4EB87014A}</id>
 					<name>FragColor</name>
 				</item>
 				<item>
-					<id>{BC614F36-CC9C-2F40-A480-903CDC85F1E7}</id>
-					<name>FragTexCoord</name>
+					<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
+					<name>TexCoord</name>
 				</item>
 			</outputPins>
 			<values/>
@@ -104,6 +104,16 @@
 		<item type="traktor.render.Edge" version="1">
 			<source>
 				<node ref="/object/nodes/item[1]"/>
+				<id>{1E6639B6-8B58-4694-99E7-C058E3583522}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[2]"/>
+				<id>{32EB5230-1F0D-40B8-93F6-9C8E5469454E}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[2]"/>
 				<id>{AF6C971B-D67A-42EE-A12B-97D36927C89F}</id>
 			</source>
 			<destination>
@@ -113,21 +123,11 @@
 		</item>
 		<item type="traktor.render.Edge" version="1">
 			<source>
-				<node ref="/object/nodes/item[2]"/>
-				<id>{1E6639B6-8B58-4694-99E7-C058E3583522}</id>
-			</source>
-			<destination>
-				<node ref="/object/nodes/item[1]"/>
-				<id>{32EB5230-1F0D-40B8-93F6-9C8E5469454E}</id>
-			</destination>
-		</item>
-		<item type="traktor.render.Edge" version="1">
-			<source>
 				<node ref="/object/nodes/item[3]"/>
-				<id>{BC614F36-CC9C-2F40-A480-903CDC85F1E7}</id>
+				<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
 			</source>
 			<destination>
-				<node ref="/object/nodes/item[1]"/>
+				<node ref="/object/nodes/item[2]"/>
 				<id>{6D5C5EFE-A35C-4748-B81E-B8EBACE433BC}</id>
 			</destination>
 		</item>
