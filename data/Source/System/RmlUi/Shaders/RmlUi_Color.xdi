@@ -2,26 +2,26 @@
 <object type="traktor.render.ShaderGraph" version="traktor.render.Graph:1">
 	<nodes>
 		<item type="traktor.render.PixelOutput" version="10,traktor.render.Node:1">
-			<id>{1DB02379-2498-6E47-9B5D-3263375CDBE8}</id>
+			<id>{305AF326-D7EC-C24B-9691-4FC440D2EC3A}</id>
 			<comment/>
 			<position>
-				<first>1022</first>
-				<second>260</second>
+				<first>1093</first>
+				<second>123</second>
 			</position>
 			<technique>Default</technique>
 			<priority>
 				<setup>false</setup>
-				<opaque>true</opaque>
+				<opaque>false</opaque>
 				<postOpaque>false</postOpaque>
 				<alphaBlend>false</alphaBlend>
 				<postAlphaBlend>false</postAlphaBlend>
-				<overlay>true</overlay>
+				<overlay>false</overlay>
 			</priority>
 			<cullMode>Never</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
-			<blendColorSource>BfOne</blendColorSource>
-			<blendColorDestination>BfZero</blendColorDestination>
+			<blendColorSource>BfSourceAlpha</blendColorSource>
+			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
 			<blendAlphaOperation>BoAdd</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
 			<blendAlphaDestination>BfOne</blendAlphaDestination>
@@ -31,8 +31,8 @@
 				<blue>true</blue>
 				<alpha>true</alpha>
 			</colorWriteMask>
-			<depthEnable>true</depthEnable>
-			<depthWriteEnable>true</depthWriteEnable>
+			<depthEnable>false</depthEnable>
+			<depthWriteEnable>false</depthWriteEnable>
 			<depthFunction>CfLessEqual</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
@@ -43,79 +43,61 @@
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
-			<stencilFunction>CfAlways</stencilFunction>
+			<stencilFunction>CfEqual</stencilFunction>
 			<stencilReference>0</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>
-		<item type="traktor.render.Script" version="6,traktor.render.Node:1">
-			<id>{175144E9-5755-8A4C-B6BA-DFE80E717528}</id>
-			<comment/>
-			<position>
-				<first>472</first>
-				<second>143</second>
-			</position>
-			<name>Unnamed</name>
-			<technique/>
-			<localSize>
-				<X>1</X>
-				<Y>1</Y>
-				<Z>1</Z>
-			</localSize>
-			<include/>
-			<inputPins/>
-			<outputPins>
-				<item>
-					<id>{44E9751D-1D65-A143-8E50-6D901F8746F0}</id>
-					<name>Output</name>
-					<type>Vector</type>
-				</item>
-			</outputPins>
-			<script>
-			<![CDATA[
-// Use gl_VertexID to assign positions for a triangle
-vec2 positions[3] = vec2[](
-    vec2(0.0, 0.5),   // Top vertex
-    vec2(-0.5, -0.5), // Bottom left vertex
-    vec2(0.5, -0.5)   // Bottom right vertex
-);
-
-// Assign the position based on the vertex ID
-$Output = vec4(positions[gl_VertexIndex], 0.0, 1.0);
-			]]>
-			</script>
-		</item>
 		<item type="traktor.render.External" version="2,traktor.render.Node:1">
-			<id>{9A49D513-A169-864E-9B84-5EDDD75A63AA}</id>
+			<id>{9085B9B2-DCAE-F34A-ABE7-4764669F2E13}</id>
 			<comment/>
 			<position>
-				<first>609</first>
-				<second>264</second>
+				<first>350</first>
+				<second>141</second>
 			</position>
-			<fragmentGuid>{FC000CC8-9193-CA47-9B2C-2EDAE705FCBD}</fragmentGuid>
+			<fragmentGuid>{48FE642A-4759-AB4E-AD9C-7F75657295BE}</fragmentGuid>
 			<inputPins/>
 			<outputPins>
 				<item>
-					<id>{7341ADE6-2363-F745-8474-F888A90320A6}</id>
+					<id>{6A9B232B-3FA6-5D4C-93CE-E7F4EB87014A}</id>
 					<name>FragColor</name>
 				</item>
 				<item>
-					<id>{BC614F36-CC9C-2F40-A480-903CDC85F1E7}</id>
-					<name>FragTexCoord</name>
+					<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
+					<name>TexCoord</name>
 				</item>
 			</outputPins>
 			<values/>
+		</item>
+		<item type="traktor.render.Swizzle" version="traktor.render.Node:1">
+			<id>{E1EC041C-FC4A-0A45-9D69-F573D2850222}</id>
+			<comment/>
+			<position>
+				<first>800</first>
+				<second>125</second>
+			</position>
+			<swizzle>zyxw</swizzle>
 		</item>
 	</nodes>
 	<edges>
 		<item type="traktor.render.Edge" version="1">
 			<source>
 				<node ref="/object/nodes/item[2]"/>
-				<id>{7341ADE6-2363-F745-8474-F888A90320A6}</id>
+				<id>{ADB4FC1D-3726-4CC5-B4D5-1E2468274325}</id>
 			</source>
 			<destination>
 				<node ref="/object/nodes/item"/>
 				<id>{7174FE5A-D079-4452-AFEF-9FC2BCC2900F}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[1]"/>
+				<id>{6A9B232B-3FA6-5D4C-93CE-E7F4EB87014A}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[2]"/>
+				<id>{F2E22CA6-DFF3-4B20-A70A-0D7A44EACD8C}</id>
 			</destination>
 		</item>
 	</edges>
