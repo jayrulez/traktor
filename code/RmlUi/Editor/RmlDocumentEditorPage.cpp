@@ -42,6 +42,7 @@
 #include "Ui/ToolBar/ToolBarSeparator.h"
 #include "Ui/TreeView/TreeView.h"
 #include "Ui/TreeView/TreeViewItem.h"
+#include "RmlUi/Backend/RmlUi.h"
 
 namespace traktor
 {
@@ -66,6 +67,8 @@ namespace traktor
 			Ref< db::Database > database = m_editor->getOutputDatabase();
 			if (!database)
 				return false;
+
+			RmlUi::getInstance().reloadResources();
 
 			// Read rml document from output database.
 			//m_RmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());

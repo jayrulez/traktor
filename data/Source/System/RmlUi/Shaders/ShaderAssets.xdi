@@ -21,5 +21,9 @@
 			<id>{48FE642A-4759-AB4E-AD9C-7F75657295BE}</id>
 			<editorDeployOnly>false</editorDeployOnly>
 		</item>
+		<item>
+			<id>{AFC34A55-B4CF-774F-A86F-B303A7317CF0}</id>
+			<editorDeployOnly>false</editorDeployOnly>
+		</item>
 	</dependencies>
 </object>
