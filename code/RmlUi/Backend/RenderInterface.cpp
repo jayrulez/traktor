@@ -20,7 +20,8 @@ namespace traktor::rmlui
 	{
 		const Rml::String DefaultContextName = "Default";
 
-		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
+		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
+		//const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
 		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
 	
 		size_t allocateTextureId()
@@ -49,6 +50,8 @@ namespace traktor::rmlui
 
 			Vertex* destVertices = static_cast<Vertex*>(geometry->vertexBuffer->lock());
 
+			AlignedVector<Vertex> vs = {};
+
 			for (size_t i = 0; i < vertices.size(); i++)
 			{
 				const Rml::Vertex& sourceVertex = vertices[i];
@@ -58,10 +61,12 @@ namespace traktor::rmlui
 				destVertex.position[1] = sourceVertex.position.y;
 				destVertex.position[2] = 0.0f;
 
-				destVertex.texCoord[0] = sourceVertex.tex_coord.x;
-				destVertex.texCoord[1] = sourceVertex.tex_coord.y;
+				//destVertex.texCoord[0] = sourceVertex.tex_coord.x;
+				//destVertex.texCoord[1] = sourceVertex.tex_coord.y;
 
 				destVertex.color = Color4ub(sourceVertex.colour.red, sourceVertex.colour.green, sourceVertex.colour.blue, sourceVertex.colour.alpha);
+
+				vs.push_back(destVertex);
 			}
 
 			geometry->vertexBuffer->unlock();
@@ -191,9 +196,14 @@ namespace traktor::rmlui
 	bool RenderInterface::loadResources()
 	{
 		{
+			//AlignedVector< render::VertexElement > vertexElements = {};
+			//vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
+			//vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
+			//vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
+			//m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+
 			AlignedVector< render::VertexElement > vertexElements = {};
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
 			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 		}
@@ -202,8 +212,8 @@ namespace traktor::rmlui
 			if (!m_resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
 				return false;
 
-			if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
-				return false;
+			//if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
+			//	return false;
 		}
 
 		return true;
