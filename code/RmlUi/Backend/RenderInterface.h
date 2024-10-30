@@ -58,12 +58,23 @@ namespace traktor::rmlui
 
 	public:
 
+#pragma pack(push, 1)  // Set alignment to 1 byte
+
+		struct VertexColor
+		{
+			float r;
+			float g;
+			float b;
+			float a;
+		};
+
 		struct Vertex
 		{
 			float position[3];
-			//float texCoord[2];
-			Color4ub color;
+			float texCoord[2];
+			VertexColor color;
 		};
+#pragma pack(pop)  // Restore the previous packing alignment
 
 		struct CompiledGeometry
 		{
@@ -102,8 +113,9 @@ namespace traktor::rmlui
 		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< const render::IVertexLayout > m_vertexLayout;
-		resource::Proxy< render::Shader > m_rmlUiShader;
-		resource::Proxy< render::Shader > m_rmlUiShaderWithTexture;
+		Ref< const render::IVertexLayout > m_vertexLayoutTexture;
+		resource::Proxy< render::Shader > m_rmlUiShaderColor;
+		resource::Proxy< render::Shader > m_rmlUiShaderTexture;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
 		render::BlendOperation m_blendOp;
