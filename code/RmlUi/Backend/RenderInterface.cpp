@@ -18,12 +18,9 @@ namespace traktor::rmlui
 {
 	namespace
 	{
-		const Rml::String DefaultContextName = "Default";
+		const resource::Id< render::Shader > c_idShaderRmlUiShaderColor(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
 
-		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
-		//const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
-		//const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
-		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{AFC34A55-B4CF-774F-A86F-B303A7317CF0}"));
+		const resource::Id< render::Shader > c_idShaderRmlUiShaderTexture(Guid(L"{AFC34A55-B4CF-774F-A86F-B303A7317CF0}"));
 	
 		size_t allocateTextureId()
 		{
@@ -129,7 +126,7 @@ namespace traktor::rmlui
 		{
 			batch.program = m_rmlUiShaderColor->getProgram(perm).program;
 		}
-		// todo: batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
+		batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
 		batch.program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(translation.x, translation.y, 0, 0));
 
 		m_batches.push_back(std::move(batch));
@@ -152,7 +149,7 @@ namespace traktor::rmlui
 		render::SimpleTextureCreateDesc desc;
 		desc.width = source_dimensions.x;
 		desc.height = source_dimensions.y;
-		desc.format = render::TextureFormat::TfR32G32B32A32F;
+		desc.format = render::TextureFormat::TfR8G8B8A8;
 		desc.immutable = true;
 		render::TextureInitialData initialData;
 		initialData.data = source.data();
@@ -215,24 +212,17 @@ namespace traktor::rmlui
 		{
 			AlignedVector< render::VertexElement > vertexElements = {};
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord), 1));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat4, offsetof(Vertex, color)));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
+			T_ASSERT(render::getVertexSize(vertexElements) == sizeof(Vertex));
 			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 		}
 
 		{
-			AlignedVector< render::VertexElement > vertexElements = {};
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord), 1));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat4, offsetof(Vertex, color)));
-			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
-		}
-
-		{
-			if (!m_resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShaderColor))
+			if (!m_resourceManager->bind(c_idShaderRmlUiShaderColor, m_rmlUiShaderColor))
 				return false;
 
-			if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderTexture))
+			if (!m_resourceManager->bind(c_idShaderRmlUiShaderTexture, m_rmlUiShaderTexture))
 				return false;
 		}
 
