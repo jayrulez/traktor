@@ -64,6 +64,8 @@ namespace traktor::rmlui
 
 		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context);
 
+		void reloadResources();
+
 	private:
 		struct BackendData
 		{
