@@ -81,6 +81,8 @@ namespace traktor::rmlui
 			uint32_t triangleCount;
 			Ref < render::Buffer > vertexBuffer;
 			Ref < render::Buffer > indexBuffer;
+			uint32_t minIndex = 0;
+			uint32_t maxIndex = 0;
 		};
 
 		struct Batch
