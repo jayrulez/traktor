@@ -13,5 +13,13 @@
 			<id>{FC000CC8-9193-CA47-9B2C-2EDAE705FCBD}</id>
 			<editorDeployOnly>false</editorDeployOnly>
 		</item>
+		<item>
+			<id>{5E18600A-1FCC-5140-AB80-E75615B5D01F}</id>
+			<editorDeployOnly>false</editorDeployOnly>
+		</item>
+		<item>
+			<id>{48FE642A-4759-AB4E-AD9C-7F75657295BE}</id>
+			<editorDeployOnly>false</editorDeployOnly>
+		</item>
 	</dependencies>
 </object>
