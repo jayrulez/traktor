@@ -81,14 +81,22 @@ namespace traktor::rmlui
 
 			int32_t* destIndices = static_cast<int32_t*>(geometry->indexBuffer->lock());
 
+			int minIndex = 0;
+			int maxIndex = 0;
+
 			for (int i = 0; i < indices.size(); i++)
 			{
 				int32_t& index = destIndices[i];
 
 				index = indices[i];
+
+				minIndex = std::min(minIndex, index);
+				maxIndex = std::max(maxIndex, index);
 			}
 
 			geometry->indexBuffer->unlock();
+			geometry->minIndex = minIndex;
+			geometry->maxIndex = maxIndex;
 		}
 
 		return reinterpret_cast<Rml::CompiledGeometryHandle>(geometry);

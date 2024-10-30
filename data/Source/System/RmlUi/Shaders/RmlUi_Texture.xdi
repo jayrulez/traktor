@@ -5,8 +5,8 @@
 			<id>{FD6AE40E-B82A-7742-9D44-38F86FDB28D1}</id>
 			<comment/>
 			<position>
-				<first>1290</first>
-				<second>35</second>
+				<first>1506</first>
+				<second>40</second>
 			</position>
 			<technique>Default</technique>
 			<priority>
@@ -31,8 +31,8 @@
 				<blue>true</blue>
 				<alpha>true</alpha>
 			</colorWriteMask>
-			<depthEnable>false</depthEnable>
-			<depthWriteEnable>false</depthWriteEnable>
+			<depthEnable>true</depthEnable>
+			<depthWriteEnable>true</depthWriteEnable>
 			<depthFunction>CfLessEqual</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
@@ -43,7 +43,7 @@
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
-			<stencilFunction>CfEqual</stencilFunction>
+			<stencilFunction>CfAlways</stencilFunction>
 			<stencilReference>0</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
@@ -52,8 +52,8 @@
 			<id>{0CEF77D9-23BC-4647-96E3-899D1840B6FB}</id>
 			<comment/>
 			<position>
-				<first>461</first>
-				<second>13</second>
+				<first>456</first>
+				<second>-37</second>
 			</position>
 			<declaration>{1FF41897-77F0-A24B-A040-9325E56779BB}</declaration>
 			<parameterName>RmlUi_Texture</parameterName>
@@ -64,8 +64,8 @@
 			<id>{36AB61DE-8BAD-1A41-B7E3-81A4DD6A2EED}</id>
 			<comment/>
 			<position>
-				<first>823</first>
-				<second>85</second>
+				<first>908</first>
+				<second>-142</second>
 			</position>
 			<minFilter>FtLinear</minFilter>
 			<mipFilter>FtLinear</mipFilter>
@@ -82,8 +82,8 @@
 			<id>{953024DD-939F-9B49-999E-48C1E469F578}</id>
 			<comment/>
 			<position>
-				<first>430</first>
-				<second>174</second>
+				<first>382</first>
+				<second>152</second>
 			</position>
 			<fragmentGuid>{48FE642A-4759-AB4E-AD9C-7F75657295BE}</fragmentGuid>
 			<inputPins/>
@@ -99,6 +99,14 @@
 			</outputPins>
 			<values/>
 		</item>
+		<item type="traktor.render.Mul" version="traktor.render.Node:1">
+			<id>{A4B2B779-9171-1D43-A059-2EB664D3B095}</id>
+			<comment/>
+			<position>
+				<first>1244</first>
+				<second>-1</second>
+			</position>
+		</item>
 	</nodes>
 	<edges>
 		<item type="traktor.render.Edge" version="1">
@@ -113,8 +121,18 @@
 		</item>
 		<item type="traktor.render.Edge" version="1">
 			<source>
+				<node ref="/object/nodes/item[3]"/>
+				<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
+			</source>
+			<destination>
 				<node ref="/object/nodes/item[2]"/>
-				<id>{AF6C971B-D67A-42EE-A12B-97D36927C89F}</id>
+				<id>{6D5C5EFE-A35C-4748-B81E-B8EBACE433BC}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[4]"/>
+				<id>{9E839249-E9B9-4736-8BDD-A95A1C892B42}</id>
 			</source>
 			<destination>
 				<node ref="/object/nodes/item"/>
@@ -123,12 +141,22 @@
 		</item>
 		<item type="traktor.render.Edge" version="1">
 			<source>
-				<node ref="/object/nodes/item[3]"/>
-				<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
+				<node ref="/object/nodes/item[2]"/>
+				<id>{AF6C971B-D67A-42EE-A12B-97D36927C89F}</id>
 			</source>
 			<destination>
-				<node ref="/object/nodes/item[2]"/>
-				<id>{6D5C5EFE-A35C-4748-B81E-B8EBACE433BC}</id>
+				<node ref="/object/nodes/item[4]"/>
+				<id>{69997292-C813-490C-910C-620B9AD3A2BB}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[3]"/>
+				<id>{6A9B232B-3FA6-5D4C-93CE-E7F4EB87014A}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[4]"/>
+				<id>{D2D716D6-C4A1-471F-894A-D718515F6281}</id>
 			</destination>
 		</item>
 	</edges>
