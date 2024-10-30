@@ -136,7 +136,7 @@ namespace traktor::rmlui
 	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
 		if (!m_rmlDocument)
-			return ui::Size(400, 300);
+			return ui::Size(600, 600);
 
 		//Aabb2 bounds = {};//m_document->getFrameBounds();
 
@@ -153,7 +153,6 @@ namespace traktor::rmlui
 		if (m_renderView)
 		{
 			m_renderView->reset(sz.cx, sz.cy);
-			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
 			if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
 				return;
 		}
@@ -189,21 +188,29 @@ namespace traktor::rmlui
 			const auto& batches = RmlUi::getInstance().renderContext(m_rmlContext);
 
 			render::Clear cl;
-			cl.mask = render::CfColor | render::CfDepth | render::CfStencil;
-			cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
+			cl.mask = render::CfColor | render::CfStencil;
+			cl.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 1.0f);
 			cl.depth = 1.0f;
 			cl.stencil = 0;
 			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
 			{
 				for (auto& batch : batches)
 				{
+					render::Primitives p = {
+						render::PrimitiveType::Triangles,
+						0,
+						batch.compiledGeometry->triangleCount,
+						batch.compiledGeometry->minIndex,
+						batch.compiledGeometry->maxIndex
+					};
+
 					m_renderView->draw(
 						batch.compiledGeometry->vertexBuffer->getBufferView(),
 						RmlUi::getInstance().getRenderInterface()->getVertexLayout(),
 						batch.compiledGeometry->indexBuffer->getBufferView(),
 						render::IndexType::UInt32,
 						batch.program,
-						render::Primitives(render::PrimitiveType::Triangles, 0, batch.compiledGeometry->triangleCount, 0, 0),
+						p,
 						1);
 				}
 

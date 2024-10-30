@@ -17,8 +17,8 @@
 			<id>{9C61481B-AFCF-F546-92D1-ABAFEE3202B1}</id>
 			<comment/>
 			<position>
-				<first>520</first>
-				<second>361</second>
+				<first>524</first>
+				<second>544</second>
 			</position>
 			<name>Color</name>
 			<usage>Color</usage>
@@ -39,8 +39,8 @@
 			<id>{6A9B232B-3FA6-5D4C-93CE-E7F4EB87014A}</id>
 			<comment/>
 			<position>
-				<first>1500</first>
-				<second>437</second>
+				<first>1488</first>
+				<second>581</second>
 			</position>
 			<name>FragColor</name>
 		</item>
@@ -68,8 +68,8 @@
 			<id>{C50A934A-17B4-7B48-8A31-13B20C39D287}</id>
 			<comment/>
 			<position>
-				<first>524</first>
-				<second>500</second>
+				<first>522</first>
+				<second>355</second>
 			</position>
 			<name>TexCoord</name>
 			<usage>Custom</usage>
@@ -80,8 +80,8 @@
 			<id>{169FBDA6-2172-4946-82E4-DC98CC73B2A5}</id>
 			<comment/>
 			<position>
-				<first>1235</first>
-				<second>495</second>
+				<first>1586</first>
+				<second>326</second>
 			</position>
 			<name>TexCoord</name>
 		</item>
@@ -104,6 +104,41 @@
 			<parameterName>RmlUi_Transform</parameterName>
 			<type>Matrix</type>
 			<frequency>Draw</frequency>
+		</item>
+		<item type="traktor.render.Vector" version="traktor.render.Node:1">
+			<id>{06205A4D-CEA9-2B46-8EAA-DD7968C9FC68}</id>
+			<comment/>
+			<position>
+				<first>526</first>
+				<second>413</second>
+			</position>
+			<value>0.5, -0.5, 0, 0</value>
+		</item>
+		<item type="traktor.render.Vector" version="traktor.render.Node:1">
+			<id>{1D63776A-58EC-7146-BB93-11B2488ADD75}</id>
+			<comment/>
+			<position>
+				<first>530</first>
+				<second>478</second>
+			</position>
+			<value>0.5, 0.5, 0, 0</value>
+		</item>
+		<item type="traktor.render.MulAdd" version="traktor.render.Node:1">
+			<id>{599395AC-C263-F342-B117-9D00A80F238A}</id>
+			<comment/>
+			<position>
+				<first>1002</first>
+				<second>378</second>
+			</position>
+		</item>
+		<item type="traktor.render.Swizzle" version="traktor.render.Node:1">
+			<id>{0D231F88-DDBD-DF4C-AB8B-9BF77C09B405}</id>
+			<comment/>
+			<position>
+				<first>1360</first>
+				<second>414</second>
+			</position>
+			<swizzle>xy</swizzle>
 		</item>
 	</nodes>
 	<edges>
@@ -139,16 +174,6 @@
 		</item>
 		<item type="traktor.render.Edge" version="1">
 			<source>
-				<node ref="/object/nodes/item[6]"/>
-				<id>{BD91C9E9-9950-4EC8-BAD2-60D2E8699107}</id>
-			</source>
-			<destination>
-				<node ref="/object/nodes/item[7]"/>
-				<id>{731844D4-AFDC-4EAA-8B41-C4BA2455898F}</id>
-			</destination>
-		</item>
-		<item type="traktor.render.Edge" version="1">
-			<source>
 				<node ref="/object/nodes/item[8]"/>
 				<id>{70C35B91-1C36-454C-98EC-7514AACF73C8}</id>
 			</source>
@@ -175,6 +200,56 @@
 			<destination>
 				<node ref="/object/nodes/item[8]"/>
 				<id>{71A0310C-3928-44C3-8D4F-7D9AFF9EAE70}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[6]"/>
+				<id>{BD91C9E9-9950-4EC8-BAD2-60D2E8699107}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[12]"/>
+				<id>{4067F6C8-9404-45CA-9359-D9E2456F7431}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[10]"/>
+				<id>{D51E6077-37E9-4B1C-86D2-92DA544DC613}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[12]"/>
+				<id>{F95D9BA4-88CC-4001-9948-B8173FDDE6F0}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[11]"/>
+				<id>{D51E6077-37E9-4B1C-86D2-92DA544DC613}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[12]"/>
+				<id>{567A2DC4-F113-4DE2-917A-791917DA5DA5}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[12]"/>
+				<id>{29BA4386-B838-4550-93DF-F53D8B812C88}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[13]"/>
+				<id>{F2E22CA6-DFF3-4B20-A70A-0D7A44EACD8C}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[13]"/>
+				<id>{ADB4FC1D-3726-4CC5-B4D5-1E2468274325}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[7]"/>
+				<id>{731844D4-AFDC-4EAA-8B41-C4BA2455898F}</id>
 			</destination>
 		</item>
 	</edges>
