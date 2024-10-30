@@ -79,8 +79,8 @@ namespace traktor::rmlui
 					body
 					{
 						position: absolute;
-						width: 1024px;
-						height: 768px;
+						width: 400px;
+						height: 300px;
 						background-color: #ffffff;
 						font-family: atop;
 					}
@@ -153,6 +153,7 @@ namespace traktor::rmlui
 		if (m_renderView)
 		{
 			m_renderView->reset(sz.cx, sz.cy);
+			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
 			if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
 				return;
 		}
