@@ -27,6 +27,9 @@ namespace traktor::rmlui
 	Rml::FileHandle FileInterface::Open(const Rml::String& path)
 	{
 		Ref< IStream > stream = FileSystem::getInstance().open(Path(mbstows(path)), File::FmRead);
+		if (!stream)
+			return 0;
+
 		size_t fileId = allocateFileId();
 		m_openFiles.insert(fileId, stream);
 		return static_cast<Rml::FileHandle>(fileId);
