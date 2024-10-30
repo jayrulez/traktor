@@ -79,18 +79,16 @@ namespace traktor::rmlui
 					body
 					{
 						position: absolute;
-						top: 50px;
-						left: 50px;
 						width: 500px;
 						height: 500px;
-						background-color: #fff;
+						background-color: #ffffff;
 					}
 					div
 					{
 						display: block;
 						height: 200px;
 						width: 200px;
-						background-color: #ff0;
+						background-color: #ff00ff;
 					}
 				</style>
 				</head>
@@ -136,7 +134,7 @@ namespace traktor::rmlui
 	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
 		if (!m_rmlDocument)
-			return ui::Size(2631, 1117);
+			return ui::Size(400, 300);
 
 		//Aabb2 bounds = {};//m_document->getFrameBounds();
 
@@ -190,6 +188,8 @@ namespace traktor::rmlui
 			render::Clear cl;
 			cl.mask = render::CfColor | render::CfDepth | render::CfStencil;
 			cl.colors[0] = Color4f(0.8f, 0.5f, 0.8f, 1.0f);
+			cl.depth = 1.0f;
+			cl.stencil = 0;
 			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
 			{
 				for (auto& batch : batches)

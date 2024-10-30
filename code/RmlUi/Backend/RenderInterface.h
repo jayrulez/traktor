@@ -61,7 +61,7 @@ namespace traktor::rmlui
 		struct Vertex
 		{
 			float position[3];
-			float texCoord[2];
+			//float texCoord[2];
 			Color4ub color;
 		};
 

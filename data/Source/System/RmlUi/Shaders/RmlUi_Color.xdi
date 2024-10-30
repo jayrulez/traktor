@@ -11,13 +11,13 @@
 			<technique>Default</technique>
 			<priority>
 				<setup>false</setup>
-				<opaque>false</opaque>
+				<opaque>true</opaque>
 				<postOpaque>false</postOpaque>
 				<alphaBlend>false</alphaBlend>
 				<postAlphaBlend>false</postAlphaBlend>
 				<overlay>true</overlay>
 			</priority>
-			<cullMode>CounterClockWise</cullMode>
+			<cullMode>Never</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
 			<blendColorSource>BfOne</blendColorSource>
@@ -48,12 +48,49 @@
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>
-		<item type="traktor.render.External" version="2,traktor.render.Node:1">
-			<id>{4B7FAF74-0ED8-E043-AAE4-B9560C240DA2}</id>
+		<item type="traktor.render.Script" version="6,traktor.render.Node:1">
+			<id>{175144E9-5755-8A4C-B6BA-DFE80E717528}</id>
 			<comment/>
 			<position>
-				<first>561</first>
-				<second>277</second>
+				<first>472</first>
+				<second>143</second>
+			</position>
+			<name>Unnamed</name>
+			<technique/>
+			<localSize>
+				<X>1</X>
+				<Y>1</Y>
+				<Z>1</Z>
+			</localSize>
+			<include/>
+			<inputPins/>
+			<outputPins>
+				<item>
+					<id>{44E9751D-1D65-A143-8E50-6D901F8746F0}</id>
+					<name>Output</name>
+					<type>Vector</type>
+				</item>
+			</outputPins>
+			<script>
+			<![CDATA[
+// Use gl_VertexID to assign positions for a triangle
+vec2 positions[3] = vec2[](
+    vec2(0.0, 0.5),   // Top vertex
+    vec2(-0.5, -0.5), // Bottom left vertex
+    vec2(0.5, -0.5)   // Bottom right vertex
+);
+
+// Assign the position based on the vertex ID
+$Output = vec4(positions[gl_VertexIndex], 0.0, 1.0);
+			]]>
+			</script>
+		</item>
+		<item type="traktor.render.External" version="2,traktor.render.Node:1">
+			<id>{9A49D513-A169-864E-9B84-5EDDD75A63AA}</id>
+			<comment/>
+			<position>
+				<first>609</first>
+				<second>264</second>
 			</position>
 			<fragmentGuid>{FC000CC8-9193-CA47-9B2C-2EDAE705FCBD}</fragmentGuid>
 			<inputPins/>
@@ -73,7 +110,7 @@
 	<edges>
 		<item type="traktor.render.Edge" version="1">
 			<source>
-				<node ref="/object/nodes/item[1]"/>
+				<node ref="/object/nodes/item[2]"/>
 				<id>{7341ADE6-2363-F745-8474-F888A90320A6}</id>
 			</source>
 			<destination>
