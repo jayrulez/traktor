@@ -22,7 +22,8 @@ namespace traktor::rmlui
 
 		const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
 		//const resource::Id< render::Shader > c_idShaderRmlUiShader(Guid(L"{20046EBD-5DC4-494B-AF59-8F89AFFCC107}"));
-		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
+		//const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{2664F5C5-16C6-B042-ACF5-27EC491EBCB6}"));
+		const resource::Id< render::Shader > c_idShaderRmlUiShaderWithTexture(Guid(L"{AFC34A55-B4CF-774F-A86F-B303A7317CF0}"));
 	
 		size_t allocateTextureId()
 		{
@@ -61,10 +62,15 @@ namespace traktor::rmlui
 				destVertex.position[1] = sourceVertex.position.y;
 				destVertex.position[2] = 0.0f;
 
-				//destVertex.texCoord[0] = sourceVertex.tex_coord.x;
-				//destVertex.texCoord[1] = sourceVertex.tex_coord.y;
+				destVertex.texCoord[0] = sourceVertex.tex_coord.x;
+				destVertex.texCoord[1] = sourceVertex.tex_coord.y;
 
-				destVertex.color = Color4ub(sourceVertex.colour.red, sourceVertex.colour.green, sourceVertex.colour.blue, sourceVertex.colour.alpha);
+				destVertex.color = { 
+					.r = (float)sourceVertex.colour.red, 
+					.g = (float)sourceVertex.colour.green, 
+					.b = (float)sourceVertex.colour.blue, 
+					.a = (float)sourceVertex.colour.alpha 
+				};
 
 				vs.push_back(destVertex);
 			}
@@ -91,7 +97,7 @@ namespace traktor::rmlui
 		return reinterpret_cast<Rml::CompiledGeometryHandle>(geometry);
 	}
 
-	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture)
+	void RenderInterface::RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle textureHandle)
 	{
 		Batch batch;
 
@@ -104,14 +110,24 @@ namespace traktor::rmlui
 		batch.transformScissorRegion = false;
 
 		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+
+		size_t textureId = static_cast<size_t>(textureHandle);
+
+		render::ITexture* texture = nullptr;
+
+		if (m_textures.find(textureId) != m_textures.end())
+		{
+			texture = m_textures[textureId];
+		}
+
 		if (texture)
 		{
-			batch.program = m_rmlUiShaderWithTexture->getProgram(perm).program;
-			// todo: batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), Vector4(batch.translation.x, batch.translation.y, 0, 0));
+			batch.program = m_rmlUiShaderTexture->getProgram(perm).program;
+			batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), texture);
 		}
 		else
 		{
-			batch.program = m_rmlUiShader->getProgram(perm).program;
+			batch.program = m_rmlUiShaderColor->getProgram(perm).program;
 		}
 		// todo: batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
 		batch.program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(translation.x, translation.y, 0, 0));
@@ -140,9 +156,10 @@ namespace traktor::rmlui
 		desc.immutable = true;
 		render::TextureInitialData initialData;
 		initialData.data = source.data();
-		initialData.pitch = 4 * 4 * desc.width;
-		initialData.slicePitch = 4 * 4 * desc.width * desc.height;
+		initialData.pitch =  4 * desc.width;
+		initialData.slicePitch =  4 * desc.width * desc.height;
 		desc.initialData[0] = initialData;
+		desc.mipCount = 1;
 		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, L"RmlUi");
 		
 		size_t textureId = allocateTextureId();
@@ -196,24 +213,27 @@ namespace traktor::rmlui
 	bool RenderInterface::loadResources()
 	{
 		{
-			//AlignedVector< render::VertexElement > vertexElements = {};
-			//vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			//vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
-			//vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
-			//m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
-
 			AlignedVector< render::VertexElement > vertexElements = {};
 			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(Vertex, color)));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord), 1));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat4, offsetof(Vertex, color)));
 			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 		}
 
 		{
-			if (!m_resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShader))
+			AlignedVector< render::VertexElement > vertexElements = {};
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord), 1));
+			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat4, offsetof(Vertex, color)));
+			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+		}
+
+		{
+			if (!m_resourceManager->bind(c_idShaderRmlUiShader, m_rmlUiShaderColor))
 				return false;
 
-			//if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderWithTexture))
-			//	return false;
+			if (!m_resourceManager->bind(c_idShaderRmlUiShaderWithTexture, m_rmlUiShaderTexture))
+				return false;
 		}
 
 		return true;
@@ -227,8 +247,9 @@ namespace traktor::rmlui
 
 	void RenderInterface::unloadResources()
 	{
-		m_rmlUiShader.clear();
-		m_rmlUiShaderWithTexture.clear();
+		m_rmlUiShaderColor.clear();
+		m_rmlUiShaderTexture.clear();
 		m_vertexLayout.reset();
+		m_vertexLayoutTexture.reset();
 	}
 }
