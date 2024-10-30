@@ -79,9 +79,10 @@ namespace traktor::rmlui
 					body
 					{
 						position: absolute;
-						width: 500px;
-						height: 500px;
+						width: 1024px;
+						height: 768px;
 						background-color: #ffffff;
+						font-family: atop;
 					}
 					div
 					{
@@ -89,11 +90,12 @@ namespace traktor::rmlui
 						height: 200px;
 						width: 200px;
 						background-color: #ff00ff;
+						color: #000000;
 					}
 				</style>
 				</head>
 				<body>
-					<div/>
+					<div>Hello World</div>
 				</body>
 				</rml>)");
 

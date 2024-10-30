@@ -60,6 +60,8 @@ namespace traktor::rmlui
 
 		m_initialized = Rml::Initialise();
 
+		Rml::LoadFontFace("assets/Atop-R99O3.ttf");
+
 		m_backendData->renderInterface.loadResources();
 
 		return m_initialized;
@@ -149,5 +151,10 @@ namespace traktor::rmlui
 		m_backendData->renderMutex.release();
 
 		return batches;
+	}
+
+	void RmlUi::reloadResources()
+	{
+		m_backendData->renderInterface.reloadResources();
 	}
 }
