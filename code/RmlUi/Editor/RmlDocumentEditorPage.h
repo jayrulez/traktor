@@ -39,8 +39,7 @@ namespace traktor
 		class ToolBar;
 		class ToolBarButton;
 		class ToolBarButtonClickEvent;
-		class TreeView;
-		class TreeViewItem;
+		class StatusBar;
 
 	}
 
@@ -77,11 +76,12 @@ namespace traktor
 			editor::IEditor* m_editor;
 			editor::IEditorPageSite* m_site;
 			editor::IDocument* m_document;
-			Ref< ui::TreeView > m_treeMovie;
-			Ref< RmlDocumentPreviewControl > m_previewControl;
-			Ref< ui::ToolBar > m_toolBarPlay;
 			Ref< resource::IResourceManager > m_resourceManager;
+			Ref< RmlDocumentPreviewControl > m_previewControl;
 			Ref< RmlDocumentResource > m_RmlDocument;
+			Ref< ui::Container > m_container;
+			Ref< ui::StatusBar > m_statusBar;
+			Ref< ui::ToolBar > m_toolBar;
 		};
 
 	}
