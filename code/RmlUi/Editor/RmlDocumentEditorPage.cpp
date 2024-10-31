@@ -28,6 +28,7 @@
 #include "RmlUi/Editor/RmlDocumentPreviewControl.h"
 #include "Render/IRenderSystem.h"
 #include "Render/Resource/ShaderFactory.h"
+#include "Render/Resource/TextureFactory.h"
 #include "Resource/ResourceManager.h"
 #include "Ui/Application.h"
 #include "Ui/Container.h"
@@ -36,13 +37,12 @@
 #include "Ui/AspectLayout.h"
 #include "Ui/CenterLayout.h"
 #include "Ui/Splitter.h"
+#include "Ui/StatusBar/StatusBar.h"
 #include "Ui/ToolBar/ToolBar.h"
 #include "Ui/ToolBar/ToolBarButton.h"
 #include "Ui/ToolBar/ToolBarButtonClickEvent.h"
 #include "Ui/ToolBar/ToolBarSeparator.h"
-#include "Ui/TreeView/TreeView.h"
-#include "Ui/TreeView/TreeViewItem.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUi.h"
 
 namespace traktor
 {
@@ -68,44 +68,54 @@ namespace traktor
 			if (!database)
 				return false;
 
-			RmlUi::getInstance().reloadResources();
-
 			// Read rml document from output database.
 			//m_RmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());
 			//if (!m_RmlDocument)
 			//	return false;
 
 			m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
+			m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
+			m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
 			//m_resourceManager->addFactory(new rmlui::RmlDocumentResourceFactory());
 
-			Ref< ui::Container > container = new ui::Container();
-			container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
+			m_container = new ui::Container();
+			m_container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
 
-			m_toolBarPlay = new ui::ToolBar();
-			m_toolBarPlay->create(container);
+			m_toolBar = new ui::ToolBar();
+			m_toolBar->create(m_container);
 			for (int32_t i = 0; i < 6; ++i)
-				m_toolBarPlay->addImage(new ui::StyleBitmap(L"Flash.Playback", i));
-			m_toolBarPlay->addItem(new ui::ToolBarButton(i18n::Text(L"RMLUI_EDITOR_RELOAD"), 0, ui::Command(L"RmlUi.Editor.Reload")));
-
+				m_toolBar->addImage(new ui::StyleBitmap(L"Flash.Playback", i));
+			m_toolBar->addItem(new ui::ToolBarButton(
+				i18n::Text(L"RMLUI_EDITOR_RELOAD"), 
+				0, 
+				ui::Command(L"RmlUi.Editor.Reload")
+			));
 
 			Ref< ui::Splitter > splitter = new ui::Splitter();
-			splitter->create(container, true, 300_ut);
+			splitter->create(m_container, true, 300_ut);
 
-			m_treeMovie = new ui::TreeView();
-			m_treeMovie->create(splitter, ui::TreeView::WsTreeButtons | ui::TreeView::WsTreeLines | ui::WsDoubleBuffer);
+			// Create aspect container.
+			Ref< ui::Container > container = new ui::Container();
+			container->create(m_container, ui::WsNone, new ui::AspectLayout(16.0f / 9.0f));
 
-			m_previewControl = new RmlDocumentPreviewControl(m_editor);
-			if (!m_previewControl->create(splitter, ui::WsNone, database, m_resourceManager, renderSystem))
+			m_previewControl = new RmlDocumentPreviewControl(m_editor, database, m_resourceManager, renderSystem);
+			if (!m_previewControl->create(container))
 				return false;
+
+			// Create status bar.
+			m_statusBar = new ui::StatusBar();
+			m_statusBar->create(m_container, ui::WsDoubleBuffer);
+			m_statusBar->addColumn(-1);
 
 			m_previewControl->setRmlDocument(m_RmlDocument);
 			m_previewControl->update();
 
-			return true;
+			return true;			
 		}
 
 		void RmlDocumentEditorPage::destroy()
 		{
+			safeDestroy(m_resourceManager);
 			safeDestroy(m_previewControl);
 		}
 
@@ -150,7 +160,5 @@ namespace traktor
 			if (shouldRedraw)
 				m_previewControl->update();
 		}
-
-
 	}
 }
