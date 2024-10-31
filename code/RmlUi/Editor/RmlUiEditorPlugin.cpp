@@ -12,10 +12,9 @@
 #include "Core/Settings/PropertyGroup.h"
 #include "Editor/IEditor.h"
 #include "RmlUi/Editor/RmlUiEditorPlugin.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUi.h"
 #include "Resource/ResourceManager.h"
 #include "Render/Resource/ShaderFactory.h"
-#include "Render/Resource/TextureFactory.h"
 
 namespace traktor::rmlui
 {
@@ -27,11 +26,15 @@ namespace traktor::rmlui
 	{
 		m_editor = editor;
 
-		return true;
+		render::IRenderSystem* renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
+
+		return RmlUi::getInstance().initialize(renderSystem);
 	}
 
 	void RmlUiEditorPlugin::destroy()
 	{
+		if (RmlUi::getInstance().isInitialized())
+			RmlUi::getInstance().shutdown();
 	}
 
 	int32_t RmlUiEditorPlugin::getOrdinal() const
@@ -54,20 +57,10 @@ namespace traktor::rmlui
 
 	void RmlUiEditorPlugin::handleWorkspaceOpened()
 	{
-		render::IRenderSystem* renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
-
-		m_resourceManager = new resource::ResourceManager(m_editor->getOutputDatabase(), true);
-		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
-		m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
-
-		RmlUi::getInstance().initialize(m_resourceManager, renderSystem);
 	}
 
 	void RmlUiEditorPlugin::handleWorkspaceClosed()
 	{
-		if (RmlUi::getInstance().isInitialized())
-			RmlUi::getInstance().shutdown();
-		delete m_resourceManager;
 	}
 
 	void RmlUiEditorPlugin::handleEditorClosed()

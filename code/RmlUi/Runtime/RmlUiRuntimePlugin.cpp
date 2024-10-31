@@ -11,7 +11,7 @@
 #include "Core/Log/Log.h"
 #include "Database/Database.h"
 #include "RmlUi/Runtime/RmlUiRuntimePlugin.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUi.h"
 
 namespace traktor::rmlui
 {
@@ -22,8 +22,7 @@ namespace traktor::rmlui
 
 		bool RmlUiRuntimePlugin::create(IEnvironment* environment)
 	{
-		// m_resourceManager->addFactory(new render::ShaderFactory(renderSystem)); ???
-		return RmlUi::getInstance().initialize(environment->getResource()->getResourceManager(), environment->getRender()->getRenderSystem());
+		return RmlUi::getInstance().initialize(environment->getRender()->getRenderSystem());
 	}
 
 	void RmlUiRuntimePlugin::destroy(IEnvironment* environment)
