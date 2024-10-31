@@ -184,8 +184,9 @@ namespace traktor::rmlui
 
 		if (m_rmlContext)
 		{
-			//m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
-			m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
+			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
+			//m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
+			m_rmlContext->SetDensityIndependentPixelRatio(scale);
 		}
 	}
 
