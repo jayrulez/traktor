@@ -150,7 +150,7 @@ namespace traktor::rmlui
 
 		if (m_textures.find(textureId) != m_textures.end())
 		{
-			safeDestroy(m_textures[textureId]);
+			//safeDestroy(m_textures[textureId]);
 			m_textures.remove(textureId);
 		}
 	}
