@@ -36,9 +36,7 @@ namespace traktor::rmlui
 	class T_DLLCLASS RenderInterface : public Rml::RenderInterface
 	{
 	public:
-		RenderInterface(
-			resource::IResourceManager* resourceManager,
-			render::IRenderSystem* renderSystem);
+		RenderInterface(render::IRenderSystem* renderSystem);
 
 		virtual Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
@@ -81,8 +79,6 @@ namespace traktor::rmlui
 			uint32_t triangleCount;
 			Ref < render::Buffer > vertexBuffer;
 			Ref < render::Buffer > indexBuffer;
-			uint32_t minIndex = 0;
-			uint32_t maxIndex = 0;
 		};
 
 		struct Batch
@@ -92,16 +88,8 @@ namespace traktor::rmlui
 			int32_t scissorRegion[4];
 			bool scissorRegionEnabled;
 			bool transformScissorRegion = false;
-			render::IProgram* program = nullptr;
+			Vector4 translation = {};
 		};
-
-		const Ref< const render::IVertexLayout >& getVertexLayout() const;
-
-		bool loadResources();
-
-		bool reloadResources();
-
-		void unloadResources();
 
 	private:
 		friend class RmlUi;
@@ -112,12 +100,7 @@ namespace traktor::rmlui
 
 		const AlignedVector<Batch>& getBatches() const;
 
-		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
-		Ref< const render::IVertexLayout > m_vertexLayout;
-		Ref< const render::IVertexLayout > m_vertexLayoutTexture;
-		resource::Proxy< render::Shader > m_rmlUiShaderColor;
-		resource::Proxy< render::Shader > m_rmlUiShaderTexture;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
 		render::BlendOperation m_blendOp;

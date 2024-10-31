@@ -12,7 +12,7 @@
 #include "Core/Io/IStream.h"
 #include "RmlUi/ClassFactory.h"
 #include "RmlUi/RmlDocumentResource.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUi.h"
 
 namespace traktor::rmlui
 {

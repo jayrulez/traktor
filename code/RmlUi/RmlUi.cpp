@@ -10,8 +10,9 @@
 #include "Core/Rtti/ITypedObject.h"
 #include "Core/Singleton/SingletonManager.h"
 #include "Core/Misc/TString.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUi.h"
 #include "RmlUi/Core/Context.h"
+#include "Render/Buffer.h"
 
 namespace traktor::rmlui
 {
@@ -22,10 +23,8 @@ namespace traktor::rmlui
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.rmlui.RmlUi", 0, RmlUi, Object)
 
-		RmlUi::BackendData::BackendData(
-			resource::IResourceManager* resourceManager,
-			render::IRenderSystem* renderSystem)
-		: renderInterface(resourceManager, renderSystem)
+		RmlUi::BackendData::BackendData(render::IRenderSystem* renderSystem)
+		: renderInterface(renderSystem)
 	{
 
 	}
@@ -47,22 +46,18 @@ namespace traktor::rmlui
 		T_SAFE_RELEASE(this);
 	}
 
-	bool RmlUi::initialize(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem)
+	bool RmlUi::initialize(render::IRenderSystem* renderSystem)
 	{
 		if (m_initialized)
 			return true;
 
-		m_backendData = new BackendData(resourceManager, renderSystem);
+		m_backendData = new BackendData(renderSystem);
 
 		Rml::SetFileInterface(&m_backendData->fileInterface);
 		Rml::SetSystemInterface(&m_backendData->systemInterface);
 		Rml::SetRenderInterface(&m_backendData->renderInterface);
 
 		m_initialized = Rml::Initialise();
-
-		Rml::LoadFontFace("assets/Atop-R99O3.ttf");
-
-		m_backendData->renderInterface.loadResources();
 
 		return m_initialized;
 	}
@@ -78,8 +73,6 @@ namespace traktor::rmlui
 			return;
 
 		Rml::Shutdown();
-
-		m_backendData->renderInterface.unloadResources();
 
 		delete m_backendData;
 
@@ -136,7 +129,9 @@ namespace traktor::rmlui
 	AlignedVector<RenderInterface::Batch> RmlUi::renderContext(Rml::Context* context)
 	{
 		m_backendData->renderMutex.wait();
+
 		AlignedVector<RenderInterface::Batch> batches = {};
+
 		if (context != nullptr)
 		{
 			m_backendData->renderInterface.beginRendering();
@@ -153,8 +148,22 @@ namespace traktor::rmlui
 		return batches;
 	}
 
-	void RmlUi::reloadResources()
+	bool RmlUi::loadFonts(const AlignedVector<std::string>& fonts)
 	{
-		m_backendData->renderInterface.reloadResources();
+		if (!m_initialized)
+			return false;
+
+		for (auto& font : fonts)
+		{
+			bool loaded = Rml::LoadFontFace(font);
+			if (!loaded)
+			{
+				// todo: log error loading font
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

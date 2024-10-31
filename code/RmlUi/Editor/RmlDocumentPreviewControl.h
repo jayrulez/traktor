@@ -63,21 +63,19 @@ namespace traktor
 	namespace rmlui
 	{
 		class RmlDocumentResource;
+		class RmlUiRenderer;
 
 		class T_DLLCLASS RmlDocumentPreviewControl : public ui::Widget
 		{
 			T_RTTI_CLASS;
 
 		public:
-			explicit RmlDocumentPreviewControl(editor::IEditor* editor);
-
-			bool create(
-				ui::Widget* parent,
-				int style,
+			explicit RmlDocumentPreviewControl(editor::IEditor* editor,
 				db::Database* database,
 				resource::IResourceManager* resourceManager,
-				render::IRenderSystem* renderSystem
-			);
+				render::IRenderSystem* renderSystem);
+
+			bool create(ui::Widget* parent);
 
 			virtual void destroy() override final;
 
@@ -89,7 +87,12 @@ namespace traktor
 			editor::IEditor* m_editor;
 			Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
 			Ref< db::Database > m_database;
+			Ref< resource::IResourceManager > m_resourceManager;
+			Ref< render::IRenderSystem > m_renderSystem;
 			Ref< render::IRenderView > m_renderView;
+			Ref< render::RenderContext > m_renderContext;
+			Ref< render::RenderGraph > m_renderGraph;
+			Ref< rmlui::RmlUiRenderer > m_rmlUiRenderer;
 			Rml::Context* m_rmlContext = nullptr;
 			Ref< RmlDocumentResource > m_rmlDocument;
 
