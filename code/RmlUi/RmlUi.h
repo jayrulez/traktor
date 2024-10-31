@@ -46,7 +46,7 @@ namespace traktor::rmlui
 
 		void destroy() override;
 
-		bool initialize(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem);
+		bool initialize(render::IRenderSystem* renderSystem);
 
 		bool isInitialized() const;
 
@@ -64,14 +64,12 @@ namespace traktor::rmlui
 
 		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context);
 
-		void reloadResources();
+		bool loadFonts(const AlignedVector<std::string>& fonts);
 
 	private:
 		struct BackendData
 		{
-			BackendData(
-				resource::IResourceManager* resourceManager, 
-				render::IRenderSystem* renderSystem);
+			BackendData(render::IRenderSystem* renderSystem);
 
 			FileInterface fileInterface;
 			RenderInterface renderInterface;

@@ -23,7 +23,8 @@
 #include "Render/VertexElement.h"
 #include "Render/Frame/RenderGraph.h"
 #include "RmlUi/RmlDocumentResource.h"
-#include "RmlUi/Backend/RmlUi.h"
+#include "RmlUi/RmlUiRenderer.h"
+#include "RmlUi/RmlUi.h"
 #include "RmlUi/Editor/RmlDocumentPreviewControl.h"
 #include "Ui/Itf/IWidget.h"
 #include "Ui/Application.h"
@@ -34,20 +35,26 @@ namespace traktor::rmlui
 {
 	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlDocumentPreviewControl", RmlDocumentPreviewControl, ui::Widget)
 
-		RmlDocumentPreviewControl::RmlDocumentPreviewControl(editor::IEditor* editor)
+		RmlDocumentPreviewControl::RmlDocumentPreviewControl(editor::IEditor* editor,
+			db::Database* database,
+			resource::IResourceManager* resourceManager,
+			render::IRenderSystem* renderSystem)
 		: m_editor(editor)
+		, m_database(database)
+		, m_resourceManager(resourceManager)
+		, m_renderSystem(renderSystem)
 	{
 	}
 
-	bool RmlDocumentPreviewControl::create(
-		ui::Widget* parent,
-		int style,
-		db::Database* database,
-		resource::IResourceManager* resourceManager,
-		render::IRenderSystem* renderSystem
-	)
+	bool RmlDocumentPreviewControl::create(ui::Widget* parent)
 	{
-		if (!Widget::create(parent, style | ui::WsFocus | ui::WsNoCanvas))
+		if (!RmlUi::getInstance().isInitialized())
+		{
+			// todo: print error in log
+			return false;
+		}
+
+		if (!Widget::create(parent, ui::WsFocus | ui::WsNoCanvas))
 			return false;
 
 		render::RenderViewEmbeddedDesc desc;
@@ -58,17 +65,33 @@ namespace traktor::rmlui
 		desc.waitVBlanks = 1;
 		desc.syswin = getIWidget()->getSystemWindow();
 
-		m_renderView = renderSystem->createRenderView(desc);
+		m_renderView = m_renderSystem->createRenderView(desc);
 		if (!m_renderView)
 			return false;
 
-		if (!RmlUi::getInstance().isInitialized())
+		m_renderContext = new render::RenderContext(4 * 1024 * 1024);
+		m_renderGraph = new render::RenderGraph(m_renderSystem, desc.multiSample);
+
+		// Create RmlUi renderer.
+		m_rmlUiRenderer = new rmlui::RmlUiRenderer();
+		if (!m_rmlUiRenderer->create(
+			m_resourceManager,
+			m_renderSystem,
+			1,
+			true
+		))
+			return false;
+
+		// todo: get fonts from document
+		if (!RmlUi::getInstance().loadFonts({ "assets/Atop-R99O3.ttf" }))
 		{
 			return false;
 		}
 
 		// todo: get name from rml document
 		m_rmlContext = RmlUi::getInstance().createContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
+		if (!m_rmlContext)
+			return false;
 
 		// todo: remove
 		// temporary testing
@@ -105,20 +128,23 @@ namespace traktor::rmlui
 		addEventHandler< ui::SizeEvent >(this, &RmlDocumentPreviewControl::eventSize);
 		addEventHandler< ui::PaintEvent >(this, &RmlDocumentPreviewControl::eventPaint);
 
+		// Register our idle event handler.
 		m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &RmlDocumentPreviewControl::eventIdle);
 
-		m_database = database;
 		return true;
 	}
 
 	void RmlDocumentPreviewControl::destroy()
 	{
+		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
+
 		RmlUi::getInstance().destroyContext(m_rmlContext);
 
 		m_rmlContext = nullptr;
 
-		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
-
+		safeDestroy(m_rmlUiRenderer);
+		//safeDestroy(m_renderContext);
+		safeDestroy(m_renderGraph);
 		safeClose(m_renderView);
 
 		Widget::destroy();
@@ -130,8 +156,6 @@ namespace traktor::rmlui
 
 		const ui::Size sz = getInnerRect().getSize();
 	}
-
-
 
 	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
@@ -150,16 +174,18 @@ namespace traktor::rmlui
 	{
 		ui::Size sz = event->getSize();
 
+		sz = getInnerRect().getSize();
+		const float scale = std::max(dpi() / 96.0f, 1.0f);
+
 		if (m_renderView)
 		{
 			m_renderView->reset(sz.cx, sz.cy);
-			if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
-				return;
 		}
 
 		if (m_rmlContext)
 		{
-			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
+			//m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
+			m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
 		}
 	}
 
@@ -169,6 +195,7 @@ namespace traktor::rmlui
 			return;
 
 		ui::Size sz = getInnerRect().getSize();
+		const float scale = std::max(dpi() / 96.0f, 1.0f);
 
 		// Render view events; reset view if it has become lost.
 		render::RenderEvent re;
@@ -177,46 +204,26 @@ namespace traktor::rmlui
 			if (re.type == render::RenderEventType::Lost)
 			{
 				m_renderView->reset(sz.cx, sz.cy);
-				if (!RmlUi::getInstance().getRenderInterface()->reloadResources())
-					return;
 			}
 		}
+
+		// Add passes to render graph.
+		m_rmlUiRenderer->beginSetup(m_renderGraph);
+		m_rmlUiRenderer->render(m_rmlContext);
+		m_rmlUiRenderer->endSetup();
+
+		// Validate render graph.
+		if (!m_renderGraph->validate())
+			return;
+
+		// Build render context.
+		m_renderContext->flush();
+		m_renderGraph->build(m_renderContext, sz.cx, sz.cy);
 
 		// Render frame.
 		if (m_renderView->beginFrame())
 		{
-			const auto& batches = RmlUi::getInstance().renderContext(m_rmlContext);
-
-			render::Clear cl;
-			cl.mask = render::CfColor | render::CfStencil;
-			cl.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 1.0f);
-			cl.depth = 1.0f;
-			cl.stencil = 0;
-			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
-			{
-				for (auto& batch : batches)
-				{
-					render::Primitives p = {
-						render::PrimitiveType::Triangles,
-						0,
-						batch.compiledGeometry->triangleCount,
-						batch.compiledGeometry->minIndex,
-						batch.compiledGeometry->maxIndex
-					};
-
-					m_renderView->draw(
-						batch.compiledGeometry->vertexBuffer->getBufferView(),
-						RmlUi::getInstance().getRenderInterface()->getVertexLayout(),
-						batch.compiledGeometry->indexBuffer->getBufferView(),
-						render::IndexType::UInt32,
-						batch.program,
-						p,
-						1);
-				}
-
-				m_renderView->endPass();
-			}
-
+			m_renderContext->render(m_renderView);
 			m_renderView->endFrame();
 			m_renderView->present();
 		}
