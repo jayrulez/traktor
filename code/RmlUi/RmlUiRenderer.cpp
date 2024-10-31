@@ -1,0 +1,201 @@
+/*
+ * TRAKTOR
+ * Copyright (c) 2022-2024 Anders Pistol.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+#include <algorithm>
+#include <cstring>
+#include "Core/Log/Log.h"
+#include "Core/Math/Const.h"
+#include "Core/Misc/SafeDestroy.h"
+#include "Render/IRenderSystem.h"
+#include "Render/IRenderTargetSet.h"
+#include "Render/IRenderView.h"
+#include "Render/Buffer.h"
+#include "Render/Context/RenderContext.h"
+#include "Render/Frame/RenderGraph.h"
+#include "RmlUi/RmlUiRenderer.h"
+#include "RmlUi/RmlUiResources.h"
+#include "RmlUi/RmlDocumentResource.h"
+#include "RmlUi/RmlUi.h"
+#include "Render/VertexElement.h"
+
+namespace traktor::rmlui
+{
+	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlUiRenderer", RmlUiRenderer, Object)
+
+		RmlUiRenderer::RmlUiRenderer()
+		: m_clearBackground(false)
+	{
+	}
+
+	RmlUiRenderer::~RmlUiRenderer()
+	{
+		T_EXCEPTION_GUARD_BEGIN
+
+			destroy();
+
+		T_EXCEPTION_GUARD_END
+	}
+
+	bool RmlUiRenderer::create(
+		resource::IResourceManager* resourceManager,
+		render::IRenderSystem* renderSystem,
+		uint32_t frameCount,
+		bool clearBackground
+	)
+	{
+		m_resourceManager = resourceManager;
+		m_renderSystem = renderSystem;
+		m_clearBackground = clearBackground;
+
+		m_shapeResources = new RmlUiResources();
+		if (!m_shapeResources->create(resourceManager))
+		{
+			log::error << L"Unable to create RmlUi renderer; failed to load required resources." << Endl;
+			return false;
+		}
+
+
+		AlignedVector< render::VertexElement > vertexElements = {};
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(RenderInterface::Vertex, position)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(RenderInterface::Vertex, texCoord)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(RenderInterface::Vertex, color)));
+		T_ASSERT(render::getVertexSize(vertexElements) == sizeof(RenderInterface::Vertex));
+		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
+
+		return true;
+	}
+
+	void RmlUiRenderer::destroy()
+	{
+		m_renderSystem = nullptr;
+
+		safeDestroy(m_shapeResources);
+	}
+
+	void RmlUiRenderer::beginSetup(render::RenderGraph* renderGraph)
+	{
+		m_renderGraph = renderGraph;
+		m_renderPassOutput = new render::RenderPass(L"RmlUi");
+
+		if (m_clearBackground)
+		{
+			const render::Clear cl =
+			{
+				.mask = render::CfColor | render::CfDepth | render::CfStencil,
+				.colors = { Color4f(1.0f, 1.0f, 1.0f, 0.0) },
+				.depth = 1.0f,
+				.stencil = 0
+			};
+			m_renderPassOutput->setOutput(0, cl, render::TfNone, render::TfColor | render::TfDepth);
+		}
+		else
+		{
+			const render::Clear cl =
+			{
+				.mask = render::CfStencil,
+				.stencil = 0
+			};
+			m_renderPassOutput->setOutput(0, cl, render::TfColor | render::TfDepth, render::TfColor | render::TfDepth);
+		}
+	}
+
+	void RmlUiRenderer::endSetup()
+	{
+		if (!m_renderPassOutput->getBuilds().empty())
+			m_renderGraph->addPass(m_renderPassOutput);
+
+		m_renderGraph = nullptr;
+		m_renderPassOutput = nullptr;
+	}
+
+	void RmlUiRenderer::setClearBackground(bool clearBackground)
+	{
+		m_clearBackground = clearBackground;
+	}
+
+	void RmlUiRenderer::render(Rml::Context* context)
+	{
+
+		/*
+
+					render::Clear cl;
+			cl.mask = render::CfColor | render::CfDepth | render::CfStencil;
+			cl.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 0.0f);
+			cl.depth = 1.0f;
+			cl.stencil = 0;
+			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
+			{
+				for (auto& batch : batches)
+				{
+					m_renderView->draw(
+						batch.compiledGeometry->vertexBuffer->getBufferView(),
+						RmlUi::getInstance().getRenderInterface()->getVertexLayout(),
+						batch.compiledGeometry->indexBuffer->getBufferView(),
+						render::IndexType::UInt32,
+						batch.program,
+						render::Primitives::setIndexed(render::PrimitiveType::Triangles, 0, batch.compiledGeometry->triangleCount),
+						1);
+				}
+
+				m_renderView->endPass();
+			}
+
+
+		*/
+
+		const auto& batches = RmlUi::getInstance().renderContext(context);
+
+		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+
+		m_renderPassOutput->addBuild([=, this](const render::RenderGraph& renderGraph, render::RenderContext* renderContext) {
+
+			for (auto& batch : batches)
+			{
+				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >(L"RmlUi");
+
+				render::IProgram* program = nullptr;
+
+				if (batch.texture)
+				{
+					program = m_shapeResources->m_shaderTexture->getProgram(perm).program;
+				}
+				else
+				{
+					program = m_shapeResources->m_shaderColor->getProgram(perm).program;
+				}
+
+
+				renderBlock->program = program;
+				renderBlock->indexBuffer = batch.compiledGeometry->indexBuffer->getBufferView();
+				renderBlock->indexType = render::IndexType::UInt32;
+				renderBlock->vertexBuffer = batch.compiledGeometry->vertexBuffer->getBufferView();
+				renderBlock->vertexLayout = m_vertexLayout;
+				renderBlock->primitive = render::PrimitiveType::Triangles;
+				renderBlock->offset = 0;
+				renderBlock->count = batch.compiledGeometry->triangleCount;
+
+				renderBlock->programParams = renderContext->alloc< render::ProgramParameters >();
+				renderBlock->programParams->beginParameters(renderContext);
+
+				if (batch.texture)
+				{
+					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), batch.texture);
+				}
+
+				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
+				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
+
+				renderBlock->programParams->endParameters(renderContext);
+
+				renderContext->draw(renderBlock);
+			}
+
+
+			});
+	}
+}

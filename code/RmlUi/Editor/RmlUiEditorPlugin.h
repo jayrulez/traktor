@@ -47,7 +47,6 @@ namespace traktor::rmlui
 
 	private:
 		editor::IEditor* m_editor = nullptr;
-		resource::IResourceManager* m_resourceManager;
 	};
 
 }

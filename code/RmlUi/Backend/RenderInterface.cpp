@@ -10,18 +10,14 @@
 #include "Core/Rtti/ITypedObject.h"
 #include "RmlUi/Backend/RenderInterface.h"
 #include "Render/Buffer.h"
-#include "Render/VertexElement.h"
 #include "Resource/Id.h"
 #include "Render/IProgram.h"
+#include "Core/Misc/SafeDestroy.h"
 
 namespace traktor::rmlui
 {
 	namespace
 	{
-		const resource::Id< render::Shader > c_idShaderRmlUiShaderColor(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
-
-		const resource::Id< render::Shader > c_idShaderRmlUiShaderTexture(Guid(L"{AFC34A55-B4CF-774F-A86F-B303A7317CF0}"));
-	
 		size_t allocateTextureId()
 		{
 			static size_t s_fileId = 0;
@@ -29,11 +25,8 @@ namespace traktor::rmlui
 		}
 	}
 
-	RenderInterface::RenderInterface(
-		resource::IResourceManager* resourceManager,
-		render::IRenderSystem* renderSystem)
-		: m_resourceManager(resourceManager)
-		, m_renderSystem(renderSystem)
+	RenderInterface::RenderInterface(render::IRenderSystem* renderSystem)
+		: m_renderSystem(renderSystem)
 	{
 	}
 
@@ -81,22 +74,12 @@ namespace traktor::rmlui
 
 			int32_t* destIndices = static_cast<int32_t*>(geometry->indexBuffer->lock());
 
-			int minIndex = 0;
-			int maxIndex = 0;
-
 			for (int i = 0; i < indices.size(); i++)
 			{
-				int32_t& index = destIndices[i];
-
-				index = indices[i];
-
-				minIndex = std::min(minIndex, index);
-				maxIndex = std::max(maxIndex, index);
+				destIndices[i] = indices[i];
 			}
 
 			geometry->indexBuffer->unlock();
-			geometry->minIndex = minIndex;
-			geometry->maxIndex = maxIndex;
 		}
 
 		return reinterpret_cast<Rml::CompiledGeometryHandle>(geometry);
@@ -113,8 +96,7 @@ namespace traktor::rmlui
 		batch.scissorRegion[3] = m_scissorRegion[3];
 		batch.scissorRegionEnabled = m_scissorRegionEnabled;
 		batch.transformScissorRegion = false;
-
-		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
+		batch.translation = Vector4(translation.x, translation.y, 1, 1);
 
 		size_t textureId = static_cast<size_t>(textureHandle);
 
@@ -125,17 +107,7 @@ namespace traktor::rmlui
 			texture = m_textures[textureId];
 		}
 
-		if (texture)
-		{
-			batch.program = m_rmlUiShaderTexture->getProgram(perm).program;
-			batch.program->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), texture);
-		}
-		else
-		{
-			batch.program = m_rmlUiShaderColor->getProgram(perm).program;
-		}
-		batch.program->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
-		batch.program->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), Vector4(translation.x, translation.y, 0, 0));
+		batch.texture = texture;
 
 		m_batches.push_back(std::move(batch));
 	}
@@ -178,7 +150,7 @@ namespace traktor::rmlui
 
 		if (m_textures.find(textureId) != m_textures.end())
 		{
-			m_textures[textureId].reset();
+			safeDestroy(m_textures[textureId]);
 			m_textures.remove(textureId);
 		}
 	}
@@ -201,11 +173,6 @@ namespace traktor::rmlui
 		return m_batches;
 	}
 
-	const Ref< const render::IVertexLayout >& RenderInterface::getVertexLayout() const
-	{
-		return m_vertexLayout;
-	}
-
 	void RenderInterface::beginRendering()
 	{
 	}
@@ -213,41 +180,5 @@ namespace traktor::rmlui
 	void RenderInterface::endRendering()
 	{
 		m_batches.clear();
-	}
-
-	bool RenderInterface::loadResources()
-	{
-		{
-			AlignedVector< render::VertexElement > vertexElements = {};
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(Vertex, position)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(Vertex, texCoord)));
-			vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(Vertex, color)));
-			T_ASSERT(render::getVertexSize(vertexElements) == sizeof(Vertex));
-			m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
-		}
-
-		{
-			if (!m_resourceManager->bind(c_idShaderRmlUiShaderColor, m_rmlUiShaderColor))
-				return false;
-
-			if (!m_resourceManager->bind(c_idShaderRmlUiShaderTexture, m_rmlUiShaderTexture))
-				return false;
-		}
-
-		return true;
-	}
-
-	bool RenderInterface::reloadResources()
-	{
-		unloadResources();
-		return loadResources();
-	}
-
-	void RenderInterface::unloadResources()
-	{
-		m_rmlUiShaderColor.clear();
-		m_rmlUiShaderTexture.clear();
-		m_vertexLayout.reset();
-		m_vertexLayoutTexture.reset();
 	}
 }
