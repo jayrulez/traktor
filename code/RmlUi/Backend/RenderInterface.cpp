@@ -122,36 +122,11 @@ namespace traktor::rmlui
 
 	Rml::TextureHandle RenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
 	{
-		// todo: fix path
-		//drawing::Image* image = drawing::Image::load(L"assets/" + mbstows(source) + L".tga");
-		drawing::Image* image = drawing::Image::load(mbstows(source));
+		Ref< drawing::Image > image = drawing::Image::load(mbstows(source));
 		if (!image)
 		{
 			return 0;
 		}
-
-		//AlignedVector<Rml::byte> imageBytes;
-		//auto size = image->getWidth() * image->getHeight() * 4;
-		//imageBytes.resize(size);
-		//Color4ub* dest = (Color4ub*)imageBytes.ptr();
-
-		//// convert to rgba32F
-		//Color4f* imageData = (Color4f*)image->getData();
-		//for (int i = 0; i < image->getDataSize() / 32; i++)
-		//{
-		//	Color4f& pixel = imageData[i];
-
-		//	Color4ub& destPixel = dest[i];
-
-		//	auto x = pixel.getRed();
-
-		//	destPixel.r = pixel.getRed() / 255.0f;
-		//	destPixel.g = pixel.getGreen() / 255.0f;
-		//	destPixel.b = pixel.getBlue() / 255.0f;
-		//	destPixel.a = pixel.getAlpha() / 255.0f;
-
-		//	dest++;
-		//}
 
 		texture_dimensions.x = image->getWidth();
 		texture_dimensions.y = image->getHeight();
@@ -191,7 +166,7 @@ namespace traktor::rmlui
 
 		if (m_textures.find(textureId) != m_textures.end())
 		{
-			//safeDestroy(m_textures[textureId]);
+			safeDestroy(m_textures[textureId]);
 			m_textures.remove(textureId);
 		}
 	}
