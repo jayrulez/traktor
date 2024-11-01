@@ -13,6 +13,9 @@
 #include "Resource/Id.h"
 #include "Render/IProgram.h"
 #include "Core/Misc/SafeDestroy.h"
+#include "Drawing/Image.h"
+#include "Core/Misc/TString.h"
+#include "Core/Config.h"
 
 namespace traktor::rmlui
 {
@@ -119,9 +122,47 @@ namespace traktor::rmlui
 
 	Rml::TextureHandle RenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
 	{
-		// todo: can I use resource manager to load from a path?
+		// todo: fix path
+		//drawing::Image* image = drawing::Image::load(L"assets/" + mbstows(source) + L".tga");
+		drawing::Image* image = drawing::Image::load(mbstows(source));
+		if (!image)
+		{
+			return 0;
+		}
 
-		return { };
+		//AlignedVector<Rml::byte> imageBytes;
+		//auto size = image->getWidth() * image->getHeight() * 4;
+		//imageBytes.resize(size);
+		//Color4ub* dest = (Color4ub*)imageBytes.ptr();
+
+		//// convert to rgba32F
+		//Color4f* imageData = (Color4f*)image->getData();
+		//for (int i = 0; i < image->getDataSize() / 32; i++)
+		//{
+		//	Color4f& pixel = imageData[i];
+
+		//	Color4ub& destPixel = dest[i];
+
+		//	auto x = pixel.getRed();
+
+		//	destPixel.r = pixel.getRed() / 255.0f;
+		//	destPixel.g = pixel.getGreen() / 255.0f;
+		//	destPixel.b = pixel.getBlue() / 255.0f;
+		//	destPixel.a = pixel.getAlpha() / 255.0f;
+
+		//	dest++;
+		//}
+
+		texture_dimensions.x = image->getWidth();
+		texture_dimensions.y = image->getHeight();
+
+		image->convert(drawing::PixelFormat::getR8G8B8A8());
+
+		Rml::Span<const Rml::byte> data(static_cast<Rml::byte*>(image->getData()), image->getDataSize());
+
+		Rml::TextureHandle handle = GenerateTexture(data, texture_dimensions);
+
+		return handle;
 	}
 
 	Rml::TextureHandle RenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
@@ -137,7 +178,7 @@ namespace traktor::rmlui
 		initialData.slicePitch = 4 * desc.width * desc.height;
 		desc.initialData[0] = initialData;
 		desc.mipCount = 1;
-		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, L"RmlUi");
+		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, T_FILE_LINE_W);
 
 		size_t textureId = allocateTextureId();
 		m_textures.insert(textureId, texture);
