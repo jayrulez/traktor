@@ -148,14 +148,14 @@ namespace traktor::rmlui
 		return batches;
 	}
 
-	bool RmlUi::loadFonts(const AlignedVector<std::string>& fonts)
+	bool RmlUi::loadFonts(const AlignedVector<std::pair<std::string, bool>>& fonts)
 	{
 		if (!m_initialized)
 			return false;
 
-		for (auto& font : fonts)
+		for (auto& entry : fonts)
 		{
-			bool loaded = Rml::LoadFontFace(font);
+			bool loaded = Rml::LoadFontFace(entry.first, entry.second);
 			if (!loaded)
 			{
 				// todo: log error loading font
