@@ -62,8 +62,8 @@ namespace traktor::rmlui
 
 		AlignedVector< render::VertexElement > vertexElements = {};
 		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(RenderInterface::Vertex, position)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(RenderInterface::Vertex, color)));
 		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(RenderInterface::Vertex, texCoord)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtFloat4, offsetof(RenderInterface::Vertex, color)));
 		T_ASSERT(render::getVertexSize(vertexElements) == sizeof(RenderInterface::Vertex));
 		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 
@@ -118,35 +118,30 @@ namespace traktor::rmlui
 		m_clearBackground = clearBackground;
 	}
 
-	void RmlUiRenderer::render(Rml::Context* context)
+	void RmlUiRenderer::render(Rml::Context* context, int32_t width, int32_t height)
 	{
+		//Matrix44 projection2 = orthoLh(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -10000, 10000);
 
-		/*
+		//// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
+		//Matrix44 correction_matrix(
+		//	Vector4(1.0f, 0.0f, 0.0f, 0.0f), 
+		//	Vector4(0.0f, -1.0f, 0.0f, 0.0f), 
+		//	Vector4(0.0f, 0.0f, 0.5f, 0.0f),
+		//	Vector4(0.0f, 0.0f, 0.5f, 1.0f));
 
-					render::Clear cl;
-			cl.mask = render::CfColor | render::CfDepth | render::CfStencil;
-			cl.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 0.0f);
-			cl.depth = 1.0f;
-			cl.stencil = 0;
-			if (m_renderView->beginPass(&cl, render::TfAll, render::TfAll))
-			{
-				for (auto& batch : batches)
-				{
-					m_renderView->draw(
-						batch.compiledGeometry->vertexBuffer->getBufferView(),
-						RmlUi::getInstance().getRenderInterface()->getVertexLayout(),
-						batch.compiledGeometry->indexBuffer->getBufferView(),
-						render::IndexType::UInt32,
-						batch.program,
-						render::Primitives::setIndexed(render::PrimitiveType::Triangles, 0, batch.compiledGeometry->triangleCount),
-						1);
-				}
+		Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 10000, -10000);
 
-				m_renderView->endPass();
-			}
+		// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
+		Rml::Matrix4f correction_matrix;
+		correction_matrix.SetColumns(
+			Rml::Vector4f(1.0f, 0.0f, 0.0f, 0.0f), 
+			Rml::Vector4f(0.0f, -1.0f, 0.0f, 0.0f), 
+			Rml::Vector4f(0.0f, 0.0f, 1.0f, 0.0f),
+			Rml::Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
 
+		projection = correction_matrix * projection;
 
-		*/
+		Matrix44 proj = *((Matrix44*)&projection);
 
 		const auto& batches = RmlUi::getInstance().renderContext(context);
 
@@ -187,7 +182,7 @@ namespace traktor::rmlui
 					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), batch.texture);
 				}
 
-				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity());
+				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), proj);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
 
 				renderBlock->programParams->endParameters(renderContext);
