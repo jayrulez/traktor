@@ -84,11 +84,12 @@ namespace traktor::rmlui
 
 		// todo: get fonts from document
 		if (!RmlUi::getInstance().loadFonts({ 
-			"assets/Atop-R99O3.ttf",
-			"assets/LatoLatin-Regular.ttf",
-			"assets/LatoLatin-Bold.ttf",
-			"assets/LatoLatin-BoldItalic.ttf",
-			"assets/LatoLatin-Italic.ttf"
+			{"assets/Atop-R99O3.ttf", false},
+			{"assets/LatoLatin-Regular.ttf", false},
+			{"assets/LatoLatin-Bold.ttf", false},
+			{"assets/LatoLatin-BoldItalic.ttf", false},
+			{"assets/LatoLatin-Italic.ttf", false},
+			{"assets/NotoEmoji-Regular.ttf", true}
 			}))
 		{
 			return false;
