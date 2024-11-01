@@ -83,7 +83,13 @@ namespace traktor::rmlui
 			return false;
 
 		// todo: get fonts from document
-		if (!RmlUi::getInstance().loadFonts({ "assets/Atop-R99O3.ttf" }))
+		if (!RmlUi::getInstance().loadFonts({ 
+			"assets/Atop-R99O3.ttf",
+			"assets/LatoLatin-Regular.ttf",
+			"assets/LatoLatin-Bold.ttf",
+			"assets/LatoLatin-BoldItalic.ttf",
+			"assets/LatoLatin-Italic.ttf"
+			}))
 		{
 			return false;
 		}
@@ -99,26 +105,106 @@ namespace traktor::rmlui
 				<head>
 				<title>Example</title>
 				<style>
+
+        div
+        {
+            display: block;
+        }
+
+        p
+        {
+            display: block;
+        }
+
+        h1
+        {
+            display: block;
+        }
+
+        em
+        {
+            font-style: italic;
+        }
+
+        strong
+        {
+            font-weight: bold;
+        }
+
+        select
+        {
+            text-align: left;
+        }
+
+        tabset tabs
+        {
+            display: block;
+        }
+
+        table {
+            box-sizing: border-box;
+            display: table;
+        }
+        tr {
+            box-sizing: border-box;
+            display: table-row;
+        }
+        td {
+            box-sizing: border-box;
+            display: table-cell;
+        }
+        col {
+            box-sizing: border-box;
+            display: table-column;
+        }
+        colgroup {
+            display: table-column-group;
+        }
+        thead, tbody, tfoot {
+            display: table-row-group;
+        }
+
+			body
+			{
+				width: 100%;
+				height: 100%;
+				background-color: #000000;
+				margin: 20dp;
+			}
+
 					body
 					{
-						position: absolute;
-						width: 400px;
-						height: 300px;
-						background-color: #ffffff;
 						font-family: atop;
+						font-weight: normal;
+						font-style: normal;
+						font-size: 15dp;
+						color: white;
+						background-color: #000000;
+						nav: auto;
+						padding: 60dp;
 					}
 					div
 					{
-						display: block;
-						height: 200px;
-						width: 200px;
+						font-family: atop;
+						width: 800px;
+						height: 400px;
 						background-color: #ff00ff;
-						color: #000000;
+						color: #ffffff;
 					}
+
+div span {
+	
+	font-size: 40dp;
+	font-weight: bold;
+
+	font-effect: glow(3dp black);
+}
 				</style>
 				</head>
 				<body>
-					<div>Hello World</div>
+					<div>
+						<span>Hello World</span>
+					</div>
 				</body>
 				</rml>)");
 
@@ -137,6 +223,8 @@ namespace traktor::rmlui
 	void RmlDocumentPreviewControl::destroy()
 	{
 		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
+
+		m_rmlContext->UnloadAllDocuments();
 
 		RmlUi::getInstance().destroyContext(m_rmlContext);
 
@@ -175,7 +263,7 @@ namespace traktor::rmlui
 		ui::Size sz = event->getSize();
 
 		sz = getInnerRect().getSize();
-		const float scale = std::max(dpi() / 96.0f, 1.0f);
+		const float scale = 1.0f;// std::max(dpi() / 96.0f, 1.0f);
 
 		if (m_renderView)
 		{
@@ -186,7 +274,7 @@ namespace traktor::rmlui
 		{
 			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
 			//m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
-			m_rmlContext->SetDensityIndependentPixelRatio(scale);
+			//m_rmlContext->SetDensityIndependentPixelRatio(scale);
 		}
 	}
 
@@ -210,7 +298,7 @@ namespace traktor::rmlui
 
 		// Add passes to render graph.
 		m_rmlUiRenderer->beginSetup(m_renderGraph);
-		m_rmlUiRenderer->render(m_rmlContext);
+		m_rmlUiRenderer->render(m_rmlContext, sz.cx, sz.cy);
 		m_rmlUiRenderer->endSetup();
 
 		// Validate render graph.
