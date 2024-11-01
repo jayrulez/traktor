@@ -101,6 +101,20 @@ namespace traktor
 			void eventPaint(ui::PaintEvent* event);
 
 			void eventIdle(ui::IdleEvent* event);
+
+			void eventKey(ui::KeyEvent* event);
+
+			void eventKeyDown(ui::KeyDownEvent* event);
+
+			void eventKeyUp(ui::KeyUpEvent* event);
+
+			void eventButtonDown(ui::MouseButtonDownEvent* event);
+
+			void eventButtonUp(ui::MouseButtonUpEvent* event);
+
+			void eventMouseMove(ui::MouseMoveEvent* event);
+
+			void eventMouseWheel(ui::MouseWheelEvent* event);
 		};
 
 	}
