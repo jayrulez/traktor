@@ -129,19 +129,19 @@ namespace traktor::rmlui
 		//	Vector4(0.0f, 0.0f, 0.5f, 0.0f),
 		//	Vector4(0.0f, 0.0f, 0.5f, 1.0f));
 
-		//Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 10000, -10000);
+		Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 10000, -10000);
 
-		//// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
-		//Rml::Matrix4f correction_matrix;
-		//correction_matrix.SetColumns(
-		//	Rml::Vector4f(1.0f, 0.0f, 0.0f, 0.0f), 
-		//	Rml::Vector4f(0.0f, -1.0f, 0.0f, 0.0f), 
-		//	Rml::Vector4f(0.0f, 0.0f, 1.0f, 0.0f),
-		//	Rml::Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
+		// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
+		Rml::Matrix4f correction_matrix;
+		correction_matrix.SetColumns(
+			Rml::Vector4f(1.0f, 0.0f, 0.0f, 0.0f), 
+			Rml::Vector4f(0.0f, -1.0f, 0.0f, 0.0f), 
+			Rml::Vector4f(0.0f, 0.0f, 1.0f, 0.0f),
+			Rml::Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
 
-		//projection = correction_matrix * projection;
+		projection = correction_matrix * projection;
 
-		//Matrix44 proj = *((Matrix44*)&projection);
+		Matrix44 proj = *((Matrix44*)&projection);
 
 		const auto& batches = RmlUi::getInstance().renderContext(context);
 
@@ -203,7 +203,6 @@ namespace traktor::rmlui
 				matrix.set(2,2, Scalar(1.0f/1000.0f));
 				matrix.set(2,3, Scalar(0.0f));
 				matrix.set(3,3, Scalar(1.0f));
-
 
 				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), matrix);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
