@@ -17,23 +17,23 @@
 				<postAlphaBlend>false</postAlphaBlend>
 				<overlay>false</overlay>
 			</priority>
-			<cullMode>Never</cullMode>
+			<cullMode>CounterClockWise</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
-			<blendColorSource>BfSourceAlpha</blendColorSource>
+			<blendColorSource>BfOne</blendColorSource>
 			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
-			<blendAlphaOperation>BoAdd</blendAlphaOperation>
+			<blendAlphaOperation>BoSubtract</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
-			<blendAlphaDestination>BfOne</blendAlphaDestination>
+			<blendAlphaDestination>BfOneMinusSourceAlpha</blendAlphaDestination>
 			<colorWriteMask>
 				<red>true</red>
 				<green>true</green>
 				<blue>true</blue>
 				<alpha>true</alpha>
 			</colorWriteMask>
-			<depthEnable>true</depthEnable>
-			<depthWriteEnable>true</depthWriteEnable>
-			<depthFunction>CfLessEqual</depthFunction>
+			<depthEnable>false</depthEnable>
+			<depthWriteEnable>false</depthWriteEnable>
+			<depthFunction>CfNever</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
@@ -44,7 +44,7 @@
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
 			<stencilFunction>CfAlways</stencilFunction>
-			<stencilReference>0</stencilReference>
+			<stencilReference>1</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>
@@ -52,8 +52,8 @@
 			<id>{0CEF77D9-23BC-4647-96E3-899D1840B6FB}</id>
 			<comment/>
 			<position>
-				<first>456</first>
-				<second>-37</second>
+				<first>416</first>
+				<second>-159</second>
 			</position>
 			<declaration>{1FF41897-77F0-A24B-A040-9325E56779BB}</declaration>
 			<parameterName>RmlUi_Texture</parameterName>
