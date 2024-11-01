@@ -5,8 +5,8 @@
 			<id>{305AF326-D7EC-C24B-9691-4FC440D2EC3A}</id>
 			<comment/>
 			<position>
-				<first>1093</first>
-				<second>123</second>
+				<first>1092</first>
+				<second>122</second>
 			</position>
 			<technique>Default</technique>
 			<priority>
@@ -17,12 +17,12 @@
 				<postAlphaBlend>false</postAlphaBlend>
 				<overlay>false</overlay>
 			</priority>
-			<cullMode>Never</cullMode>
+			<cullMode>CounterClockWise</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
-			<blendColorSource>BfSourceAlpha</blendColorSource>
+			<blendColorSource>BfOne</blendColorSource>
 			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
-			<blendAlphaOperation>BoAdd</blendAlphaOperation>
+			<blendAlphaOperation>BoSubtract</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
 			<blendAlphaDestination>BfOne</blendAlphaDestination>
 			<colorWriteMask>
@@ -33,7 +33,7 @@
 			</colorWriteMask>
 			<depthEnable>false</depthEnable>
 			<depthWriteEnable>false</depthWriteEnable>
-			<depthFunction>CfLessEqual</depthFunction>
+			<depthFunction>CfNever</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
@@ -44,7 +44,7 @@
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
 			<stencilFunction>CfEqual</stencilFunction>
-			<stencilReference>0</stencilReference>
+			<stencilReference>1</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>

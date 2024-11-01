@@ -75,7 +75,7 @@ namespace traktor::rmlui
 		// \name RmlUiRenderer
 		// \{
 
-		void render(Rml::Context* context);
+		void render(Rml::Context* context, int32_t width, int32_t height);
 
 		// \}
 

@@ -60,17 +60,17 @@ namespace traktor::rmlui
 
 		struct VertexColor
 		{
-			float r;
-			float g;
-			float b;
-			float a;
+			uint8_t r;
+			uint8_t g;
+			uint8_t b;
+			uint8_t a;
 		};
 
 		struct Vertex
 		{
 			float position[3];
-			float texCoord[2];
 			VertexColor color;
+			float texCoord[2];
 		};
 #pragma pack(pop)  // Restore the previous packing alignment
 

@@ -55,11 +55,11 @@ namespace traktor::rmlui
 				destVertex.texCoord[0] = sourceVertex.tex_coord.x;
 				destVertex.texCoord[1] = sourceVertex.tex_coord.y;
 
-				destVertex.color = { 
-					.r = (float)sourceVertex.colour.red, 
-					.g = (float)sourceVertex.colour.green, 
-					.b = (float)sourceVertex.colour.blue, 
-					.a = (float)sourceVertex.colour.alpha 
+				destVertex.color = {
+					.r = (uint8_t)(sourceVertex.colour.red),
+					.g = (uint8_t)(sourceVertex.colour.green),
+					.b = (uint8_t)(sourceVertex.colour.blue),
+					.a = (uint8_t)(sourceVertex.colour.alpha)
 				};
 
 				vs.push_back(destVertex);
@@ -96,7 +96,7 @@ namespace traktor::rmlui
 		batch.scissorRegion[3] = m_scissorRegion[3];
 		batch.scissorRegionEnabled = m_scissorRegionEnabled;
 		batch.transformScissorRegion = false;
-		batch.translation = Vector4(translation.x, translation.y, 1, 1);
+		batch.translation = Vector4(translation.x, translation.y, 0, 0);
 
 		size_t textureId = static_cast<size_t>(textureHandle);
 
@@ -133,12 +133,12 @@ namespace traktor::rmlui
 		desc.immutable = true;
 		render::TextureInitialData initialData;
 		initialData.data = source.data();
-		initialData.pitch =  4 * desc.width;
-		initialData.slicePitch =  4 * desc.width * desc.height;
+		initialData.pitch = 4 * desc.width;
+		initialData.slicePitch = 4 * desc.width * desc.height;
 		desc.initialData[0] = initialData;
 		desc.mipCount = 1;
 		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, L"RmlUi");
-		
+
 		size_t textureId = allocateTextureId();
 		m_textures.insert(textureId, texture);
 		return static_cast<Rml::TextureHandle>(textureId);
