@@ -81,13 +81,13 @@ namespace traktor
 				resource::IResourceManager* resourceManager,
 				render::IRenderSystem* renderSystem);
 
-			bool create(ui::Widget* parent);
+			bool create(ui::Widget* parent, RmlDocumentResource* rmlDocument);
 
 			virtual void destroy() override final;
 
-			void setRmlDocument(RmlDocumentResource* rmlDocument);
-
 			virtual ui::Size getPreferredSize(const ui::Size& hint) const override final;
+
+			void setRmlDocument(RmlDocumentResource* rmlDocument);
 
 		private:
 			editor::IEditor* m_editor;

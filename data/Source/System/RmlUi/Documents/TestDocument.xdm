@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<object type="traktor.db.LocalInstanceMeta" version="2">
-	<guid>{C10F44B4-3C9C-0242-A677-E35DF4BEF959}</guid>
-	<primaryType>traktor.rmlui.RmlDocumentAsset</primaryType>
-	<blobs/>
-</object>

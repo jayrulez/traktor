@@ -27,12 +27,21 @@ namespace traktor::rmlui
 		T_RTTI_CLASS;
 
 	public:
+		RmlDocumentAsset() = default;
+
+		const AlignedVector<Path>& getFonts() const;
+		const AlignedVector<Path>& getFallbackFonts() const;
+		int32_t getWidth() const;
+		int32_t getHeight() const;
 
 		virtual void serialize(ISerializer& s) override final;
 
 	private:
 		friend class Pipeline;
-
+		AlignedVector<Path> m_fontFilePaths = {};
+		AlignedVector<Path> m_fallbackFontFilePaths = {};
+		int32_t m_referenceWidth = 1366;
+		int32_t m_referenceHeight = 768;
 	};
 
 }
