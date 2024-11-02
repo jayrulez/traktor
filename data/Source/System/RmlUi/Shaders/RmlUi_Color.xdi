@@ -24,7 +24,7 @@
 			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
 			<blendAlphaOperation>BoSubtract</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
-			<blendAlphaDestination>BfOne</blendAlphaDestination>
+			<blendAlphaDestination>BfOneMinusSourceAlpha</blendAlphaDestination>
 			<colorWriteMask>
 				<red>true</red>
 				<green>true</green>
@@ -32,18 +32,18 @@
 				<alpha>true</alpha>
 			</colorWriteMask>
 			<depthEnable>false</depthEnable>
-			<depthWriteEnable>false</depthWriteEnable>
-			<depthFunction>CfNever</depthFunction>
+			<depthWriteEnable>true</depthWriteEnable>
+			<depthFunction>CfAlways</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
 			<alphaToCoverageEnable>false</alphaToCoverageEnable>
 			<wireframe>false</wireframe>
-			<stencilEnable>false</stencilEnable>
+			<stencilEnable>true</stencilEnable>
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
-			<stencilFunction>CfEqual</stencilFunction>
+			<stencilFunction>CfAlways</stencilFunction>
 			<stencilReference>1</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
