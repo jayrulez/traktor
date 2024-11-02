@@ -32,8 +32,8 @@
 				<alpha>true</alpha>
 			</colorWriteMask>
 			<depthEnable>false</depthEnable>
-			<depthWriteEnable>false</depthWriteEnable>
-			<depthFunction>CfNever</depthFunction>
+			<depthWriteEnable>true</depthWriteEnable>
+			<depthFunction>CfAlways</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
