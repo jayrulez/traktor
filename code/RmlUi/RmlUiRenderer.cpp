@@ -128,18 +128,28 @@ namespace traktor::rmlui
 
 			for (auto& batch : batches)
 			{
-				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >(L"RmlUi");
+				if (batch.scissorRegionEnabled)
+				{
+					render::SetScissorRectRenderBlock* scrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(L"RmlUi_SetScissorRect");
+					scrb->scissorRect = batch.scissorRegion;
+					renderContext->draw(scrb);
+				}
 
 				render::IProgram* program = nullptr;
 
+				std::wstring passName = L"RmlUi";
 				if (batch.texture)
 				{
 					program = m_shapeResources->m_shaderTexture->getProgram(perm).program;
+					passName = passName + L"_Texture";
 				}
 				else
 				{
 					program = m_shapeResources->m_shaderColor->getProgram(perm).program;
+					passName = passName + L"_Color";
 				}
+
+				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >( passName);
 
 				renderBlock->program = program;
 				renderBlock->indexBuffer = batch.compiledGeometry->indexBuffer->getBufferView();
