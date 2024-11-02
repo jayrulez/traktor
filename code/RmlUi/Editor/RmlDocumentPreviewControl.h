@@ -60,6 +60,12 @@ namespace traktor
 
 	}
 
+	namespace ui
+	{
+		class Edit;
+		class Button;
+	}
+
 	namespace rmlui
 	{
 		class RmlDocumentResource;

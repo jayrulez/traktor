@@ -120,29 +120,6 @@ namespace traktor::rmlui
 
 	void RmlUiRenderer::render(Rml::Context* context, int32_t width, int32_t height)
 	{
-		//Matrix44 projection2 = orthoLh(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -10000, 10000);
-
-		//// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
-		//Matrix44 correction_matrix(
-		//	Vector4(1.0f, 0.0f, 0.0f, 0.0f), 
-		//	Vector4(0.0f, -1.0f, 0.0f, 0.0f), 
-		//	Vector4(0.0f, 0.0f, 0.5f, 0.0f),
-		//	Vector4(0.0f, 0.0f, 0.5f, 1.0f));
-
-		Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 10000, -10000);
-
-		// https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
-		Rml::Matrix4f correction_matrix;
-		correction_matrix.SetColumns(
-			Rml::Vector4f(1.0f, 0.0f, 0.0f, 0.0f), 
-			Rml::Vector4f(0.0f, -1.0f, 0.0f, 0.0f), 
-			Rml::Vector4f(0.0f, 0.0f, 1.0f, 0.0f),
-			Rml::Vector4f(0.0f, 0.0f, 1.0f, 1.0f));
-
-		projection = correction_matrix * projection;
-
-		Matrix44 proj = *((Matrix44*)&projection);
-
 		const auto& batches = RmlUi::getInstance().renderContext(context);
 
 		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
@@ -164,7 +141,6 @@ namespace traktor::rmlui
 					program = m_shapeResources->m_shaderColor->getProgram(perm).program;
 				}
 
-
 				renderBlock->program = program;
 				renderBlock->indexBuffer = batch.compiledGeometry->indexBuffer->getBufferView();
 				renderBlock->indexType = render::IndexType::UInt32;
@@ -182,37 +158,15 @@ namespace traktor::rmlui
 					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), batch.texture);
 				}
 
-				float scaleX = 2.0f/(float)width;
-				float scaleY = -2.0f/(float)height;
+				Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, (float)-height, -1.0f, 1.0f);
 
-				float offsetX = -1.0f;
-				float offsetY = 1.0f;
-
-				if (1)
-				{
-					offsetY = -offsetY;
-					scaleY = -scaleY;
-				}
-
-
-				Matrix44 matrix = Matrix44::identity();
-				matrix.set(0,0, Scalar(scaleX));
-				matrix.set(0,3, Scalar(offsetX));
-				matrix.set(1,1, Scalar(scaleY));
-				matrix.set(1,3, Scalar(offsetY));
-				matrix.set(2,2, Scalar(1.0f/1000.0f));
-				matrix.set(2,3, Scalar(0.0f));
-				matrix.set(3,3, Scalar(1.0f));
-
-				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), matrix);
+				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity() * projection);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
 
 				renderBlock->programParams->endParameters(renderContext);
 
 				renderContext->draw(renderBlock);
 			}
-
-
-			});
+		});
 	}
 }
