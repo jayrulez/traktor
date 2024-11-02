@@ -30,6 +30,7 @@
 #include "Ui/Application.h"
 #include "Resource/IResourceManager.h"
 #include "Render/IProgram.h"
+#include "Core/Misc/TString.h"
 
 namespace traktor::rmlui
 {
@@ -203,8 +204,15 @@ namespace traktor::rmlui
 	{
 	}
 
-	bool RmlDocumentPreviewControl::create(ui::Widget* parent)
+	bool RmlDocumentPreviewControl::create(ui::Widget* parent, RmlDocumentResource* rmlDocument)
 	{
+		m_rmlDocument = rmlDocument;
+
+		if (!m_rmlDocument)
+		{
+			return false;
+		}
+
 		if (!RmlUi::getInstance().isInitialized())
 		{
 			// todo: print error in log
@@ -229,6 +237,12 @@ namespace traktor::rmlui
 		m_renderContext = new render::RenderContext(4 * 1024 * 1024);
 		m_renderGraph = new render::RenderGraph(m_renderSystem, desc.multiSample);
 
+		// todo: get fonts from document
+		if (!RmlUi::getInstance().loadFonts(m_rmlDocument->getFonts(), m_rmlDocument->getFallbackFonts()))
+		{
+			// todo:log error
+		}
+
 		// Create RmlUi renderer.
 		m_rmlUiRenderer = new rmlui::RmlUiRenderer();
 		if (!m_rmlUiRenderer->create(
@@ -239,10 +253,14 @@ namespace traktor::rmlui
 		))
 			return false;
 
-		// todo: get name from rml document
-		m_rmlContext = RmlUi::getInstance().createContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
+		m_rmlContext = RmlUi::getInstance().createContext(m_rmlDocument->getFilePath().getPathName(), Vector2i(m_rmlDocument->getWidth(), m_rmlDocument->getHeight()));
 		if (!m_rmlContext)
 			return false;
+
+		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
+		Rml::ElementDocument* document = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
+
+		document->Show();
 
 		m_rmlContext->EnableMouseCursor(true);
 
@@ -280,43 +298,32 @@ namespace traktor::rmlui
 		Widget::destroy();
 	}
 
-	void RmlDocumentPreviewControl::setRmlDocument(RmlDocumentResource* rmlDocument)
-	{
-		const ui::Size sz = getInnerRect().getSize();
-		m_rmlDocument = rmlDocument;
-
-		// todo: get fonts from document
-		if (!RmlUi::getInstance().loadFonts({
-			{"assets/Atop-R99O3.ttf", false},
-			{"assets/LatoLatin-Regular.ttf", false},
-			{"assets/LatoLatin-Bold.ttf", false},
-			{"assets/LatoLatin-BoldItalic.ttf", false},
-			{"assets/LatoLatin-Italic.ttf", false},
-			{"assets/NotoEmoji-Regular.ttf", true}
-			}))
-		{
-			// todo:log error
-		}
-
-		// todo: remove
-		// temporary testing
-		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
-		Rml::ElementDocument* document = m_rmlContext->LoadDocument("assets/demo.rml");
-
-		document->Show();
-	}
-
 	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
 	{
 		if (!m_rmlDocument)
 			return ui::Size(600, 600);
 
-		//Aabb2 bounds = {};//m_document->getFrameBounds();
-
-		int width = 0;// int(bounds.mx.x / 20.0f);
-		int height = 0;// int(bounds.mx.y / 20.0f);
+		int width = m_rmlDocument->getWidth();
+		int height = m_rmlDocument->getHeight();
 
 		return ui::Size(width, height);
+	}
+
+	void RmlDocumentPreviewControl::setRmlDocument(RmlDocumentResource* rmlDocument)
+	{
+		m_rmlContext->UnloadAllDocuments();
+		m_rmlDocument = rmlDocument;
+
+		// todo: get fonts from document
+		if (!RmlUi::getInstance().loadFonts(m_rmlDocument->getFonts(), m_rmlDocument->getFallbackFonts()))
+		{
+			// todo:log error
+		}
+
+		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
+		Rml::ElementDocument* document = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
+
+		document->Show();
 	}
 
 	void RmlDocumentPreviewControl::eventSize(ui::SizeEvent* event)
@@ -333,7 +340,7 @@ namespace traktor::rmlui
 
 		if (m_rmlContext)
 		{
-			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
+			//m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
 			//m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
 			m_rmlContext->SetDensityIndependentPixelRatio(scale);
 		}
@@ -440,7 +447,7 @@ namespace traktor::rmlui
 
 		int32_t buttonIndex = getMouseButtonIndex(event->getButton());
 
-		m_rmlContext->ProcessMouseButtonUp(
+		m_rmlContext->ProcessMouseButtonDown(
 			buttonIndex,
 			getModifierState(event->getKeyState()));
 	}
