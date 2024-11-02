@@ -80,13 +80,14 @@ namespace traktor::rmlui
 		// \}
 
 	private:
-		resource::IResourceManager* m_resourceManager;
-		render::IRenderSystem* m_renderSystem;
+		resource::IResourceManager* m_resourceManager = nullptr;
+		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< render::RenderGraph > m_renderGraph;
 		Ref< render::RenderPass > m_renderPassOutput;
 		Ref< RmlUiResources > m_shapeResources;
 		Ref< const render::IVertexLayout > m_vertexLayout;
 		bool m_clearBackground;
+		Matrix44 m_projection = Matrix44::identity();
 	};
 
 }
