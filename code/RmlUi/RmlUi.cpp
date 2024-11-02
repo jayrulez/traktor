@@ -150,19 +150,29 @@ namespace traktor::rmlui
 		return batches;
 	}
 
-	bool RmlUi::loadFonts(const AlignedVector<std::pair<std::string, bool>>& fonts)
+	bool RmlUi::loadFonts(const AlignedVector<Path>& fonts, const AlignedVector<Path>& fallbackFonts)
 	{
 		if (!m_initialized)
 			return false;
 
 		for (auto& entry : fonts)
 		{
-			bool loaded = Rml::LoadFontFace(entry.first, entry.second);
+			bool loaded = Rml::LoadFontFace(tstombs(entry.getPathName()));
 			if (!loaded)
 			{
 				// todo: log error loading font
 
 				return false;
+			}
+		}
+
+		for (auto& entry : fallbackFonts)
+		{
+			bool loaded = Rml::LoadFontFace(tstombs(entry.getPathName()), true);
+			if (!loaded)
+			{
+				// todo: log error loading font
+
 			}
 		}
 

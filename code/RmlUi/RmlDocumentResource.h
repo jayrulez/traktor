@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Core/Serialization/ISerializable.h"
+#include "Core/Io/Path.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -30,9 +31,26 @@ namespace traktor::rmlui
 	public:
 		RmlDocumentResource() = default;
 
+		RmlDocumentResource(const Path& filePath, 
+			const AlignedVector<Path>& fonts, 
+			const AlignedVector<Path>& fallbackFonts, 
+			int32_t width, 
+			int32_t height);
+
+		const Path& getFilePath() const;
+		const AlignedVector<Path>& getFonts() const;
+		const AlignedVector<Path>& getFallbackFonts() const;
+		int32_t getWidth() const;
+		int32_t getHeight() const;
+
 		virtual void serialize(ISerializer& s) override final;
 
 	private:
+		Path m_rmlFilePath = {};
+		AlignedVector<Path> m_fontFilePaths = {};
+		AlignedVector<Path> m_fallbackFontFilePaths = {};
+		int32_t m_referenceWidth = 0;
+		int32_t m_referenceHeight = 0;
 	};
 
 }

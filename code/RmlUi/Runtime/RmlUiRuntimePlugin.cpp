@@ -27,7 +27,8 @@ namespace traktor::rmlui
 
 	void RmlUiRuntimePlugin::destroy(IEnvironment* environment)
 	{
-		RmlUi::getInstance().shutdown();
+		if (RmlUi::getInstance().isInitialized())
+			RmlUi::getInstance().shutdown();
 	}
 
 	Ref< IState > RmlUiRuntimePlugin::createInitialState(IEnvironment* environment)
