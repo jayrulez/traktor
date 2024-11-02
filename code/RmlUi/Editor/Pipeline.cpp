@@ -81,11 +81,15 @@ namespace traktor::rmlui
 		if (const RmlDocumentAsset* rmlDocumentAsset = dynamic_type_cast<const RmlDocumentAsset*>(sourceAsset))
 		{
 			pipelineDepends->addDependency(traktor::Path(m_assetPath), rmlDocumentAsset->getFileName().getOriginal());
-			//for (const auto& font : rmlDocumentAsset->getFonts())
-			//	pipelineDepends->addDependency(traktor::Path(m_assetPath), font.fileName.getOriginal());
+
+			for (const auto& font : rmlDocumentAsset->getFonts())
+				pipelineDepends->addDependency(traktor::Path(m_assetPath), font.getOriginal());
+
+			for (const auto& font : rmlDocumentAsset->getFallbackFonts())
+				pipelineDepends->addDependency(traktor::Path(m_assetPath), font.getOriginal());
 		}
 		pipelineDepends->addDependency(c_idRmlUiShaderAssets, editor::PdfBuild | editor::PdfResource);
-		pipelineDepends->addDependency< render::TextureOutput >();
+		//pipelineDepends->addDependency< render::TextureOutput >();
 		return true;
 	}
 
@@ -114,7 +118,16 @@ namespace traktor::rmlui
 				return false;
 			}
 
-			rmlDocument = new RmlDocumentResource();// RmlDocumentFactory().createRmlDocument(traktor::Path(m_assetPath), sourceInstance, sourceStream);
+			// todo: check that the file and fonts exist
+			// perhaps load them and bake the bytes into RmlDocumentResource?
+
+			rmlDocument = new RmlDocumentResource(
+				rmlDocumentAsset->getFileName(),
+				rmlDocumentAsset->getFonts(),
+				rmlDocumentAsset->getFallbackFonts(),
+				rmlDocumentAsset->getWidth(),
+				rmlDocumentAsset->getHeight()
+			);// RmlDocumentFactory().createRmlDocument(traktor::Path(m_assetPath), sourceInstance, sourceStream);
 
 			safeClose(sourceStream);
 		}

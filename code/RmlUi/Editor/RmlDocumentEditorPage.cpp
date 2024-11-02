@@ -23,6 +23,7 @@
 #include "Editor/IDocument.h"
 #include "Editor/IEditor.h"
 #include "RmlUi/RmlDocumentResource.h"
+#include "RmlUi/RmlDocumentResourceFactory.h"
 #include "RmlUi/Editor/RmlDocumentEditorPage.h"
 #include "RmlUi/Editor/RmlDocumentAsset.h"
 #include "RmlUi/Editor/RmlDocumentPreviewControl.h"
@@ -70,14 +71,14 @@ namespace traktor::rmlui
 			return false;
 
 		// Read rml document from output database.
-		//m_RmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());
-		//if (!m_RmlDocument)
-		//	return false;
+		m_RmlDocument = database->getObjectReadOnly< RmlDocumentResource >(m_document->getInstance(0)->getGuid());
+		if (!m_RmlDocument)
+			return false;
 
 		m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
 		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
 		m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
-		//m_resourceManager->addFactory(new rmlui::RmlDocumentResourceFactory());
+		m_resourceManager->addFactory(new rmlui::RmlDocumentResourceFactory());
 
 		m_container = new ui::Container();
 		m_container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
@@ -100,7 +101,7 @@ namespace traktor::rmlui
 		previewContainer->create(m_container, ui::WsNone, new ui::AspectLayout(16.0f / 9.0f));
 
 		m_previewControl = new RmlDocumentPreviewControl(m_editor, database, m_resourceManager, renderSystem);
-		if (!m_previewControl->create(previewContainer))
+		if (!m_previewControl->create(previewContainer, m_RmlDocument))
 			return false;
 
 		// Create status bar.
@@ -108,7 +109,6 @@ namespace traktor::rmlui
 		m_statusBar->create(m_container, ui::WsDoubleBuffer);
 		m_statusBar->addColumn(-1);
 
-		m_previewControl->setRmlDocument(m_RmlDocument);
 		m_previewControl->update();
 
 		return true;
