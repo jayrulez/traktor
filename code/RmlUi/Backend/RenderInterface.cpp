@@ -93,10 +93,7 @@ namespace traktor::rmlui
 		Batch batch;
 
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
-		batch.scissorRegion[0] = m_scissorRegion[0];
-		batch.scissorRegion[1] = m_scissorRegion[1];
-		batch.scissorRegion[2] = m_scissorRegion[2];
-		batch.scissorRegion[3] = m_scissorRegion[3];
+		batch.scissorRegion = m_scissorRegion;
 		batch.scissorRegionEnabled = m_scissorRegionEnabled;
 		batch.transformScissorRegion = false;
 		batch.translation = Vector4(translation.x, translation.y, 0, 0);
@@ -178,10 +175,7 @@ namespace traktor::rmlui
 
 	void RenderInterface::SetScissorRegion(Rml::Rectanglei region)
 	{
-		m_scissorRegion[0] = region.Position().x;
-		m_scissorRegion[1] = region.Position().y;
-		m_scissorRegion[2] = region.Size().x;
-		m_scissorRegion[3] = region.Size().y;
+		m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Right(), region.Bottom());
 	}
 
 	const AlignedVector<RenderInterface::Batch>& RenderInterface::getBatches() const

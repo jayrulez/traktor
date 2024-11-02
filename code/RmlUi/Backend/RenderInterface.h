@@ -85,7 +85,7 @@ namespace traktor::rmlui
 		{
 			CompiledGeometry* compiledGeometry;
 			Ref < render::ITexture > texture;
-			int32_t scissorRegion[4];
+			render::Rectangle scissorRegion = {};
 			bool scissorRegionEnabled;
 			bool transformScissorRegion = false;
 			Vector4 translation = {};
@@ -105,7 +105,7 @@ namespace traktor::rmlui
 		AlignedVector<Batch> m_batches;
 		render::BlendOperation m_blendOp;
 		bool m_scissorRegionEnabled = false;
-		int32_t m_scissorRegion[4] = { 0,0,0,0 };
+		render::Rectangle m_scissorRegion = {};
 
 		SmallMap<size_t, Ref< render::ITexture> > m_textures;
 	};
