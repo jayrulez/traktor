@@ -239,31 +239,12 @@ namespace traktor::rmlui
 		))
 			return false;
 
-		// todo: get fonts from document
-		if (!RmlUi::getInstance().loadFonts({
-			{"assets/Atop-R99O3.ttf", false},
-			{"assets/LatoLatin-Regular.ttf", false},
-			{"assets/LatoLatin-Bold.ttf", false},
-			{"assets/LatoLatin-BoldItalic.ttf", false},
-			{"assets/LatoLatin-Italic.ttf", false},
-			{"assets/NotoEmoji-Regular.ttf", true}
-			}))
-		{
-			return false;
-		}
-
 		// todo: get name from rml document
 		m_rmlContext = RmlUi::getInstance().createContext(L"Test", Vector2i(m_renderView->getWidth(), m_renderView->getHeight()));
 		if (!m_rmlContext)
 			return false;
 
-		// todo: remove
-		// temporary testing
-		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
-		Rml::ElementDocument* document = m_rmlContext->LoadDocument("assets/demo.rml");
-
-		document->Show();
-
+		m_rmlContext->EnableMouseCursor(true);
 
 		addEventHandler< ui::SizeEvent >(this, &RmlDocumentPreviewControl::eventSize);
 		addEventHandler< ui::PaintEvent >(this, &RmlDocumentPreviewControl::eventPaint);
@@ -301,9 +282,28 @@ namespace traktor::rmlui
 
 	void RmlDocumentPreviewControl::setRmlDocument(RmlDocumentResource* rmlDocument)
 	{
+		const ui::Size sz = getInnerRect().getSize();
 		m_rmlDocument = rmlDocument;
 
-		const ui::Size sz = getInnerRect().getSize();
+		// todo: get fonts from document
+		if (!RmlUi::getInstance().loadFonts({
+			{"assets/Atop-R99O3.ttf", false},
+			{"assets/LatoLatin-Regular.ttf", false},
+			{"assets/LatoLatin-Bold.ttf", false},
+			{"assets/LatoLatin-BoldItalic.ttf", false},
+			{"assets/LatoLatin-Italic.ttf", false},
+			{"assets/NotoEmoji-Regular.ttf", true}
+			}))
+		{
+			// todo:log error
+		}
+
+		// todo: remove
+		// temporary testing
+		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
+		Rml::ElementDocument* document = m_rmlContext->LoadDocument("assets/demo.rml");
+
+		document->Show();
 	}
 
 	ui::Size RmlDocumentPreviewControl::getPreferredSize(const ui::Size& hint) const
@@ -335,7 +335,7 @@ namespace traktor::rmlui
 		{
 			m_rmlContext->SetDimensions(Rml::Vector2i(sz.cx, sz.cy));
 			//m_rmlContext->SetDimensions(Rml::Vector2i((int32_t)(sz.cx / scale), (int32_t)(sz.cy / scale)));
-			//m_rmlContext->SetDensityIndependentPixelRatio(scale);
+			m_rmlContext->SetDensityIndependentPixelRatio(scale);
 		}
 	}
 
@@ -482,7 +482,7 @@ namespace traktor::rmlui
 		}
 
 		m_rmlContext->ProcessMouseWheel(
-			event->getRotation(),
+			(float)event->getRotation(),
 			getModifierState(event->getKeyState()));
 	}
 
