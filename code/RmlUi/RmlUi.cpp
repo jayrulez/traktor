@@ -72,6 +72,8 @@ namespace traktor::rmlui
 		if (!m_initialized)
 			return;
 
+		Rml::ReleaseTextures();
+
 		Rml::Shutdown();
 
 		delete m_backendData;
