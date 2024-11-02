@@ -64,7 +64,7 @@ namespace traktor::rmlui
 
 		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context);
 
-		bool loadFonts(const AlignedVector<std::pair<std::string, bool>>& fonts);
+		bool loadFonts(const AlignedVector<Path>& fonts, const AlignedVector<Path>& fallbackFonts = {});
 
 	private:
 		struct BackendData
