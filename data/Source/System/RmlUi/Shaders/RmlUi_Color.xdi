@@ -17,7 +17,7 @@
 				<postAlphaBlend>false</postAlphaBlend>
 				<overlay>false</overlay>
 			</priority>
-			<cullMode>CounterClockWise</cullMode>
+			<cullMode>Never</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
 			<blendColorSource>BfOne</blendColorSource>
