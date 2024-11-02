@@ -489,7 +489,7 @@ namespace traktor::rmlui
 		}
 
 		m_rmlContext->ProcessMouseWheel(
-			(float)event->getRotation(),
+			-(float)event->getRotation(),
 			getModifierState(event->getKeyState()));
 	}
 
