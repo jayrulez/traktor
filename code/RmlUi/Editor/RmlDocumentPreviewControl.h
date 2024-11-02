@@ -101,6 +101,7 @@ namespace traktor
 			Ref< rmlui::RmlUiRenderer > m_rmlUiRenderer;
 			Rml::Context* m_rmlContext = nullptr;
 			Ref< RmlDocumentResource > m_rmlDocument;
+			Rml::ElementDocument* m_elementDocument = nullptr;
 
 			void eventSize(ui::SizeEvent* event);
 

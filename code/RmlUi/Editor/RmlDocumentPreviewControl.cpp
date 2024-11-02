@@ -258,9 +258,9 @@ namespace traktor::rmlui
 			return false;
 
 		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
-		Rml::ElementDocument* document = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
+		m_elementDocument = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
 
-		document->Show();
+		m_elementDocument->Show();
 
 		m_rmlContext->EnableMouseCursor(true);
 
@@ -311,6 +311,11 @@ namespace traktor::rmlui
 
 	void RmlDocumentPreviewControl::setRmlDocument(RmlDocumentResource* rmlDocument)
 	{
+		if (m_elementDocument)
+			m_elementDocument->Close();
+
+		m_elementDocument = nullptr;
+
 		m_rmlContext->UnloadAllDocuments();
 		m_rmlDocument = rmlDocument;
 
@@ -321,9 +326,9 @@ namespace traktor::rmlui
 		}
 
 		//Rml::ElementDocument* document = m_rmlContext->LoadDocumentFromMemory(R"()");
-		Rml::ElementDocument* document = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
+		m_elementDocument = m_rmlContext->LoadDocument(tstombs(m_rmlDocument->getFilePath().getPathName()));
 
-		document->Show();
+		m_elementDocument->Show();
 	}
 
 	void RmlDocumentPreviewControl::eventSize(ui::SizeEvent* event)
