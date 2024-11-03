@@ -144,6 +144,7 @@ namespace traktor::rmlui
 		desc.height = source_dimensions.y;
 		desc.format = render::TextureFormat::TfR8G8B8A8;
 		desc.immutable = true;
+		desc.sRGB = true;
 		render::TextureInitialData initialData;
 		initialData.data = source.data();
 		initialData.pitch = 4 * desc.width;
