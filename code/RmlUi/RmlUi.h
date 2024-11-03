@@ -62,7 +62,7 @@ namespace traktor::rmlui
 
 		void destroyContext(Rml::Context* context);
 
-		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context);
+		AlignedVector<RenderInterface::Batch> renderContext(Rml::Context* context, uint32_t width, uint32_t height);
 
 		bool loadFonts(const AlignedVector<Path>& fonts, const AlignedVector<Path>& fallbackFonts = {});
 

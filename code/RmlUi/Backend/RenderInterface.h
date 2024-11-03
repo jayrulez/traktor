@@ -54,6 +54,8 @@ namespace traktor::rmlui
 
 		virtual void SetScissorRegion(Rml::Rectanglei region) override;
 
+		virtual void SetTransform(const Rml::Matrix4f* transform) override;
+
 	public:
 
 #pragma pack(push, 1)  // Set alignment to 1 byte
@@ -85,16 +87,20 @@ namespace traktor::rmlui
 		{
 			CompiledGeometry* compiledGeometry;
 			Ref < render::ITexture > texture;
+
 			render::Rectangle scissorRegion = {};
-			bool scissorRegionEnabled;
 			bool transformScissorRegion = false;
+
+			Matrix44 transform = Matrix44::identity();
 			Vector4 translation = {};
 		};
 
 	private:
 		friend class RmlUi;
 
-		void beginRendering();
+		Rml::TextureHandle createTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions, bool srgb);
+
+		void beginRendering(uint32_t width, uint32_t height);
 
 		void endRendering();
 
@@ -103,9 +109,16 @@ namespace traktor::rmlui
 		render::IRenderSystem* m_renderSystem = nullptr;
 		AlignedVector<CompiledGeometry> m_compiledGeometry;
 		AlignedVector<Batch> m_batches;
-		render::BlendOperation m_blendOp;
-		bool m_scissorRegionEnabled = false;
+		
+		Matrix44 m_transform = Matrix44::identity();
+		bool m_transformEnabled = false;
+
+		render::Rectangle m_originalScissorRegion = {};
 		render::Rectangle m_scissorRegion = {};
+		bool m_scissorRegionEnabled = false;
+
+		uint32_t m_width = 0;
+		uint32_t m_height = 0;
 
 		SmallMap<size_t, Ref< render::ITexture> > m_textures;
 	};

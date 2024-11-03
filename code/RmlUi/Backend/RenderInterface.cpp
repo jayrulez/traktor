@@ -7,6 +7,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include "Core/Config.h"
 #include "Core/Rtti/ITypedObject.h"
 #include "RmlUi/Backend/RenderInterface.h"
 #include "Render/Buffer.h"
@@ -15,7 +16,6 @@
 #include "Core/Misc/SafeDestroy.h"
 #include "Drawing/Image.h"
 #include "Core/Misc/TString.h"
-#include "Core/Config.h"
 
 namespace traktor::rmlui
 {
@@ -94,8 +94,8 @@ namespace traktor::rmlui
 
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
 		batch.scissorRegion = m_scissorRegion;
-		batch.scissorRegionEnabled = m_scissorRegionEnabled;
-		batch.transformScissorRegion = false;
+		batch.transformScissorRegion = (m_scissorRegionEnabled && m_transform != Matrix44::identity());
+		batch.transform = m_transform;
 		batch.translation = Vector4(translation.x, translation.y, 0, 0);
 
 		size_t textureId = static_cast<size_t>(textureHandle);
@@ -132,30 +132,14 @@ namespace traktor::rmlui
 
 		Rml::Span<const Rml::byte> data(static_cast<Rml::byte*>(image->getData()), image->getDataSize());
 
-		Rml::TextureHandle handle = GenerateTexture(data, texture_dimensions);
+		Rml::TextureHandle handle = createTexture(data, texture_dimensions, false);
 
 		return handle;
 	}
 
 	Rml::TextureHandle RenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
 	{
-		render::SimpleTextureCreateDesc desc;
-		desc.width = source_dimensions.x;
-		desc.height = source_dimensions.y;
-		desc.format = render::TextureFormat::TfR8G8B8A8;
-		desc.immutable = true;
-		desc.sRGB = true;
-		render::TextureInitialData initialData;
-		initialData.data = source.data();
-		initialData.pitch = 4 * desc.width;
-		initialData.slicePitch = 4 * desc.width * desc.height;
-		desc.initialData[0] = initialData;
-		desc.mipCount = 1;
-		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, T_FILE_LINE_W);
-
-		size_t textureId = allocateTextureId();
-		m_textures.insert(textureId, texture);
-		return static_cast<Rml::TextureHandle>(textureId);
+		return createTexture(source, source_dimensions, true);
 	}
 
 	void RenderInterface::ReleaseTexture(Rml::TextureHandle texture)
@@ -172,6 +156,10 @@ namespace traktor::rmlui
 	void RenderInterface::EnableScissorRegion(bool enable)
 	{
 		m_scissorRegionEnabled = enable;
+		if (!enable)
+		{
+			m_scissorRegion = m_originalScissorRegion;
+		}
 	}
 
 	void RenderInterface::SetScissorRegion(Rml::Rectanglei region)
@@ -179,13 +167,55 @@ namespace traktor::rmlui
 		m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Right(), region.Bottom());
 	}
 
+	void RenderInterface::SetTransform(const Rml::Matrix4f* rmlTransform)
+	{
+		//Matrix44 transform = Matrix44::identity();
+		//if (!rmlTransform)
+		//{
+		//	m_transformEnabled = false;
+		//}
+		//else {
+		//	transform = *((Matrix44*)rmlTransform);
+		//	constexpr bool isColumnMajor = std::is_same<Rml::Matrix4f, Rml::ColumnMajorMatrix4f>::value;
+		//	if (!isColumnMajor)
+		//	{
+		//		transform.transpose();
+		//	}
+		//}
+		//m_transform = transform;
+	}
+
 	const AlignedVector<RenderInterface::Batch>& RenderInterface::getBatches() const
 	{
 		return m_batches;
 	}
 
-	void RenderInterface::beginRendering()
+	Rml::TextureHandle RenderInterface::createTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions, bool srgb)
 	{
+		render::SimpleTextureCreateDesc desc;
+		desc.width = source_dimensions.x;
+		desc.height = source_dimensions.y;
+		desc.format = render::TextureFormat::TfR8G8B8A8;
+		desc.immutable = true;
+		desc.sRGB = srgb;
+		render::TextureInitialData initialData;
+		initialData.data = source.data();
+		initialData.pitch = 4 * desc.width;
+		initialData.slicePitch = 4 * desc.width * desc.height;
+		desc.initialData[0] = initialData;
+		desc.mipCount = 1;
+		Ref< render::ITexture > texture = m_renderSystem->createSimpleTexture(desc, T_FILE_LINE_W);
+		size_t textureId = allocateTextureId();
+		m_textures.insert(textureId, texture);
+		return static_cast<Rml::TextureHandle>(textureId);
+	}
+
+	void RenderInterface::beginRendering(uint32_t width, uint32_t height)
+	{
+		m_width = width;
+		m_height = height;
+		m_originalScissorRegion = { 0,0,width, height };
+		m_scissorRegion = m_originalScissorRegion;
 	}
 
 	void RenderInterface::endRendering()
