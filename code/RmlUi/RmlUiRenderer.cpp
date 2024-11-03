@@ -167,7 +167,7 @@ namespace traktor::rmlui
 
 				Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, -(float)height, -1.0f, 1.0f);
 
-				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity() * projection);
+				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), batch.transform * projection);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
 
 				renderBlock->programParams->endParameters(renderContext);
