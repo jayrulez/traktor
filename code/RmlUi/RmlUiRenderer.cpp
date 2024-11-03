@@ -25,6 +25,38 @@
 
 namespace traktor::rmlui
 {
+	namespace
+	{
+		render::Rectangle transformRectangle(const render::Rectangle& rect, const Matrix44& matrix) {
+			// Define the four corners of the rectangle
+			Vector4 topLeft(rect.left, rect.top, 0, 1);
+			Vector4 topRight(rect.left + rect.width, rect.top, 0, 1);
+			Vector4 bottomLeft(rect.left, rect.top + rect.height, 0, 1);
+			Vector4 bottomRight(rect.left + rect.width, rect.top + rect.height, 0,1);
+
+			// Transform each corner
+			Vector4 transformedTopLeft = Vector4::zero();
+			Vector4 transformedTopRight = Vector4::zero();
+			Vector4 transformedBottomLeft = Vector4::zero();
+			Vector4 transformedBottomRight = Vector4::zero();
+
+
+			matrix.transform(&topLeft, &transformedTopLeft, 1);
+			matrix.transform(&topRight, &transformedTopRight, 1);
+			matrix.transform(&bottomLeft, &transformedBottomLeft, 1);
+			matrix.transform(&bottomRight, &transformedBottomRight, 1);
+
+			// Calculate the new bounding rectangle by finding min/max x and y
+			int32_t newLeft = static_cast<int32_t>(std::min({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }));
+			int32_t newTop = static_cast<int32_t>(std::min({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }));
+			uint32_t newWidth = static_cast<uint32_t>(std::max({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }) - newLeft);
+			uint32_t newHeight = static_cast<uint32_t>(std::max({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }) - newTop);
+
+			// Return the transformed rectangle
+			return render::Rectangle(newLeft, newTop, newWidth, newHeight);
+		}
+	}
+
 	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlUiRenderer", RmlUiRenderer, Object)
 
 		RmlUiRenderer::RmlUiRenderer()
@@ -132,18 +164,10 @@ namespace traktor::rmlui
 
 				if (batch.transformScissorRegion)
 				{
-					Vector4 v = Vector4(
-						(float)batch.scissorRegion.left,
-						(float)batch.scissorRegion.top,
-						(float)batch.scissorRegion.width,
-						(float)batch.scissorRegion.height
-					);
-
 					// perhaps do this from inside RenderInterface when batching?
-					// todo: transform scissor
-					scrb->scissorRect = batch.scissorRegion;
+					scrb->scissorRect = transformRectangle(batch.scissorRegion, batch.transform);
 				}
-				else 
+				else
 				{
 					scrb->scissorRect = batch.scissorRegion;
 				}
