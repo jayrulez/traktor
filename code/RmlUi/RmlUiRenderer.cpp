@@ -129,7 +129,24 @@ namespace traktor::rmlui
 			for (auto& batch : batches)
 			{
 				render::SetScissorRectRenderBlock* scrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(L"RmlUi_SetScissorRect");
-				scrb->scissorRect = batch.scissorRegion;
+
+				if (batch.transformScissorRegion)
+				{
+					Vector4 v = Vector4(
+						(float)batch.scissorRegion.left,
+						(float)batch.scissorRegion.top,
+						(float)batch.scissorRegion.width,
+						(float)batch.scissorRegion.height
+					);
+
+					// perhaps do this from inside RenderInterface when batching?
+					// todo: transform scissor
+					scrb->scissorRect = batch.scissorRegion;
+				}
+				else 
+				{
+					scrb->scissorRect = batch.scissorRegion;
+				}
 				renderContext->draw(scrb);
 
 				render::IProgram* program = nullptr;
