@@ -128,7 +128,7 @@ namespace traktor::rmlui
 		Rml::RemoveContext(context->GetName());
 	}
 
-	AlignedVector<RenderInterface::Batch> RmlUi::renderContext(Rml::Context* context)
+	AlignedVector<RenderInterface::Batch> RmlUi::renderContext(Rml::Context* context, uint32_t width, uint32_t height)
 	{
 		m_backendData->renderMutex.wait();
 
@@ -136,7 +136,7 @@ namespace traktor::rmlui
 
 		if (context != nullptr)
 		{
-			m_backendData->renderInterface.beginRendering();
+			m_backendData->renderInterface.beginRendering(width, height);
 
 			context->Render();
 
