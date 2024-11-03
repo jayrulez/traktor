@@ -139,7 +139,7 @@ namespace traktor::rmlui
 
 	Rml::TextureHandle RenderInterface::GenerateTexture(Rml::Span<const Rml::byte> source, Rml::Vector2i source_dimensions)
 	{
-		return createTexture(source, source_dimensions, true);
+		return createTexture(source, source_dimensions, false);
 	}
 
 	void RenderInterface::ReleaseTexture(Rml::TextureHandle texture)
@@ -167,22 +167,23 @@ namespace traktor::rmlui
 		m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Right(), region.Bottom());
 	}
 
-	void RenderInterface::SetTransform(const Rml::Matrix4f* rmlTransform)
+	void RenderInterface::SetTransform(const Rml::Matrix4f* rmlTransformPtr)
 	{
-		//Matrix44 transform = Matrix44::identity();
-		//if (!rmlTransform)
-		//{
-		//	m_transformEnabled = false;
-		//}
-		//else {
-		//	transform = *((Matrix44*)rmlTransform);
-		//	constexpr bool isColumnMajor = std::is_same<Rml::Matrix4f, Rml::ColumnMajorMatrix4f>::value;
-		//	if (!isColumnMajor)
-		//	{
-		//		transform.transpose();
-		//	}
-		//}
-		//m_transform = transform;
+		Matrix44 transform = Matrix44::identity();
+		if (!rmlTransformPtr)
+		{
+			m_transformEnabled = false;
+		}
+		else {
+			transform = *((Matrix44*)rmlTransformPtr);
+			constexpr bool isColumnMajor = std::is_same<Rml::Matrix4f, Rml::ColumnMajorMatrix4f>::value;
+			if (!isColumnMajor)
+			{
+				transform.transpose();
+			}
+			m_transformEnabled = true;
+		}
+		m_transform = transform;
 	}
 
 	const AlignedVector<RenderInterface::Batch>& RenderInterface::getBatches() const
