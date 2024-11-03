@@ -75,7 +75,7 @@ namespace traktor::rmlui
 		// \name RmlUiRenderer
 		// \{
 
-		void render(Rml::Context* context, int32_t width, int32_t height);
+		void render(Rml::Context* context, uint32_t width, uint32_t height);
 
 		// \}
 
@@ -87,7 +87,6 @@ namespace traktor::rmlui
 		Ref< RmlUiResources > m_shapeResources;
 		Ref< const render::IVertexLayout > m_vertexLayout;
 		bool m_clearBackground;
-		Matrix44 m_projection = Matrix44::identity();
 	};
 
 }
