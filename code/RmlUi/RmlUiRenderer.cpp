@@ -118,9 +118,9 @@ namespace traktor::rmlui
 		m_clearBackground = clearBackground;
 	}
 
-	void RmlUiRenderer::render(Rml::Context* context, int32_t width, int32_t height)
+	void RmlUiRenderer::render(Rml::Context* context, uint32_t width, uint32_t height)
 	{
-		const auto& batches = RmlUi::getInstance().renderContext(context);
+		const auto& batches = RmlUi::getInstance().renderContext(context, width, height);
 
 		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
 
@@ -128,12 +128,9 @@ namespace traktor::rmlui
 
 			for (auto& batch : batches)
 			{
-				if (batch.scissorRegionEnabled)
-				{
-					render::SetScissorRectRenderBlock* scrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(L"RmlUi_SetScissorRect");
-					scrb->scissorRect = batch.scissorRegion;
-					renderContext->draw(scrb);
-				}
+				render::SetScissorRectRenderBlock* scrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(L"RmlUi_SetScissorRect");
+				scrb->scissorRect = batch.scissorRegion;
+				renderContext->draw(scrb);
 
 				render::IProgram* program = nullptr;
 
@@ -149,7 +146,7 @@ namespace traktor::rmlui
 					passName = passName + L"_Color";
 				}
 
-				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >( passName);
+				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >(passName);
 
 				renderBlock->program = program;
 				renderBlock->indexBuffer = batch.compiledGeometry->indexBuffer->getBufferView();
@@ -168,7 +165,7 @@ namespace traktor::rmlui
 					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), batch.texture);
 				}
 
-				Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, (float)-height, -1.0f, 1.0f);
+				Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, -(float)height, -1.0f, 1.0f);
 
 				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), Matrix44::identity() * projection);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
@@ -177,6 +174,6 @@ namespace traktor::rmlui
 
 				renderContext->draw(renderBlock);
 			}
-		});
+			});
 	}
 }
