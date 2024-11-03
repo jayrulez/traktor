@@ -132,7 +132,7 @@ namespace traktor::rmlui
 
 		Rml::Span<const Rml::byte> data(static_cast<Rml::byte*>(image->getData()), image->getDataSize());
 
-		Rml::TextureHandle handle = createTexture(data, texture_dimensions, false);
+		Rml::TextureHandle handle = createTexture(data, texture_dimensions, true);
 
 		return handle;
 	}
