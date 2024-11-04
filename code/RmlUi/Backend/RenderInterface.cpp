@@ -218,7 +218,7 @@ namespace traktor::rmlui
 		m_height = height;
 
 		m_scissorRegionEnabled = false;
-		m_originalScissorRegion = { 0,0,width, height };
+		m_originalScissorRegion = { 0,0,(int32_t)width, (int32_t)height };
 		m_scissorRegion = m_originalScissorRegion;
 
 		m_transformEnabled = false;
