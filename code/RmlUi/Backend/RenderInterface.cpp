@@ -112,9 +112,14 @@ namespace traktor::rmlui
 		m_batches.push_back(std::move(batch));
 	}
 
-	void RenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometry)
+	void RenderInterface::ReleaseGeometry(Rml::CompiledGeometryHandle geometryHandle)
 	{
-		delete reinterpret_cast<CompiledGeometry*>(geometry);
+		if (CompiledGeometry* geometry = reinterpret_cast<CompiledGeometry*>(geometryHandle))
+		{
+			safeDestroy(geometry->indexBuffer);
+			safeDestroy(geometry->vertexBuffer);
+			delete geometry;
+		}
 	}
 
 	Rml::TextureHandle RenderInterface::LoadTexture(Rml::Vector2i& texture_dimensions, const Rml::String& source)
