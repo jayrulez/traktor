@@ -93,6 +93,8 @@ namespace traktor::rmlui
 
 			Matrix44 transform = Matrix44::identity();
 			Vector4 translation = {};
+
+			bool stencil = false;
 		};
 
 	private:
@@ -116,6 +118,8 @@ namespace traktor::rmlui
 		render::Rectangle m_originalScissorRegion = {};
 		render::Rectangle m_scissorRegion = {};
 		bool m_scissorRegionEnabled = false;
+
+		bool m_useStencilPipeline = false;
 
 		uint32_t m_width = 0;
 		uint32_t m_height = 0;

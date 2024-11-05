@@ -27,33 +27,44 @@ namespace traktor::rmlui
 {
 	namespace
 	{
-		render::Rectangle transformRectangle(const render::Rectangle& rect, const Matrix44& matrix) {
-			// Define the four corners of the rectangle
-			Vector4 topLeft(rect.left, rect.top, 0, 1);
-			Vector4 topRight(rect.left + rect.width, rect.top, 0, 1);
-			Vector4 bottomLeft(rect.left, rect.top + rect.height, 0, 1);
-			Vector4 bottomRight(rect.left + rect.width, rect.top + rect.height, 0,1);
+		void transformRectangle(render::Rectangle& rect, const Matrix44& m)
+		{
+			//render::Rectangle rect = rectp;
+			////rect.height = -rect.height;
+			////rect.top = rect.top + rect.height;
+			//Matrix44 matrix = m;
 
-			// Transform each corner
-			Vector4 transformedTopLeft = Vector4::zero();
-			Vector4 transformedTopRight = Vector4::zero();
-			Vector4 transformedBottomLeft = Vector4::zero();
-			Vector4 transformedBottomRight = Vector4::zero();
+			////matrix.set(1, 0, Scalar(matrix.get(1, 0) * -1.0f));
+			////matrix.set(1, 1, Scalar(matrix.get(1, 1) * -1.0f));
+			////matrix.set(1, 2, Scalar(matrix.get(1, 2) * -1.0f));
+			////matrix.set(1, 3, Scalar(matrix.get(1, 3) * -1.0f));
+
+			//Vector4 topLeft(rect.left, rect.top, 0, 1);
+			//Vector4 topRight(rect.left + rect.width, rect.top, 0, 1);
+			//Vector4 bottomLeft(rect.left, rect.top + rect.height, 0, 1);
+			//Vector4 bottomRight(rect.left + rect.width, rect.top + rect.height, 0, 1);
+
+			////// Transform each corner
+			//Vector4 transformedTopLeft = matrix * topLeft;
+			//Vector4 transformedTopRight = matrix * topRight;
+			//Vector4 transformedBottomLeft = matrix * bottomLeft;
+			//Vector4 transformedBottomRight = matrix * bottomRight;
 
 
-			matrix.transform(&topLeft, &transformedTopLeft, 1);
-			matrix.transform(&topRight, &transformedTopRight, 1);
-			matrix.transform(&bottomLeft, &transformedBottomLeft, 1);
-			matrix.transform(&bottomRight, &transformedBottomRight, 1);
+			//// Calculate the new bounding rectangle by finding min/max x and y
+			//int32_t newLeft = static_cast<int32_t>(std::min({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }));
+			//int32_t newTop = static_cast<int32_t>(std::min({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }));
+			//int32_t newWidth = static_cast<int32_t>(std::max({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }) - newLeft);
+			//int32_t newHeight = static_cast<int32_t>(std::max({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }) - newTop);
 
-			// Calculate the new bounding rectangle by finding min/max x and y
-			int32_t newLeft = static_cast<int32_t>(std::min({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }));
-			int32_t newTop = static_cast<int32_t>(std::min({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }));
-			uint32_t newWidth = static_cast<uint32_t>(std::max({ transformedTopLeft.x(), transformedTopRight.x(), transformedBottomLeft.x(), transformedBottomRight.x() }) - newLeft);
-			uint32_t newHeight = static_cast<uint32_t>(std::max({ transformedTopLeft.y(), transformedTopRight.y(), transformedBottomLeft.y(), transformedBottomRight.y() }) - newTop);
+			////if (newLeft < 0 || newTop < 0 || newWidth < 0 || newHeight < 0)
+			////{
+			////	int x = 2;
+			////}
 
-			// Return the transformed rectangle
-			return render::Rectangle(newLeft, newTop, newWidth, newHeight);
+			////return rectp;
+			//// Return the transformed rectangle
+			//return render::Rectangle(max(newLeft, 0), max(newTop, 0), max(newWidth, 0), max(newHeight, 0));
 		}
 	}
 
@@ -152,31 +163,57 @@ namespace traktor::rmlui
 
 	void RmlUiRenderer::render(Rml::Context* context, uint32_t width, uint32_t height)
 	{
+		Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, -(float)height, -1.0f, 1.0f);
+
 		const auto& batches = RmlUi::getInstance().renderContext(context, width, height);
 
 		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
 
 		m_renderPassOutput->addBuild([=, this](const render::RenderGraph& renderGraph, render::RenderContext* renderContext) {
 
+			render::Rectangle scissor = {-1,-1,-1,-1};
+
 			for (auto& batch : batches)
 			{
-				render::SetScissorRectRenderBlock* scrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(L"RmlUi_SetScissorRect");
+				if(scissor != batch.scissorRegion)
+				{
+					scissor = batch.scissorRegion;
 
-				if (batch.transformScissorRegion)
-				{
-					// perhaps do this from inside RenderInterface when batching?
-					scrb->scissorRect = transformRectangle(batch.scissorRegion, batch.transform);
+					render::Rectangle scissor = batch.scissorRegion;
+
+					std::wstring ssrbName = L"RmlUi_SetScissorRect_"
+						+ std::to_wstring(scissor.left)
+						+ L"_" + std::to_wstring(scissor.top)
+						+ L"_" + std::to_wstring(scissor.width)
+						+ L"_" + std::to_wstring(scissor.height);
+
+					render::SetScissorRectRenderBlock* ssrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(ssrbName);
+					ssrb->scissorRect = scissor;
+
+					renderContext->draw(ssrb);
 				}
-				else
-				{
-					scrb->scissorRect = batch.scissorRegion;
-				}
-				renderContext->draw(scrb);
 
 				render::IProgram* program = nullptr;
 
 				std::wstring passName = L"RmlUi";
-				if (batch.texture)
+
+				if (batch.transformScissorRegion)
+				{
+					// perhaps do this from inside RenderInterface when batching?
+					//transformRectangle(scissor, batch.transform);
+					// todo: draw a quad for stencil pixels
+
+					// use stencil pipeline
+				}
+
+				if(batch.stencil)
+				{
+					// revisit this logic
+					program = m_shapeResources->m_shaderStencil->getProgram(perm).program;
+					passName = passName + L"_Stencil";
+				}
+				/*else */
+					if (batch.texture)
 				{
 					program = m_shapeResources->m_shaderTexture->getProgram(perm).program;
 					passName = passName + L"_Texture";
@@ -206,9 +243,14 @@ namespace traktor::rmlui
 					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"RmlUi_Texture"), batch.texture);
 				}
 
-				Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, -(float)height, -1.0f, 1.0f);
+				Matrix44 transform = batch.transform;
 
-				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), batch.transform * projection);
+				//transform.set(1, 0, Scalar(transform.get(1, 0) * -1.0f));
+				//transform.set(1, 1, Scalar(transform.get(1, 1) * -1.0f));
+				//transform.set(1, 2, Scalar(transform.get(1, 2) * -1.0f));
+				//transform.set(1, 3, Scalar(transform.get(1, 3) * -1.0f));
+
+				renderBlock->programParams->setMatrixParameter(render::getParameterHandle(L"RmlUi_Transform"), projection * transform);
 				renderBlock->programParams->setVectorParameter(render::getParameterHandle(L"RmlUi_Translation"), batch.translation);
 
 				renderBlock->programParams->endParameters(renderContext);
