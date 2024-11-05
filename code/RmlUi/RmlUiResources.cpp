@@ -15,6 +15,7 @@ namespace traktor::rmlui
 	{
 		const resource::Id< render::Shader > c_idShaderColor(Guid(L"{5E18600A-1FCC-5140-AB80-E75615B5D01F}"));
 		const resource::Id< render::Shader > c_idShaderTexture(Guid(L"{AFC34A55-B4CF-774F-A86F-B303A7317CF0}"));
+		const resource::Id< render::Shader > c_idShaderStencil(Guid(L"{57314865-7390-A14B-8182-1E0DE19D4ABA}"));
 	}
 
 	T_IMPLEMENT_RTTI_CLASS(L"traktor.rmlui.RmlUiResources", RmlUiResources, Object)
@@ -25,6 +26,8 @@ namespace traktor::rmlui
 			return false;
 		if (!resourceManager->bind(c_idShaderTexture, m_shaderTexture))
 			return false;
+		if (!resourceManager->bind(c_idShaderStencil, m_shaderStencil))
+			return false;
 
 		return true;
 	}
@@ -33,6 +36,7 @@ namespace traktor::rmlui
 	{
 		m_shaderColor.clear();
 		m_shaderTexture.clear();
+		m_shaderStencil.clear();
 	}
 
 }
