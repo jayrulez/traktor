@@ -94,7 +94,7 @@ namespace traktor::rmlui
 
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
 		batch.scissorRegion = m_scissorRegion;
-		batch.transformScissorRegion = (m_scissorRegionEnabled && m_transformEnabled);
+		batch.stencil = batch.transformScissorRegion = (m_scissorRegionEnabled && m_transformEnabled);
 		batch.transform = m_transform;
 		batch.translation = Vector4(translation.x, translation.y, 0, 0);
 
@@ -169,7 +169,31 @@ namespace traktor::rmlui
 
 	void RenderInterface::SetScissorRegion(Rml::Rectanglei region)
 	{
-		m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Width(), region.Height());
+		if (m_scissorRegionEnabled) {
+			if (m_transformEnabled)
+			{
+				m_useStencilPipeline = true;
+
+				Rml::Vertex vertices[4];
+
+				vertices[0].position = Rml::Vector2f(region.TopLeft());
+				vertices[1].position = Rml::Vector2f(region.TopRight());
+				vertices[2].position = Rml::Vector2f(region.BottomRight());
+				vertices[3].position = Rml::Vector2f(region.BottomLeft());
+
+				int indices[6] = { 0, 2, 1, 0, 3, 2 };
+
+				if (Rml::CompiledGeometryHandle handle = CompileGeometry({ vertices, 4 }, { indices, 6 }))
+				{
+					RenderGeometry(handle, {}, {});
+					ReleaseGeometry(handle);
+				}
+
+				m_useStencilPipeline = false;
+			}else{
+				m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Width(), region.Height());
+			}
+		}
 	}
 
 	void RenderInterface::SetTransform(const Rml::Matrix4f* rmlTransformPtr)
@@ -182,7 +206,9 @@ namespace traktor::rmlui
 		else 
 		{
 			m_transformEnabled = true;
-			transform = *((Matrix44*)rmlTransformPtr);
+
+			Rml::Matrix4f rmlTransform = *rmlTransformPtr;
+			transform = *((Matrix44*)&rmlTransform);
 			constexpr bool isColumnMajor = std::is_same<Rml::Matrix4f, Rml::ColumnMajorMatrix4f>::value;
 			if (!isColumnMajor)
 			{

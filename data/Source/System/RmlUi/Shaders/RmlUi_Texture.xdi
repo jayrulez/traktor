@@ -33,7 +33,7 @@
 			</colorWriteMask>
 			<depthEnable>false</depthEnable>
 			<depthWriteEnable>true</depthWriteEnable>
-			<depthFunction>CfAlways</depthFunction>
+			<depthFunction>CfEqual</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
