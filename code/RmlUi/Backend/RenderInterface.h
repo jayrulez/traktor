@@ -89,7 +89,8 @@ namespace traktor::rmlui
 			Ref < render::ITexture > texture;
 
 			render::Rectangle scissorRegion = {};
-			bool transformScissorRegion = false;
+			bool transformScissorRegion = false; 
+			// big todo: RmlUi6: scissor should not be transformed. Refactor to remove this assumption
 
 			Matrix44 transform = Matrix44::identity();
 			Vector4 translation = {};
