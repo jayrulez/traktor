@@ -284,14 +284,17 @@ namespace traktor::rmlui
 	{
 		ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
 
-		m_rmlContext->UnloadAllDocuments();
+		if (m_rmlContext) 
+		{
+			m_rmlContext->UnloadAllDocuments();
 
-		RmlUi::getInstance().destroyContext(m_rmlContext);
+			RmlUi::getInstance().destroyContext(m_rmlContext);
 
-		m_rmlContext = nullptr;
+			m_rmlContext = nullptr;
+		}
 
 		safeDestroy(m_rmlUiRenderer);
-		//safeDestroy(m_renderContext);
+		delete m_renderContext;
 		safeDestroy(m_renderGraph);
 		safeClose(m_renderView);
 

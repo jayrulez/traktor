@@ -167,8 +167,6 @@ namespace traktor::rmlui
 
 		const auto& batches = RmlUi::getInstance().renderContext(context, width, height);
 
-		const render::Shader::Permutation perm(render::handle_t(render::Handle(L"Default")));
-
 		m_renderPassOutput->addBuild([=, this](const render::RenderGraph& renderGraph, render::RenderContext* renderContext) {
 
 			render::Rectangle scissor = {-1,-1,-1,-1};
@@ -206,22 +204,49 @@ namespace traktor::rmlui
 					// use stencil pipeline
 				}
 
-				if(batch.stencil)
+				render::Shader::Permutation permutation;
+
+				render::Shader::Permutation permutationDefault(render::handle_t(render::Handle(L"Default")));
+
+				if (batch.stencil)
 				{
-					// revisit this logic
-					program = m_shapeResources->m_shaderStencil->getProgram(perm).program;
-					passName = passName + L"_Stencil";
+					permutation = render::Shader::Permutation(render::handle_t(render::Handle(L"StencilGeometry")));
+					permutation = permutationDefault;
+					passName = passName + L"_StencilGeometry";
+
+					program = m_shapeResources->m_shaderStencilGeometry->getProgram(permutation).program;
 				}
-				/*else */
-					if (batch.texture)
+				else if(batch.transformScissorRegion && batch.texture)
 				{
-					program = m_shapeResources->m_shaderTexture->getProgram(perm).program;
+					permutation = render::Shader::Permutation(render::handle_t(render::Handle(L"TextureStencil")));
+					permutation = permutationDefault;
+					passName = passName + L"_TextureStencil";
+
+					program = m_shapeResources->m_shaderTextureStencil->getProgram(permutation).program;
+				}
+				else if (batch.transformScissorRegion && !batch.texture)
+				{
+					permutation = render::Shader::Permutation(render::handle_t(render::Handle(L"ColorStencil")));
+					permutation = permutationDefault;
+					passName = passName + L"_ColorStencil";
+
+					program = m_shapeResources->m_shaderColorStencil->getProgram(permutation).program;
+				}
+				else if (batch.texture)
+				{
+					permutation = render::Shader::Permutation(render::handle_t(render::Handle(L"Texture")));
+					permutation = permutationDefault;
 					passName = passName + L"_Texture";
+
+					program = m_shapeResources->m_shaderTexture->getProgram(permutation).program;
 				}
 				else
 				{
-					program = m_shapeResources->m_shaderColor->getProgram(perm).program;
+					permutation = render::Shader::Permutation(render::handle_t(render::Handle(L"Color")));
+					permutation = permutationDefault;
 					passName = passName + L"_Color";
+
+					program = m_shapeResources->m_shaderColor->getProgram(permutation).program;
 				}
 
 				render::IndexedRenderBlock* renderBlock = renderContext->allocNamed< render::IndexedRenderBlock >(passName);
