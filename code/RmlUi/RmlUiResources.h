@@ -36,7 +36,9 @@ namespace traktor::rmlui
 
 		resource::Proxy< render::Shader > m_shaderColor;
 		resource::Proxy< render::Shader > m_shaderTexture;
-		resource::Proxy< render::Shader > m_shaderStencil;
+		resource::Proxy< render::Shader > m_shaderColorStencil;
+		resource::Proxy< render::Shader > m_shaderTextureStencil;
+		resource::Proxy< render::Shader > m_shaderStencilGeometry;
 	};
 
 }

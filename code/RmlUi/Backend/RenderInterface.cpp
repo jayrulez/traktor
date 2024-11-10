@@ -93,8 +93,9 @@ namespace traktor::rmlui
 		Batch batch;
 
 		batch.compiledGeometry = reinterpret_cast<CompiledGeometry*>(geometry);
+		batch.stencil = m_useStencilPipeline;
 		batch.scissorRegion = m_scissorRegion;
-		batch.stencil = batch.transformScissorRegion = (m_scissorRegionEnabled && m_transformEnabled);
+		batch.transformScissorRegion = (m_scissorRegionEnabled && m_transformEnabled);
 		batch.transform = m_transform;
 		batch.translation = Vector4(translation.x, translation.y, 0, 0);
 
@@ -169,7 +170,8 @@ namespace traktor::rmlui
 
 	void RenderInterface::SetScissorRegion(Rml::Rectanglei region)
 	{
-		if (m_scissorRegionEnabled) {
+		if (m_scissorRegionEnabled)
+		{
 			if (m_transformEnabled)
 			{
 				m_useStencilPipeline = true;
@@ -190,7 +192,9 @@ namespace traktor::rmlui
 				}
 
 				m_useStencilPipeline = false;
-			}else{
+			}
+			else
+			{
 				m_scissorRegion = render::Rectangle(region.Left(), region.Top(), region.Width(), region.Height());
 			}
 		}
@@ -198,15 +202,10 @@ namespace traktor::rmlui
 
 	void RenderInterface::SetTransform(const Rml::Matrix4f* rmlTransformPtr)
 	{
+		m_transformEnabled = !!(rmlTransformPtr);
 		Matrix44 transform = Matrix44::identity();
-		if (!rmlTransformPtr)
+		if (m_transformEnabled)
 		{
-			m_transformEnabled = false;
-		}
-		else 
-		{
-			m_transformEnabled = true;
-
 			Rml::Matrix4f rmlTransform = *rmlTransformPtr;
 			transform = *((Matrix44*)&rmlTransform);
 			constexpr bool isColumnMajor = std::is_same<Rml::Matrix4f, Rml::ColumnMajorMatrix4f>::value;
