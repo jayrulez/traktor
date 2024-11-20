@@ -179,14 +179,14 @@ namespace traktor::rmlui
 
 					render::Rectangle scissor = batch.scissorRegion;
 
-					std::wstring ssrbName = L"RmlUi_SetScissorRect_"
+					std::wstring ssrbName = L"RmlUi_SetScissor_"
 						+ std::to_wstring(scissor.left)
 						+ L"_" + std::to_wstring(scissor.top)
 						+ L"_" + std::to_wstring(scissor.width)
 						+ L"_" + std::to_wstring(scissor.height);
 
-					render::SetScissorRectRenderBlock* ssrb = renderContext->allocNamed< render::SetScissorRectRenderBlock >(ssrbName);
-					ssrb->scissorRect = scissor;
+					render::SetScissorRenderBlock* ssrb = renderContext->allocNamed< render::SetScissorRenderBlock >(ssrbName);
+					ssrb->scissor = scissor;
 
 					renderContext->draw(ssrb);
 				}
