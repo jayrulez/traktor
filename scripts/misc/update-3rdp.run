@@ -507,7 +507,7 @@ local PACKAGES =
 		license = "MIT"
 	},
     
-	-- Turbobadger
+	-- TurboBadger
 	{
 		type = "GIT",
 		name = "turbobadger",
