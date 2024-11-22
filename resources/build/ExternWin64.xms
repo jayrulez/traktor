@@ -6728,6 +6728,7 @@
 					</includePaths>
 					<definitions>
 						<item>T_TURBOBADGER_EXPORT</item>
+						<item>TB_RUNTIME_DEBUG_INFO</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6772,7 +6773,9 @@
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions/>
+					<definitions>
+						<item>TB_RUNTIME_DEBUG_INFO</item>
+					</definitions>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -6864,7 +6867,6 @@
 						<item type="File" version="1">
 							<fileName>renderers/*.cpp</fileName>
 							<excludeFilter>tb_renderer_gl.cpp</excludeFilter>
-							<excludeFilter/>
 							<items/>
 						</item>
 					</items>
