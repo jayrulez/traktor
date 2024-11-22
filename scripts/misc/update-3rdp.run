@@ -497,6 +497,14 @@ local PACKAGES =
 		url = "https://github.com/ufbx/ufbx.git",
 		license = "MIT"
 	},
+    
+	-- Turbobadger
+	{
+		type = "GIT",
+		name = "turbobadger",
+		url = "https://github.com/fruxo/turbobadger.git",
+		license = "MIT"
+	},
 }
 
 --[[
