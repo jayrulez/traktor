@@ -44,6 +44,7 @@ export BC6H_ENC_SDK=$TRAKTOR_HOME/3rdp/bc6h_enc
 export MINIMP3_SDK=$TRAKTOR_HOME/3rdp/minimp3
 export MIMALLOC_SDK=$TRAKTOR_HOME/3rdp/mimalloc
 export UFBX_SDK=$TRAKTOR_HOME/3rdp/ufbx
+export TURBOBADGER_SDK=$TRAKTOR_HOME/3rdp/turbobadger
 
 # Vulkan SDK
 # - cleanup Extern and add Extern.vulkan which contain all paths,

@@ -6713,5 +6713,199 @@
 			</items>
 			<dependencies/>
 		</item>
+		<item type="Project" version="1">
+			<enable>true</enable>
+			<name>Extern.turbobadger</name>
+			<sourcePath>$(TURBOBADGER_SDK)/src/tb</sourcePath>
+			<configurations>
+				<item type="Configuration" version="5">
+					<name>DebugShared</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpDebug</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(TURBOBADGER_SDK)/src/tb</item>
+					</includePaths>
+					<definitions>
+						<item>T_TURBOBADGER_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+				<item type="Configuration" version="5">
+					<name>ReleaseShared</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpRelease</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(TURBOBADGER_SDK)/src/tb</item>
+					</includePaths>
+					<definitions>
+						<item>T_TURBOBADGER_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+				<item type="Configuration" version="5">
+					<name>DebugStatic</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpDebug</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(TURBOBADGER_SDK)/src/tb</item>
+					</includePaths>
+					<definitions/>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+				<item type="Configuration" version="5">
+					<name>ReleaseStatic</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpRelease</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(TURBOBADGER_SDK)/src/tb</item>
+					</includePaths>
+					<definitions/>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+			</configurations>
+			<items>
+				<item type="Filter">
+					<name>animation</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>animation/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="File" version="1">
+							<fileName>animation/*.cpp</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="Filter">
+					<name>image</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>image/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="File" version="1">
+							<fileName>image/*.cpp</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="Filter">
+					<name>parser</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>parser/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="File" version="1">
+							<fileName>parser/*.cpp</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="Filter">
+					<name>renderers</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>renderers/*.h</fileName>
+							<excludeFilter>tb_renderer_gl.h</excludeFilter>
+							<items/>
+						</item>
+						<item type="File" version="1">
+							<fileName>renderers/*.cpp</fileName>
+							<excludeFilter>tb_renderer_gl.cpp</excludeFilter>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="Filter">
+					<name>thirdparty</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>thirdparty/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="Filter">
+					<name>utf8</name>
+					<items>
+						<item type="File" version="1">
+							<fileName>utf8/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="File" version="1">
+							<fileName>utf8/*.cpp</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="File" version="1">
+					<fileName>*.h</fileName>
+					<excludeFilter/>
+					<items/>
+				</item>
+				<item type="File" version="1">
+					<fileName>*.cpp</fileName>
+					<excludeFilter>tb_clipboard_dummy.cpp;tb_clipboard_glfw.cpp;tb_clipboard_win.cpp;tb_file_posix.cpp;tb_system_android.cpp;tb_system_linux.cpp;tb_system_win.cpp</excludeFilter>
+					<items/>
+				</item>
+			</items>
+			<dependencies/>
+		</item>
 	</projects>
 </object>
