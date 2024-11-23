@@ -8,7 +8,7 @@
  */
 #include "TurboBadgerUi/Runtime/TurboBadgerUiLayerData.h"
 #include "TurboBadgerUi/Runtime/TurboBadgerUiLayer.h"
-#include "TurboBadgerUi/TurboBadgerUiResource.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResource.h"
 
 #include "Resource/IResourceManager.h"
 #include "Resource/Member.h"
@@ -26,10 +26,10 @@ namespace traktor::turbobadgerui
 	Ref< runtime::Layer > TurboBadgerUiLayerData::createInstance(runtime::Stage* stage, runtime::IEnvironment* environment) const
 	{
 		resource::IResourceManager* resourceManager = environment->getResource()->getResourceManager();
-		resource::Proxy< TurboBadgerUiResource > uiResource;
+		resource::Proxy< TurboBadgerUiViewResource > uiViewResource;
 
 		// Bind proxies to resource manager.
-		if (!resourceManager->bind(m_uiResource, uiResource))
+		if (!resourceManager->bind(m_uiViewResource, uiViewResource))
 			return nullptr;
 
 		// Create layer instance.
@@ -38,7 +38,7 @@ namespace traktor::turbobadgerui
 			m_name,
 			m_permitTransition,
 			environment,
-			uiResource
+			uiViewResource
 		);
 	}
 
@@ -46,6 +46,6 @@ namespace traktor::turbobadgerui
 	{
 		LayerData::serialize(s);
 
-		s >> resource::Member< TurboBadgerUiResource >(L"resource", m_uiResource);
+		s >> resource::Member< TurboBadgerUiViewResource >(L"resource", m_uiViewResource);
 	}
 }

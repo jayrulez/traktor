@@ -19,7 +19,7 @@
 void
 TBDebugOut(const char* str)
 {
-    traktor::log::info << traktor::mbstows(str) << traktor::Endl;
+    traktor::log::debug << traktor::mbstows(str) << traktor::Endl;
 }
 
 #endif // TB_RUNTIME_DEBUG_INFO

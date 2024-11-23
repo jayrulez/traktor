@@ -8,8 +8,8 @@
  */
 #include "TurboBadgerUi/Editor/TurboBadgerUiPipeline.h"
 
-#include "TurboBadgerUi/TurboBadgerUiResource.h"
-#include "TurboBadgerUi/Editor/TurboBadgerUiAsset.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResource.h"
+#include "TurboBadgerUi/Editor/TurboBadgerUiViewAsset.h"
 
 #include <cstring>
 #include <list>
@@ -34,9 +34,7 @@ namespace traktor::turbobadgerui
 {
 	namespace
 	{
-
-		const Guid c_idTurboBadgerUiShaderAssets(L"{7F092F0F-C5FB-834F-B9EE-C08E03A844B4}");
-
+		const Guid c_idTurboBadgerUiShaderAssets(L"{54D126B8-1E0A-024D-94D7-7D30C5E99F2F}"); // System/TurboBadgerUi/Shaders/ShaderAssets
 	}
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.turbobadgerui.TurboBadgerUiPipeline", 0, TurboBadgerUiPipeline, editor::IPipeline)
@@ -58,7 +56,7 @@ namespace traktor::turbobadgerui
 	TypeInfoSet TurboBadgerUiPipeline::getAssetTypes() const
 	{
 		return makeTypeInfoSet<
-			TurboBadgerUiAsset
+			TurboBadgerUiViewAsset
 		>();
 	}
 
@@ -80,9 +78,9 @@ namespace traktor::turbobadgerui
 		const Guid& outputGuid
 	) const
 	{
-		if (const TurboBadgerUiAsset* uiAsset = dynamic_type_cast<const TurboBadgerUiAsset*>(sourceAsset))
+		if (const TurboBadgerUiViewAsset* uiViewAsset = dynamic_type_cast<const TurboBadgerUiViewAsset*>(sourceAsset))
 		{
-			pipelineDepends->addDependency(traktor::Path(m_assetPath), uiAsset->getFileName().getOriginal());
+			pipelineDepends->addDependency(traktor::Path(m_assetPath), uiViewAsset->getFileName().getOriginal());
 		}
 		pipelineDepends->addDependency(c_idTurboBadgerUiShaderAssets, editor::PdfBuild | editor::PdfResource);
 		//pipelineDepends->addDependency< render::TextureOutput >();
@@ -101,21 +99,21 @@ namespace traktor::turbobadgerui
 		uint32_t reason
 	) const
 	{
-		Ref< TurboBadgerUiResource > uiResource;
+		Ref< TurboBadgerUiViewResource > uiViewResource;
 		bool optimize = false;
 
-		if (const TurboBadgerUiAsset* uiAsset = dynamic_type_cast<const TurboBadgerUiAsset*>(sourceAsset))
+		if (const TurboBadgerUiViewAsset* uiViewAsset = dynamic_type_cast<const TurboBadgerUiViewAsset*>(sourceAsset))
 		{
-			const traktor::Path filePath = FileSystem::getInstance().getAbsolutePath(traktor::Path(m_assetPath) + uiAsset->getFileName());
+			const traktor::Path filePath = FileSystem::getInstance().getAbsolutePath(traktor::Path(m_assetPath) + uiViewAsset->getFileName());
 			Ref< IStream > sourceStream = FileSystem::getInstance().open(filePath, File::FmRead);
 			if (!sourceStream)
 			{
-				log::error << L"Failed to import TurboBadgerUi asset; unable to open file \"" << uiAsset->getFileName().getOriginal() << L"\"." << Endl;
+				log::error << L"Failed to import TurboBadgerUi asset; unable to open file \"" << uiViewAsset->getFileName().getOriginal() << L"\"." << Endl;
 				return false;
 			}
 
-			uiResource = new TurboBadgerUiResource(
-				uiAsset->getFileName()
+			uiViewResource = new TurboBadgerUiViewResource(
+				uiViewAsset->getFileName()
 			);
 
 			safeClose(sourceStream);
@@ -136,7 +134,7 @@ namespace traktor::turbobadgerui
 			return false;
 		}
 
-		instance->setObject(uiResource);
+		instance->setObject(uiViewResource);
 
 		if (!instance->commit())
 		{

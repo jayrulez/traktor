@@ -8,7 +8,7 @@
  */
 #include "TurboBadgerUi/Editor/TurboBadgerUiEditorPageFactory.h"
 #include "TurboBadgerUi/Editor/TurboBadgerUiEditorPage.h"
-#include "TurboBadgerUi/Editor/TurboBadgerUiAsset.h"
+#include "TurboBadgerUi/Editor/TurboBadgerUiViewAsset.h"
 
 #include "Core/Serialization/DeepClone.h"
 #include "Ui/Command.h"
@@ -19,12 +19,12 @@ namespace traktor::turbobadgerui
 
 		const TypeInfoSet TurboBadgerUiEditorPageFactory::getEditableTypes() const
 	{
-		return makeTypeInfoSet< TurboBadgerUiAsset >();
+		return makeTypeInfoSet< TurboBadgerUiViewAsset >();
 	}
 
 	bool TurboBadgerUiEditorPageFactory::needOutputResources(const TypeInfo& typeInfo, std::set< Guid >& outDependencies) const
 	{
-		outDependencies.insert(Guid(L"{7F092F0F-C5FB-834F-B9EE-C08E03A844B4}"));	// System/TurboBadger/Shaders/ShaderAssets
+		outDependencies.insert(Guid(L"{54D126B8-1E0A-024D-94D7-7D30C5E99F2F}")); // System/TurboBadgerUi/Shaders/ShaderAssets
 		return true;
 	}
 

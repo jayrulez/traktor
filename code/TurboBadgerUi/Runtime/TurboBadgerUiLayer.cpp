@@ -7,7 +7,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "TurboBadgerUi/Runtime/TurboBadgerUiLayer.h"
-#include "TurboBadgerUi/TurboBadgerUiResource.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResource.h"
 
 #include "Core/Timer/Profiler.h"
 #include "Runtime/IEnvironment.h"
@@ -23,18 +23,18 @@ namespace traktor::turbobadgerui
 			const std::wstring& name,
 			bool permitTransition,
 			runtime::IEnvironment* environment,
-			const resource::Proxy< TurboBadgerUiResource >& uiResource
+			const resource::Proxy< TurboBadgerUiViewResource >& uiViewResource
 		)
 		: Layer(stage, name, permitTransition)
 		, m_environment(environment)
-		, m_uiResource(uiResource)
+		, m_uiViewResource(uiViewResource)
 	{
 	}
 
 	void TurboBadgerUiLayer::destroy()
 	{
 		m_environment = nullptr;
-		m_uiResource.clear();
+		m_uiViewResource.clear();
 
 		Layer::destroy();
 	}
@@ -48,9 +48,9 @@ namespace traktor::turbobadgerui
 	{
 		T_PROFILER_SCOPE(L"TurboBadgerUiLayer pre-update");
 
-		if (m_uiResource.changed())
+		if (m_uiViewResource.changed())
 		{
-			m_uiResource.consume();
+			m_uiViewResource.consume();
 		}
 
 		// todo
@@ -72,9 +72,9 @@ namespace traktor::turbobadgerui
 
 	void TurboBadgerUiLayer::preSetup(const runtime::UpdateInfo& info)
 	{
-		if (m_uiResource.changed())
+		if (m_uiViewResource.changed())
 		{
-			m_uiResource.consume();
+			m_uiViewResource.consume();
 		}
 
 		// todo
