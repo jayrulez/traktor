@@ -57,7 +57,7 @@ namespace traktor
 	namespace turbobadgerui
 	{
 		class TurboBadgerUiPreviewControl;
-		class TurboBadgerUiResource;
+		class TurboBadgerUiViewResource;
 
 		class T_DLLCLASS TurboBadgerUiEditorPage : public editor::IEditorPage
 		{
@@ -82,7 +82,7 @@ namespace traktor
 			editor::IDocument* m_document;
 			Ref< resource::IResourceManager > m_resourceManager;
 			Ref< TurboBadgerUiPreviewControl > m_previewControl;
-			Ref< TurboBadgerUiResource > m_uiResource;
+			Ref< TurboBadgerUiViewResource > m_uiViewResource;
 			Ref< ui::Container > m_container;
 			Ref< ui::StatusBar > m_statusBar;
 			Ref< ui::ToolBar > m_toolBar;

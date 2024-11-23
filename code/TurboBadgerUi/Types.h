@@ -10,9 +10,39 @@
 
 #include "Core/Config.h"
 
+#include "Render/Types.h"
+
 #include "TurboBadgerUiConfig.h"
+
+namespace traktor::render
+{
+	class ITexture;
+}
 
 namespace traktor::turbobadgerui
 {
+#pragma pack(push, 1)  // Set alignment to 1 byte
 
+	struct TurboBadgerUiVertexColor
+	{
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+		uint8_t a;
+	};
+
+	struct TurboBadgerUiVertex
+	{
+		float position[2];
+		float texCoord[2];
+		TurboBadgerUiVertexColor color;
+	};
+#pragma pack(pop)  // Restore the previous packing alignment
+
+	struct TurboBadgerUiBatch
+	{
+		Ref < render::ITexture > texture;
+		AlignedVector<TurboBadgerUiVertex> vertices;
+		render::Rectangle clipRect;
+	};
 }
