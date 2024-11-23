@@ -6729,6 +6729,7 @@
 					<definitions>
 						<item>T_TURBOBADGER_EXPORT</item>
 						<item>TB_RUNTIME_DEBUG_INFO</item>
+						<item>TB_FONT_RENDERER_STB</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6752,6 +6753,7 @@
 					</includePaths>
 					<definitions>
 						<item>T_TURBOBADGER_EXPORT</item>
+						<item>TB_FONT_RENDERER_STB</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6775,6 +6777,7 @@
 					</includePaths>
 					<definitions>
 						<item>TB_RUNTIME_DEBUG_INFO</item>
+						<item>TB_FONT_RENDERER_STB</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6796,7 +6799,10 @@
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions/>
+					<definitions>
+						<item>TB_FONT_RENDERER_STB</item>
+						<item>TB_RUNTIME_DEBUG_INFO</item>
+					</definitions>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
