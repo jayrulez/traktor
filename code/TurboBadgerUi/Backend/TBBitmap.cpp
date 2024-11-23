@@ -36,6 +36,7 @@ namespace traktor::turbobadgerui
 		render::SimpleTextureCreateDesc desc;
 		desc.width = m_width;
 		desc.height = m_height;
+		desc.mipCount = 1;
 		desc.format = render::TextureFormat::TfR8G8B8A8;
 		desc.immutable = true;
 		desc.sRGB = false;
@@ -44,7 +45,6 @@ namespace traktor::turbobadgerui
 		initialData.pitch = 4 * desc.width;
 		initialData.slicePitch = 4 * desc.width * desc.height;
 		desc.initialData[0] = initialData;
-		desc.mipCount = 1;
 		m_texture = m_renderSystem->createSimpleTexture(desc, T_FILE_LINE_W);
 
 		//SetData(data);

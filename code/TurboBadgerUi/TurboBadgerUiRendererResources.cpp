@@ -8,7 +8,9 @@
  */
 #include "TurboBadgerUi/TurboBadgerUiRendererResources.h"
 
+#include "Core/Misc/SafeDestroy.h"
 #include "Resource/IResourceManager.h"
+#include "Render/IRenderSystem.h"
 
 namespace traktor::turbobadgerui
 {
@@ -19,16 +21,47 @@ namespace traktor::turbobadgerui
 
 	T_IMPLEMENT_RTTI_CLASS(L"traktor.turbobadgerui.TurboBadgerUiRendererResources", TurboBadgerUiRendererResources, Object)
 
-		bool TurboBadgerUiRendererResources::create(resource::IResourceManager* resourceManager)
+		bool TurboBadgerUiRendererResources::create(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem)
 	{
 		if (!resourceManager->bind(c_idShader, m_shader))
 			return false;
+
+		render::SimpleTextureCreateDesc createInfo = {
+			.width = 2,
+			.height = 2,
+			.mipCount = 1,
+			.format = render::TfR8G8B8A8,
+			.sRGB = false,
+			.immutable = true,
+			.shaderStorage = false,
+		};
+
+		static const uint8_t textureData[2 * 2 * 4] = {
+			255, 255, 255, 255, // Pixel (0,0) - White
+			255, 255, 255, 255, // Pixel (0,1) - White
+			255, 255, 255, 255, // Pixel (1,0) - White
+			255, 255, 255, 255  // Pixel (1,1) - White
+		};
+
+		createInfo.initialData[0] = {
+			.data = &textureData,
+			.pitch = 4 * 2,
+			.slicePitch = 4 * 2 * 2
+		};
+
+		m_defaultTexture = renderSystem->createSimpleTexture(createInfo, L"TurboBadgerUi_DefaultTexture");
+
+		if (!m_defaultTexture)
+		{
+			return false;
+		}
 
 		return true;
 	}
 
 	void TurboBadgerUiRendererResources::destroy()
 	{
+		safeDestroy(m_defaultTexture);
 		m_shader.clear();
 	}
 }

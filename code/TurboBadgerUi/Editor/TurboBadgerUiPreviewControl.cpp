@@ -150,7 +150,10 @@ namespace traktor::turbobadgerui
 		))
 			return false;
 
-		m_view = TurboBadgerUi::getInstance().createView(/*m_uiViewResource*/);
+		m_view = TurboBadgerUi::getInstance().createView(
+			m_uiViewResource->getFilePath(), 
+			m_uiViewResource->getWidth(), 
+			m_uiViewResource->getHeight());
 
 		addEventHandler< ui::SizeEvent >(this, &TurboBadgerUiPreviewControl::eventSize);
 		addEventHandler< ui::PaintEvent >(this, &TurboBadgerUiPreviewControl::eventPaint);
@@ -208,7 +211,10 @@ namespace traktor::turbobadgerui
 
 		m_uiViewResource = uiViewResource;
 
-		m_view = TurboBadgerUi::getInstance().createView(/*m_uiViewResource*/);
+		m_view = TurboBadgerUi::getInstance().createView(
+			m_uiViewResource->getFilePath(),
+			m_uiViewResource->getWidth(),
+			m_uiViewResource->getHeight());
 	}
 
 	void TurboBadgerUiPreviewControl::eventSize(ui::SizeEvent* event)
@@ -227,6 +233,8 @@ namespace traktor::turbobadgerui
 		{
 			// todo: set dpi and resize view
 			//m_view->SetSize(sz.cx, sz.cy); // not sure we should do this, let's see when it starts working
+
+			TurboBadgerUi::getInstance().resizeView(m_view, sz.cx, sz.cy);
 		}
 	}
 

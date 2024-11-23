@@ -11,7 +11,9 @@
 #include "TurboBadgerUi/Backend/TBRenderer.h"
 #include "TurboBadgerUi/Backend/TBBitmap.h"
 
+#include "Core/Misc//SafeDestroy.h"
 #include "Render/IRenderSystem.h"
+#include "Render/Buffer.h"
 
 namespace traktor::turbobadgerui
 {
@@ -41,17 +43,29 @@ namespace traktor::turbobadgerui
 		TurboBadgerUiBatch batch(texture);
 		batch.clipRect = m_clipRect;
 
+		AlignedVector<TurboBadgerUiVertex> vertices;
 		for (int i = 0; i < tbBatch->vertex_count; i++)
 		{
 			tb::TBRendererBatcher::Vertex tbVertex = tbBatch->vertex[i];
 			TurboBadgerUiVertex vertex = {
 				.position = {tbVertex.x, tbVertex.y},
 				.texCoord = {tbVertex.u, tbVertex.v},
-				//.color = {.v = tbVertex.col},
+				.color = {
+					.r = tbVertex.r,
+					.g = tbVertex.g,
+					.b = tbVertex.b,
+					.a = tbVertex.a,
+				},
 			};
 
-			batch.vertices.push_back(vertex);
+			vertices.push_back(vertex);
 		}
+
+		uint32_t vertexBufferSize = (uint32_t)(sizeof(TurboBadgerUiVertex) * vertices.size());
+		batch.vertexBuffer = m_renderSystem->createBuffer(render::BufferUsage::BuVertex, vertexBufferSize, true);
+		std::memcpy(batch.vertexBuffer->lock(), vertices.c_ptr(), vertexBufferSize);
+		batch.vertexBuffer->unlock();
+		batch.triangleCount = (uint32_t)(vertices.size() / 3);
 
 		m_batches.push_back(batch);
 	}
@@ -63,6 +77,11 @@ namespace traktor::turbobadgerui
 
 	AlignedVector<TurboBadgerUiBatch> TBRenderer::renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height)
 	{
+		m_clipRect = {0, 0, (int32_t)width, (int32_t)height};
+		for (auto& batch : m_batches)
+		{
+			safeDestroy(batch.vertexBuffer);
+		}
 		m_batches.clear();
 
 		BeginPaint(width, height);

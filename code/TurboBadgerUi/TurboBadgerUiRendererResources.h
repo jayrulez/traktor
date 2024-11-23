@@ -12,6 +12,7 @@
 
 #include "Core/Object.h"
 #include "Render/Shader.h"
+#include "Render/ITexture.h"
 #include "Resource/Proxy.h"
 
  // import/export mechanism.
@@ -24,9 +25,12 @@
 
 namespace traktor::resource
 {
-
 	class IResourceManager;
+}
 
+namespace traktor::render
+{
+	class IRenderSystem;
 }
 
 namespace traktor::turbobadgerui
@@ -36,7 +40,7 @@ namespace traktor::turbobadgerui
 		T_RTTI_CLASS;
 
 	public:
-		bool create(resource::IResourceManager* resourceManager);
+		bool create(resource::IResourceManager* resourceManager, render::IRenderSystem* renderSystem);
 
 		void destroy();
 
@@ -44,5 +48,6 @@ namespace traktor::turbobadgerui
 		friend class TurboBadgerUiRenderer;
 
 		resource::Proxy< render::Shader > m_shader;
+		Ref< render::ITexture > m_defaultTexture;
 	};
 }

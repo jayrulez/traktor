@@ -17,6 +17,7 @@
 namespace traktor::render
 {
 	class ITexture;
+	class Buffer;
 }
 
 namespace traktor::turbobadgerui
@@ -42,7 +43,8 @@ namespace traktor::turbobadgerui
 	struct TurboBadgerUiBatch
 	{
 		Ref < render::ITexture > texture;
-		AlignedVector<TurboBadgerUiVertex> vertices;
+		Ref < render::Buffer > vertexBuffer;
+		uint32_t triangleCount;
 		render::Rectangle clipRect;
 	};
 }

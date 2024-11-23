@@ -25,13 +25,12 @@ namespace traktor::turbobadgerui
 
 		render::IRenderSystem* renderSystem = m_editor->getObjectStore()->get< render::IRenderSystem >();
 
-		//return TurboBadgerUi::getInstance().initialize(renderSystem);
-		return true;
+		return TurboBadgerUi::getInstance().initialize(renderSystem);
 	}
 
 	void TurboBadgerUiEditorPlugin::destroy()
 	{
-		// todo: destroy
+		TurboBadgerUi::getInstance().shutdown();
 	}
 
 	int32_t TurboBadgerUiEditorPlugin::getOrdinal() const

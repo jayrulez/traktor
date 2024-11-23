@@ -51,7 +51,9 @@ namespace traktor::turbobadgerui
 
 		bool isInitialized() const;
 
-		TurboBadgerUiView* createView();
+		TurboBadgerUiView* createView(const Path& resourcePath, int32_t width, int32_t height);
+
+		TurboBadgerUiView* createView(const void* resourceData, int32_t width, int32_t height);
 
 		void destroyView(TurboBadgerUiView* view);
 
@@ -62,6 +64,11 @@ namespace traktor::turbobadgerui
 		void reloadRenderResources();
 
 		void renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height, AlignedVector<TurboBadgerUiBatch>& batches);
+
+		void resizeView(TurboBadgerUiView* view, int32_t width, int32_t height);
+
+	private:
+		void setupViewDefaults(TurboBadgerUiView* view, int32_t width, int32_t height);
 
 	private:
 		struct BackendData
