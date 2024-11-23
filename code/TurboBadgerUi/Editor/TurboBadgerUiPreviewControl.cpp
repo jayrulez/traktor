@@ -181,10 +181,12 @@ namespace traktor::turbobadgerui
 			m_view = nullptr;
 		}
 
-		delete m_renderer;
-		delete m_renderContext;
+		safeDestroy(m_renderer);
+		//m_renderContext = nullptr;
 		safeDestroy(m_renderGraph);
 		safeClose(m_renderView);
+
+		m_uiViewResource = nullptr;
 
 		Widget::destroy();
 	}
@@ -211,10 +213,13 @@ namespace traktor::turbobadgerui
 
 		m_uiViewResource = uiViewResource;
 
-		m_view = TurboBadgerUi::getInstance().createView(
-			m_uiViewResource->getFilePath(),
-			m_uiViewResource->getWidth(),
-			m_uiViewResource->getHeight());
+		if (m_uiViewResource)
+		{
+			m_view = TurboBadgerUi::getInstance().createView(
+				m_uiViewResource->getFilePath(),
+				m_uiViewResource->getWidth(),
+				m_uiViewResource->getHeight());
+		}
 	}
 
 	void TurboBadgerUiPreviewControl::eventSize(ui::SizeEvent* event)
@@ -257,10 +262,14 @@ namespace traktor::turbobadgerui
 			}
 		}
 
-		// Add passes to render graph.
-		m_renderer->beginSetup(m_renderGraph);
-		m_renderer->renderView(m_view, sz.cx, sz.cy);
-		m_renderer->endSetup();
+		if (m_renderer)
+		{
+			// Add passes to render graph.
+			m_renderer->beginSetup(m_renderGraph);
+			if (m_view)
+				m_renderer->renderView(m_view, sz.cx, sz.cy);
+			m_renderer->endSetup();
+		}
 
 		// Validate render graph.
 		if (!m_renderGraph->validate())
