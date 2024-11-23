@@ -11,8 +11,10 @@
 #include "TurboBadgerUi/Types.h"
 
 #include "Core/Object.h"
+#include "Core/Thread/Mutex.h"
 
 #include "Render/Types.h"
+#include "Render/ITexture.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -36,8 +38,9 @@ namespace traktor::render
 }
 
 namespace traktor::turbobadgerui
-{
+{    
 	class TurboBadgerUiRendererResources;
+	class TurboBadgerUiView;
 
 	/*! TurboBadgerUi renderer.
 	 * \ingroup TurboBadgerUi
@@ -65,8 +68,11 @@ namespace traktor::turbobadgerui
 		void beginSetup(render::RenderGraph* renderGraph);
 
 		void endSetup();
+
+		void renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height);
 		
 	private:
+		Mutex m_renderMutex;
 		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
 		Ref< render::RenderGraph > m_renderGraph;

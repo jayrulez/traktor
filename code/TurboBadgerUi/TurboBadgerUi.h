@@ -10,6 +10,8 @@
 
 #include "TurboBadgerUi/Types.h"
 
+#include "TurboBadgerUi/Backend/TBRenderer.h"
+
 #include "Core/Object.h"
 #include "Core/Singleton/ISingleton.h"
 
@@ -21,8 +23,15 @@
 #	define T_DLLCLASS T_DLLIMPORT
 #endif
 
+namespace traktor::render
+{
+	class IRenderSystem;
+}
+
 namespace traktor::turbobadgerui
 {
+	class TurboBadgerUiView;
+
 	class T_DLLCLASS TurboBadgerUi
 		: public Object
 		, public ISingleton
@@ -32,6 +41,38 @@ namespace traktor::turbobadgerui
 	public:
 		TurboBadgerUi() = default;
 
+		static TurboBadgerUi& getInstance();
+
 		void destroy() override;
+
+		bool initialize(render::IRenderSystem* renderSystem);
+		
+		void shutdown();
+
+		bool isInitialized() const;
+
+		TurboBadgerUiView* createView();
+
+		void destroyView(TurboBadgerUiView* view);
+
+		void update();
+
+		void updateView(TurboBadgerUiView* view);
+
+		void reloadRenderResources();
+
+		void renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height, AlignedVector<TurboBadgerUiBatch>& batches);
+
+	private:
+		struct BackendData
+		{
+			BackendData(render::IRenderSystem* renderSystem);
+
+			TBRenderer renderer;
+		};
+
+		BackendData* m_backendData = nullptr;
+		bool m_initialized = false;
+		AlignedVector<TurboBadgerUiView*> m_views;
 	};
 }

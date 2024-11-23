@@ -23,7 +23,7 @@
 
 namespace traktor::turbobadgerui
 {
-	class TurboBadgerUiResource;
+	class TurboBadgerUiViewResource;
 
 	/*! Stage TurboBadgerUi layer persistent data.
 	 * \ingroup TurboBadgerUi
@@ -42,6 +42,6 @@ namespace traktor::turbobadgerui
 	private:
 		friend class TurboBadgerUiLayerPipeline;
 
-		resource::Id< TurboBadgerUiResource > m_uiResource;
+		resource::Id< TurboBadgerUiViewResource > m_uiViewResource;
 	};
 }
