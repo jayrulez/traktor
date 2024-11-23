@@ -41,8 +41,8 @@
 			<id>{A1341ECF-149B-D140-818D-FF5ADDB5FC71}</id>
 			<comment/>
 			<position>
-				<first>738</first>
-				<second>448</second>
+				<first>1025</first>
+				<second>461</second>
 			</position>
 			<minFilter>FtLinear</minFilter>
 			<mipFilter>FtLinear</mipFilter>
@@ -59,8 +59,8 @@
 			<id>{810FFE67-D207-EF45-91D7-995390BA7A48}</id>
 			<comment/>
 			<position>
-				<first>1384</first>
-				<second>308</second>
+				<first>1548</first>
+				<second>317</second>
 			</position>
 			<technique>TurboBadgerUi_Default</technique>
 			<priority>
@@ -74,11 +74,11 @@
 			<cullMode>Never</cullMode>
 			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
-			<blendColorSource>BfOne</blendColorSource>
-			<blendColorDestination>BfOneMinusSourceColor</blendColorDestination>
+			<blendColorSource>BfSourceAlpha</blendColorSource>
+			<blendColorDestination>BfOneMinusSourceAlpha</blendColorDestination>
 			<blendAlphaOperation>BoSubtract</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
-			<blendAlphaDestination>BfOneMinusSourceColor</blendAlphaDestination>
+			<blendAlphaDestination>BfOneMinusSourceAlpha</blendAlphaDestination>
 			<colorWriteMask>
 				<red>true</red>
 				<green>true</green>
@@ -87,17 +87,17 @@
 			</colorWriteMask>
 			<depthEnable>false</depthEnable>
 			<depthWriteEnable>true</depthWriteEnable>
-			<depthFunction>CfEqual</depthFunction>
+			<depthFunction>CfLess</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
-			<alphaTestFunction>CfLess</alphaTestFunction>
+			<alphaTestFunction>CfAlways</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
 			<alphaToCoverageEnable>false</alphaToCoverageEnable>
 			<wireframe>false</wireframe>
-			<stencilEnable>true</stencilEnable>
+			<stencilEnable>false</stencilEnable>
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
-			<stencilFunction>CfAlways</stencilFunction>
+			<stencilFunction>CfNever</stencilFunction>
 			<stencilReference>1</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
@@ -142,8 +142,8 @@
 			<id>{0625D25C-AC3F-D042-899C-DAF917342B3C}</id>
 			<comment/>
 			<position>
-				<first>989</first>
-				<second>352</second>
+				<first>1209</first>
+				<second>310</second>
 			</position>
 		</item>
 		<item type="traktor.render.VertexOutput" version="3,traktor.render.Node:1">
@@ -161,7 +161,7 @@
 			<comment/>
 			<position>
 				<first>808</first>
-				<second>93</second>
+				<second>92</second>
 			</position>
 		</item>
 		<item type="traktor.render.Transform" version="traktor.render.Node:1">
@@ -216,16 +216,6 @@
 		</item>
 		<item type="traktor.render.Edge" version="1">
 			<source>
-				<node ref="/object/nodes/item[8]"/>
-				<id>{9E839249-E9B9-4736-8BDD-A95A1C892B42}</id>
-			</source>
-			<destination>
-				<node ref="/object/nodes/item[4]"/>
-				<id>{7174FE5A-D079-4452-AFEF-9FC2BCC2900F}</id>
-			</destination>
-		</item>
-		<item type="traktor.render.Edge" version="1">
-			<source>
 				<node ref="/object/nodes/item[5]"/>
 				<id>{BD91C9E9-9950-4EC8-BAD2-60D2E8699107}</id>
 			</source>
@@ -272,6 +262,16 @@
 			<destination>
 				<node ref="/object/nodes/item[9]"/>
 				<id>{BFBE8191-F6E6-4A4F-A2CC-6CBC1D19BF70}</id>
+			</destination>
+		</item>
+		<item type="traktor.render.Edge" version="1">
+			<source>
+				<node ref="/object/nodes/item[8]"/>
+				<id>{9E839249-E9B9-4736-8BDD-A95A1C892B42}</id>
+			</source>
+			<destination>
+				<node ref="/object/nodes/item[4]"/>
+				<id>{7174FE5A-D079-4452-AFEF-9FC2BCC2900F}</id>
 			</destination>
 		</item>
 	</edges>

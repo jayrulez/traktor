@@ -113,7 +113,9 @@ namespace traktor::turbobadgerui
 			}
 
 			uiViewResource = new TurboBadgerUiViewResource(
-				uiViewAsset->getFileName()
+				uiViewAsset->getFileName(),
+				uiViewAsset->getWidth(),
+				uiViewAsset->getHeight()
 			);
 
 			safeClose(sourceStream);
