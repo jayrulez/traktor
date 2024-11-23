@@ -75,9 +75,9 @@ namespace traktor::turbobadgerui
 		Mutex m_renderMutex;
 		resource::IResourceManager* m_resourceManager = nullptr;
 		render::IRenderSystem* m_renderSystem = nullptr;
-		Ref< render::RenderGraph > m_renderGraph;
-		Ref< render::RenderPass > m_renderPassOutput;
-		Ref< TurboBadgerUiRendererResources > m_rendererResources;
-		Ref< const render::IVertexLayout > m_vertexLayout;
+		Ref< render::RenderGraph > m_renderGraph = nullptr;
+		Ref< render::RenderPass > m_renderPassOutput = nullptr;
+		Ref< TurboBadgerUiRendererResources > m_rendererResources = nullptr;
+		Ref< const render::IVertexLayout > m_vertexLayout = nullptr;
 	};
 }
