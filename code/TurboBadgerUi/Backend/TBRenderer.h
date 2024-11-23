@@ -9,7 +9,8 @@
 #pragma once
 
 #include "TurboBadgerUi/Types.h"
-#include "TurboBadgerUi/Backend/TBBatch.h"
+#include "TurboBadgerUi/TurboBadgerUiRenderer.h"
+#include "TurboBadgerUi/TurboBadgerUiView.h"
 
 #include "Core/Containers/AlignedVector.h"
 #include "Render/Types.h"
@@ -33,13 +34,11 @@ namespace traktor::turbobadgerui
 		void SetClipRect(const tb::TBRect& rect) override;
 
 	public:
-		void BeginBatch();
-		const AlignedVector<TBBatch>& EndBatch();
-
+		AlignedVector<TurboBadgerUiBatch> renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height);
 
 	private:
 		render::IRenderSystem* m_renderSystem;
 		render::Rectangle m_clipRect;
-		AlignedVector<TBBatch> m_batches;
+		AlignedVector<TurboBadgerUiBatch> m_batches;
 	};
 }

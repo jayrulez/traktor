@@ -31,7 +31,7 @@ namespace traktor::turbobadgerui
 	{
 		const TurboBadgerUiLayerData* layerData = mandatory_non_null_type_cast<const TurboBadgerUiLayerData*>(sourceAsset);
 
-		pipelineDepends->addDependency(layerData->m_uiResource, editor::PdfBuild | editor::PdfResource);
+		pipelineDepends->addDependency(layerData->m_uiViewResource, editor::PdfBuild | editor::PdfResource);
 
 		return true;
 	}

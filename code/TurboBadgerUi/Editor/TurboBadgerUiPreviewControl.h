@@ -63,7 +63,7 @@ namespace traktor
 
 	namespace turbobadgerui
 	{
-		class TurboBadgerUiResource;
+		class TurboBadgerUiViewResource;
 		class TurboBadgerUiRenderer;
 		class TurboBadgerUiView;
 
@@ -77,13 +77,13 @@ namespace traktor
 				resource::IResourceManager* resourceManager,
 				render::IRenderSystem* renderSystem);
 
-			bool create(ui::Widget* parent, TurboBadgerUiResource* uiResource);
+			bool create(ui::Widget* parent, TurboBadgerUiViewResource* uiViewResource);
 
 			virtual void destroy() override final;
 
 			virtual ui::Size getPreferredSize(const ui::Size& hint) const override final;
 
-			void setUiResource(TurboBadgerUiResource* uiResource);
+			void setUiViewResource(TurboBadgerUiViewResource* uiViewResource);
 
 		private:
 			editor::IEditor* m_editor;
@@ -95,7 +95,7 @@ namespace traktor
 			Ref< render::RenderContext > m_renderContext;
 			Ref< render::RenderGraph > m_renderGraph;
 			Ref< turbobadgerui::TurboBadgerUiRenderer > m_renderer;
-			Ref< TurboBadgerUiResource > m_uiResource;
+			Ref< TurboBadgerUiViewResource > m_uiViewResource;
 			TurboBadgerUiView* m_view = nullptr;
 
 			void eventSize(ui::SizeEvent* event);
