@@ -16,8 +16,12 @@ namespace traktor::turbobadgerui
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.turbobadgerui.TurboBadgerUiViewResource", 0, TurboBadgerUiViewResource, ISerializable)
 
 
-		TurboBadgerUiViewResource::TurboBadgerUiViewResource(const Path& filePath)
-		: m_viewFilePath(filePath)
+		TurboBadgerUiViewResource::TurboBadgerUiViewResource(const Path& filePath,
+			int32_t width,
+			int32_t height)
+		: m_viewFilePath(filePath),
+		m_width(width),
+		m_height(height)
 	{
 
 	}

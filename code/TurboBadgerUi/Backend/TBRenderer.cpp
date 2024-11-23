@@ -21,6 +21,7 @@ namespace traktor::turbobadgerui
 		: m_renderSystem(renderSystem)
 	{
 	}
+
 	tb::TBBitmap* TBRenderer::CreateBitmap(int width, int height, uint32_t* data)
 	{
 		TBBitmap* bitmap = new TBBitmap(this, m_renderSystem);
