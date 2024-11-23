@@ -28,7 +28,7 @@ namespace traktor::runtime
 
 namespace traktor::turbobadgerui
 {
-	class TurboBadgerUiResource;
+	class TurboBadgerUiViewResource;
 
 	/*! Stage TurboBadgerUi layer.
 	 * \ingroup TurboBadgerUi
@@ -43,7 +43,7 @@ namespace traktor::turbobadgerui
 			const std::wstring& name,
 			bool permitTransition,
 			runtime::IEnvironment* environment,
-			const resource::Proxy< TurboBadgerUiResource >& uiResource
+			const resource::Proxy< TurboBadgerUiViewResource >& uiViewResource
 		);
 
 		virtual void destroy() override;
@@ -73,6 +73,6 @@ namespace traktor::turbobadgerui
 	private:
 
 		Ref< runtime::IEnvironment > m_environment;
-		resource::Proxy< TurboBadgerUiResource > m_uiResource;
+		resource::Proxy< TurboBadgerUiViewResource > m_uiViewResource;
 	};
 }

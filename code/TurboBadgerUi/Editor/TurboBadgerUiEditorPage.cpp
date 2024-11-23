@@ -7,8 +7,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "TurboBadgerUi/Editor/TurboBadgerUiEditorPage.h"
-#include "TurboBadgerUi/TurboBadgerUiResourceFactory.h"
-#include "TurboBadgerUi/TurboBadgerUiResource.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResourceFactory.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResource.h"
 #include "TurboBadgerUi/Editor/TurboBadgerUiPreviewControl.h"
 
 #include "Core/Misc/SafeDestroy.h"
@@ -66,14 +66,14 @@ namespace traktor::turbobadgerui
 			return false;
 
 		// Read ui resource from output database.
-		m_uiResource = database->getObjectReadOnly< TurboBadgerUiResource >(m_document->getInstance(0)->getGuid());
-		if (!m_uiResource)
+		m_uiViewResource = database->getObjectReadOnly< TurboBadgerUiViewResource >(m_document->getInstance(0)->getGuid());
+		if (!m_uiViewResource)
 			return false;
 
 		m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
 		m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
 		m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
-		m_resourceManager->addFactory(new turbobadgerui::TurboBadgerUiResourceFactory());
+		m_resourceManager->addFactory(new turbobadgerui::TurboBadgerUiViewResourceFactory());
 
 		m_container = new ui::Container();
 		m_container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", 0_ut, 0_ut));
@@ -96,7 +96,7 @@ namespace traktor::turbobadgerui
 		previewContainer->create(m_container, ui::WsNone, new ui::AspectLayout(16.0f / 9.0f));
 
 		m_previewControl = new TurboBadgerUiPreviewControl(m_editor, database, m_resourceManager, renderSystem);
-		if (!m_previewControl->create(previewContainer, m_uiResource))
+		if (!m_previewControl->create(previewContainer, m_uiViewResource))
 			return false;
 
 		// Create status bar.
@@ -143,12 +143,12 @@ namespace traktor::turbobadgerui
 
 		if (eventId == m_document->getInstance(0)->getGuid())
 		{
-			Ref< TurboBadgerUiResource > uiResource = database->getObjectReadOnly< TurboBadgerUiResource >(m_document->getInstance(0)->getGuid());
-			if (uiResource)
+			Ref< TurboBadgerUiViewResource > uiViewResource = database->getObjectReadOnly< TurboBadgerUiViewResource >(m_document->getInstance(0)->getGuid());
+			if (uiViewResource)
 			{
-				m_uiResource = uiResource;
+				m_uiViewResource = uiViewResource;
 
-				m_previewControl->setUiResource(m_uiResource);
+				m_previewControl->setUiViewResource(m_uiViewResource);
 				shouldRedraw |= true;
 			}
 		}

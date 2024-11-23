@@ -6,6 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+#include "TurboBadgerUi/TurboBadgerUi.h"
 #include "TurboBadgerUi/TurboBadgerUiRenderer.h"
 
 #include "TurboBadgerUi/TurboBadgerUiRendererResources.h"
@@ -17,8 +18,6 @@
 #include "Render/VertexElement.h"
 #include "Render/Frame/RenderPass.h"
 #include "Render/Frame/RenderGraph.h"
-
-#include "TurboBadgerUi/Backend/TBVertex.h"
 
 namespace traktor::turbobadgerui
 {
@@ -57,12 +56,11 @@ namespace traktor::turbobadgerui
 			return false;
 		}
 
-
 		AlignedVector< render::VertexElement > vertexElements = {};
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(TBVertex, position)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(TBVertex, color)));
-		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(TBVertex, texCoord)));
-		T_ASSERT(render::getVertexSize(vertexElements) == sizeof(TBVertex));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Position, render::DataType::DtFloat3, offsetof(TurboBadgerUiVertex, position)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Custom, render::DataType::DtFloat2, offsetof(TurboBadgerUiVertex, texCoord)));
+		vertexElements.push_back(render::VertexElement(render::DataUsage::Color, render::DataType::DtByte4N, offsetof(TurboBadgerUiVertex, color)));
+		T_ASSERT(render::getVertexSize(vertexElements) == sizeof(TurboBadgerUiVertex));
 		m_vertexLayout = m_renderSystem->createVertexLayout(vertexElements);
 
 		return true;
@@ -98,5 +96,18 @@ namespace traktor::turbobadgerui
 
 		m_renderGraph = nullptr;
 		m_renderPassOutput = nullptr;
+	}
+
+	void TurboBadgerUiRenderer::renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height)
+	{
+		m_renderMutex.wait();
+
+		AlignedVector<TurboBadgerUiBatch> batches;
+
+		TurboBadgerUi::getInstance().renderView(view, width, height, batches);
+
+		m_renderMutex.release();
+
+		//return batches;
 	}
 }

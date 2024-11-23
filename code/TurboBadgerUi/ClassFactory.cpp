@@ -8,7 +8,7 @@
  */
 #include "TurboBadgerUi/ClassFactory.h"
 
-#include "TurboBadgerUi/TurboBadgerUiResource.h"
+#include "TurboBadgerUi/TurboBadgerUiViewResource.h"
 #include "TurboBadgerUi/TurboBadgerUi.h"
 
 #include "Core/Class/AutoRuntimeClass.h"
@@ -20,9 +20,9 @@ namespace traktor::turbobadgerui
 
 		void ClassFactory::createClasses(IRuntimeClassRegistrar* registrar) const
 	{
-		// TurboBadgerUiResource
-		auto classTurboBadgerUiResource = new AutoRuntimeClass< TurboBadgerUiResource >();
-		registrar->registerClass(classTurboBadgerUiResource);
+		// TurboBadgerUiViewResource
+		auto classTurboBadgerUiViewResource = new AutoRuntimeClass< TurboBadgerUiViewResource >();
+		registrar->registerClass(classTurboBadgerUiViewResource);
 
 		// TurboBadgerUi
 		auto classTurboBadgerUi = new AutoRuntimeClass< TurboBadgerUi >();

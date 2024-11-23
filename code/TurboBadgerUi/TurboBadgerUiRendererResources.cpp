@@ -14,7 +14,7 @@ namespace traktor::turbobadgerui
 {
 	namespace
 	{
-		const resource::Id< render::Shader > c_idShader(Guid(L"{FC6749BF-3F4F-0A44-A422-943E7B055825}"));
+		const resource::Id< render::Shader > c_idShader(Guid(L"{DC42B494-A516-E044-B088-DA73EF65571A}")); // System/TurboBadgerUi/Shaders/TurboBadgerUi_ColorTexture
 	}
 
 	T_IMPLEMENT_RTTI_CLASS(L"traktor.turbobadgerui.TurboBadgerUiRendererResources", TurboBadgerUiRendererResources, Object)
