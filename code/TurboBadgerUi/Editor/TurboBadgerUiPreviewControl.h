@@ -86,16 +86,16 @@ namespace traktor
 			void setUiViewResource(TurboBadgerUiViewResource* uiViewResource);
 
 		private:
-			editor::IEditor* m_editor;
-			Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
-			Ref< db::Database > m_database;
-			Ref< resource::IResourceManager > m_resourceManager;
-			Ref< render::IRenderSystem > m_renderSystem;
-			Ref< render::IRenderView > m_renderView;
-			Ref< render::RenderContext > m_renderContext;
-			Ref< render::RenderGraph > m_renderGraph;
-			Ref< turbobadgerui::TurboBadgerUiRenderer > m_renderer;
-			Ref< TurboBadgerUiViewResource > m_uiViewResource;
+			editor::IEditor* m_editor = nullptr;
+			Ref< ui::EventSubject::IEventHandler > m_idleEventHandler = nullptr;
+			Ref< db::Database > m_database = nullptr;
+			Ref< resource::IResourceManager > m_resourceManager = nullptr;
+			Ref< render::IRenderSystem > m_renderSystem = nullptr;
+			Ref< render::IRenderView > m_renderView = nullptr;
+			Ref< render::RenderContext > m_renderContext = nullptr;
+			Ref< render::RenderGraph > m_renderGraph = nullptr;
+			Ref< turbobadgerui::TurboBadgerUiRenderer > m_renderer = nullptr;
+			Ref< TurboBadgerUiViewResource > m_uiViewResource = nullptr;
 			TurboBadgerUiView* m_view = nullptr;
 
 			void eventSize(ui::SizeEvent* event);
