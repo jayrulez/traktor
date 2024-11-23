@@ -28,6 +28,7 @@ namespace traktor::turbobadgerui
 	{
 	public:
 		TBRenderer(render::IRenderSystem* renderSystem);
+		~TBRenderer();
 
 		tb::TBBitmap* CreateBitmap(int width, int height, uint32_t* data) override;
 		void RenderBatch(Batch* batch) override;

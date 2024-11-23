@@ -109,6 +109,9 @@ namespace traktor::turbobadgerui
 
 		m_renderMutex.release();
 
+		if (batches.size() == 0)
+			return;
+
 		{
 			Matrix44 projection = orthoLh(0.0f, 0.0f, (float)width, -(float)height, -1.0f, 1.0f);
 
