@@ -33,7 +33,9 @@ namespace traktor::turbobadgerui
 	public:
 		TurboBadgerUiViewResource() = default;
 
-		TurboBadgerUiViewResource(const Path& filePath);
+		TurboBadgerUiViewResource(const Path& filePath,
+			int32_t width,
+			int32_t height);
 
 		const Path& getFilePath() const;
 
