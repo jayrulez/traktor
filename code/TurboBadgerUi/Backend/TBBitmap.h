@@ -16,43 +16,43 @@
 
 namespace traktor::render
 {
-    class ITexture;
-    class IRenderSystem;
+	class ITexture;
+	class IRenderSystem;
 }
 
 namespace traktor::turbobadgerui
 {
-    class TBRenderer;
+	class TBRenderer;
 
-    class TBBitmap : public tb::TBBitmap
-    {
-    public:
-        TBBitmap(TBRenderer* renderer, render::IRenderSystem* renderSystem);
+	class TBBitmap : public tb::TBBitmap
+	{
+	public:
+		TBBitmap(TBRenderer* renderer, render::IRenderSystem* renderSystem);
 
-        /** Note: Implementations for batched renderers should call TBRenderer::FlushBitmap
-      to make sure any active batch is being flushed before the bitmap is deleted. */
-        ~TBBitmap() override;
+		/** Note: Implementations for batched renderers should call TBRenderer::FlushBitmap
+	  to make sure any active batch is being flushed before the bitmap is deleted. */
+		~TBBitmap() override;
 
-        bool Init(int width, int height, unsigned int* data);
+		bool Init(int width, int height, unsigned int* data);
 
-        int Width() override;
-        int Height() override;
+		int Width() override;
+		int Height() override;
 
-        /** Update the bitmap with the given data (in BGRA32 format).
-          Note: Implementations for batched renderers should call TBRenderer::FlushBitmap
-          to make sure any active batch is being flushed before the bitmap is changed. */
-        void SetData(unsigned int* data) override;
+		/** Update the bitmap with the given data (in BGRA32 format).
+		  Note: Implementations for batched renderers should call TBRenderer::FlushBitmap
+		  to make sure any active batch is being flushed before the bitmap is changed. */
+		void SetData(unsigned int* data) override;
 
-        inline Ref < render::ITexture > GetTexture() const
-        {
-            return m_texture;
-        }
+		inline Ref < render::ITexture > GetTexture() const
+		{
+			return m_texture;
+		}
 
-    private:
-        TBRenderer* m_renderer;
-        render::IRenderSystem* m_renderSystem;
-        int m_width = 0;
-        int m_height = 0;
-        Ref < render::ITexture > m_texture;
-    };
+	private:
+		TBRenderer* m_renderer;
+		render::IRenderSystem* m_renderSystem;
+		int m_width = 0;
+		int m_height = 0;
+		Ref < render::ITexture > m_texture;
+	};
 }

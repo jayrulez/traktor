@@ -181,7 +181,7 @@ namespace traktor::turbobadgerui
 			m_view = nullptr;
 		}
 
-		safeDestroy(m_renderer);
+		delete m_renderer;
 		delete m_renderContext;
 		safeDestroy(m_renderGraph);
 		safeClose(m_renderView);

@@ -161,10 +161,7 @@ namespace traktor::turbobadgerui
 					renderBlock->programParams = renderContext->alloc< render::ProgramParameters >();
 					renderBlock->programParams->beginParameters(renderContext);
 
-					if (batch.texture)
-					{
-						renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"TurboBadgerUi_Texture"), batch.texture);
-					}
+					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"TurboBadgerUi_Texture"), texture);
 
 					Matrix44 transform = Matrix44::identity();
 					Vector4 translation = Vector4::zero();

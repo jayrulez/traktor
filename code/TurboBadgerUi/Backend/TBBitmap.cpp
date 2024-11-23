@@ -10,8 +10,11 @@
 
 #include "TurboBadgerUi/Backend/TBRenderer.h"
 
+#include "Core/Misc/SafeDestroy.h"
 #include "Render/ITexture.h"
 #include "Render/IRenderSystem.h"
+#include "Drawing/Image.h"
+#include "Core/Math/Scalar.h"
 
 namespace traktor::turbobadgerui
 {
@@ -25,29 +28,26 @@ namespace traktor::turbobadgerui
 	TBBitmap::~TBBitmap()
 	{
 		m_renderer->FlushBitmap(this);
+		safeDestroy(m_texture);
 	}
 
-	bool
-		TBBitmap::Init(int width, int height, unsigned int* data)
+	bool TBBitmap::Init(int width, int height, unsigned int* data)
 	{
 		m_width = width;
 		m_height = height;
 
-		render::SimpleTextureCreateDesc desc;
-		desc.width = m_width;
-		desc.height = m_height;
-		desc.mipCount = 1;
-		desc.format = render::TextureFormat::TfR8G8B8A8;
-		desc.immutable = true;
-		desc.sRGB = false;
-		render::TextureInitialData initialData;
-		initialData.data = data;
-		initialData.pitch = 4 * desc.width;
-		initialData.slicePitch = 4 * desc.width * desc.height;
-		desc.initialData[0] = initialData;
+		render::SimpleTextureCreateDesc desc = {
+			.width = m_width,
+			.height = m_height,
+			.mipCount = 1,
+			.format = render::TextureFormat::TfR8G8B8A8,
+			.sRGB = false,
+			.immutable = false,
+		};
+
 		m_texture = m_renderSystem->createSimpleTexture(desc, T_FILE_LINE_W);
 
-		//SetData(data);
+		SetData(data);
 		return true;
 	}
 
@@ -63,7 +63,10 @@ namespace traktor::turbobadgerui
 
 	void TBBitmap::SetData(unsigned int* data)
 	{
+		m_renderer->FlushBitmap(this);
+
 		render::ITexture::Lock lock;
+
 		m_texture->lock(0, 0, lock);
 		std::memcpy(lock.bits, data, m_width * m_height * 4);
 		m_texture->unlock(0, 0);

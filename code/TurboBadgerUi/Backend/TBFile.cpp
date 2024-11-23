@@ -14,8 +14,7 @@
 namespace tb
 {
 	// static
-	TBFile*
-		tb::TBFile::Open(const char* filename, TBFileMode mode)
+	TBFile* tb::TBFile::Open(const char* filename, TBFileMode mode)
 	{
 		if (mode != TBFileMode::MODE_READ)
 			return nullptr;

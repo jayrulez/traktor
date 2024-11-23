@@ -15,6 +15,8 @@
 #include "Core/Object.h"
 #include "Core/Singleton/ISingleton.h"
 
+#include "tb_window.h"
+
  // import/export mechanism.
 #undef T_DLLCLASS
 #if defined(T_TURBOBADGERUI_EXPORT)
@@ -81,5 +83,6 @@ namespace traktor::turbobadgerui
 		BackendData* m_backendData = nullptr;
 		bool m_initialized = false;
 		AlignedVector<TurboBadgerUiView*> m_views;
+		tb::TBWindow* m_mainWindow;
 	};
 }
