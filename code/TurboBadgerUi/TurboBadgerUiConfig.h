@@ -7,6 +7,8 @@
 // You may change these here, but to make upgrades easier it's better to create a
 // copy of this file in a include path that is searched before Turbo Badger during
 // build (F.ex the solution directory for Visual Studio).
+#pragma once
+
 
 #ifndef TB_CONFIG_H
 #define TB_CONFIG_H
@@ -15,7 +17,7 @@
 	the various settings in g_tb_debug. A settings window can be
 	shown by calling ShowDebugInfoSettingsWindow. */
 #ifndef NDEBUG
-#define TB_RUNTIME_DEBUG_INFO
+//#define TB_RUNTIME_DEBUG_INFO
 #endif
 
 #ifndef NDEBUG
