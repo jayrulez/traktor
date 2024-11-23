@@ -44,7 +44,7 @@
 	app, that you know work! Freetype generates much prettier glyphs (using
 	hinting) but is a lot larger. This implementation is kept here as alternative
 	as long as it compiles. */
-	//#define TB_FONT_RENDERER_STB
+#define TB_FONT_RENDERER_STB
 
 	/** Enable to support image loading using stb_image.c (http://nothings.org/).
 		It's a *very unsafe* image library. Use only with images distributed with

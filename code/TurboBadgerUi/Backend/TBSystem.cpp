@@ -16,8 +16,7 @@
 
 #ifdef TB_RUNTIME_DEBUG_INFO
 
-void
-TBDebugOut(const char* str)
+void TBDebugOut(const char* str)
 {
     traktor::log::debug << traktor::mbstows(str) << traktor::Endl;
 }
@@ -27,8 +26,7 @@ TBDebugOut(const char* str)
 namespace tb
 {
     /** Get the system time in milliseconds since some undefined epoch. */
-    double
-        TBSystem::GetTimeMS()
+    double TBSystem::GetTimeMS()
     {
         traktor::DateTime now = traktor::DateTime::now();
         return (double)now.getSecondsSinceEpoch() * 1000;
@@ -38,37 +36,32 @@ namespace tb
       message queue. fire_time is the new time is needs to be called.
       It may be 0 which means that ProcessMessages should be called asap (but NOT from this call!)
       It may also be TB_NOT_SOON which means that ProcessMessages doesn't need to be called. */
-    void
-        TBSystem::RescheduleTimer(double fire_time)
+    void TBSystem::RescheduleTimer(double fire_time)
     {
     }
 
     /** Get how many milliseconds it should take after a touch down event should generate a long click
       event. */
-    int
-        TBSystem::GetLongClickDelayMS()
+    int TBSystem::GetLongClickDelayMS()
     {
         return 500;
     }
 
     /** Get how many pixels of dragging should start panning scrollable widgets. */
-    int
-        TBSystem::GetPanThreshold()
+    int TBSystem::GetPanThreshold()
     {
         return 40;
     }
 
     /** Get how many pixels a typical line is: The length that should be scrolled when turning a mouse
       wheel one notch. */
-    int
-        TBSystem::GetPixelsPerLine()
+    int TBSystem::GetPixelsPerLine()
     {
         return 40;
     }
 
     /** Get Dots Per Inch for the main screen. */
-    int
-        TBSystem::GetDPI()
+    int TBSystem::GetDPI()
     {
         return 96;
     }
