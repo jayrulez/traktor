@@ -71,34 +71,34 @@
 				<postAlphaBlend>false</postAlphaBlend>
 				<overlay>false</overlay>
 			</priority>
-			<cullMode>CounterClockWise</cullMode>
-			<blendEnable>false</blendEnable>
+			<cullMode>Never</cullMode>
+			<blendEnable>true</blendEnable>
 			<blendColorOperation>BoAdd</blendColorOperation>
 			<blendColorSource>BfOne</blendColorSource>
-			<blendColorDestination>BfZero</blendColorDestination>
-			<blendAlphaOperation>BoAdd</blendAlphaOperation>
+			<blendColorDestination>BfOneMinusSourceColor</blendColorDestination>
+			<blendAlphaOperation>BoSubtract</blendAlphaOperation>
 			<blendAlphaSource>BfOne</blendAlphaSource>
-			<blendAlphaDestination>BfOne</blendAlphaDestination>
+			<blendAlphaDestination>BfOneMinusSourceColor</blendAlphaDestination>
 			<colorWriteMask>
 				<red>true</red>
 				<green>true</green>
 				<blue>true</blue>
 				<alpha>true</alpha>
 			</colorWriteMask>
-			<depthEnable>true</depthEnable>
+			<depthEnable>false</depthEnable>
 			<depthWriteEnable>true</depthWriteEnable>
-			<depthFunction>CfLessEqual</depthFunction>
+			<depthFunction>CfEqual</depthFunction>
 			<alphaTestEnable>false</alphaTestEnable>
 			<alphaTestFunction>CfLess</alphaTestFunction>
 			<alphaTestReference>128</alphaTestReference>
 			<alphaToCoverageEnable>false</alphaToCoverageEnable>
 			<wireframe>false</wireframe>
-			<stencilEnable>false</stencilEnable>
+			<stencilEnable>true</stencilEnable>
 			<stencilFail>SoKeep</stencilFail>
 			<stencilZFail>SoKeep</stencilZFail>
 			<stencilPass>SoKeep</stencilPass>
 			<stencilFunction>CfAlways</stencilFunction>
-			<stencilReference>0</stencilReference>
+			<stencilReference>1</stencilReference>
 			<stencilMask>2147483648</stencilMask>
 			<precisionHint>Undefined</precisionHint>
 		</item>
@@ -150,7 +150,7 @@
 			<id>{6F49F7F5-6ADD-654A-BB81-A5715CC3CBB6}</id>
 			<comment/>
 			<position>
-				<first>1437</first>
+				<first>1590</first>
 				<second>137</second>
 			</position>
 			<technique>TurboBadgerUi_Default</technique>
@@ -168,8 +168,8 @@
 			<id>{69ABEF04-A6FD-6E48-861B-C9E2074AE2CD}</id>
 			<comment/>
 			<position>
-				<first>1138</first>
-				<second>88</second>
+				<first>1261</first>
+				<second>72</second>
 			</position>
 		</item>
 	</nodes>
