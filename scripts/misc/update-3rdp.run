@@ -511,7 +511,8 @@ local PACKAGES =
 	{
 		type = "GIT",
 		name = "turbobadger",
-		url = "https://github.com/fruxo/turbobadger.git",
+		url = "https://github.com/jayrulez/turbobadger.git",
+		branch = "traktor",
 		license = "MIT"
 	},
 }
@@ -593,7 +594,14 @@ function update(pkg)
 		if run:exist(name) then
 			stdout:printLn("Updating " .. pkg.url)
 			run:pushd(name)
-			result = result and (run:execute(GIT .. " pull --rebase --autostash") == 0)
+			if result and pkg.branch ~= nil then
+			    result = (run:execute(GIT .. " checkout " .. pkg.branch) == 0)
+			end
+			git_pull_cmd = GIT .. " pull --rebase --autostash"
+			if pkg.branch ~= nil then
+			    git_pull_cmd = git_pull_cmd .. " origin " .. pkg.branch
+			end
+			result = result and (run:execute(git_pull_cmd) == 0)
 			result = result and (run:execute(GIT .. " submodule update") == 0)
 			run:popd()
 			if result and pkg.post_update ~= nil then
@@ -604,7 +612,11 @@ function update(pkg)
 			end			
 		else
 			stdout:printLn("Cloning " .. pkg.url)
-			result = (run:execute(GIT .. " clone --recurse-submodules " .. pkg.url) == 0)
+			if pkg.branch ~= nil then
+				git_branch = "--branch " .. pkg.branch
+			end
+			git_clond_cmd = GIT .. " clone " .. git_branch .. " --recurse-submodules " .. pkg.url
+			result = (run:execute(git_clond_cmd) == 0)
 			if result and pkg.post_clone ~= nil then
 				stdout:printLn("Running post clone...")
 				run:pushd(name)
