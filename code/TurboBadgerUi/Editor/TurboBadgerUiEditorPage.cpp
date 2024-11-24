@@ -111,8 +111,8 @@ namespace traktor::turbobadgerui
 
 	void TurboBadgerUiEditorPage::destroy()
 	{
+		safeDestroy(m_previewControl);
 		safeDestroy(m_resourceManager);
-		//safeDestroy(m_previewControl);
 	}
 
 	bool TurboBadgerUiEditorPage::dropInstance(db::Instance* instance, const ui::Point& position)

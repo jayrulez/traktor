@@ -140,6 +140,9 @@ namespace traktor::turbobadgerui
 			return;
 
 		tb::TBWidgetsAnimationManager::Shutdown();
+
+		tb::g_tb_skin->UnloadBitmaps();
+
 		tb::tb_core_shutdown();
 
 		delete m_backendData;
