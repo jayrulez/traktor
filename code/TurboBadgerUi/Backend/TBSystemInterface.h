@@ -14,26 +14,20 @@
 #include "Core/Io/IStream.h"
 #include "Core/Io/File.h"
 
-#include "tb_system.h"
+#include "tb_system_interface.h"
 
 namespace traktor::turbobadgerui
 {
-    class TBUIFile : public tb::TBFile
+    class TBSystemInterface : public tb::TBSystemInterface
     {
     public:
-        TBUIFile(const std::wstring& filepath, File::Mode accessMode);
+        void DebugOut(const char* str) override;
 
-        ~TBUIFile();
-
-        long Size() override;
-        size_t Read(void* buf, size_t elemSize, size_t count) override;
-
-        inline bool IsOpen() const
-        {
-            return m_stream != nullptr;
-        }
-
-    private:
-        Ref<IStream> m_stream = nullptr;
+		double GetTimeMS() override;
+		void RescheduleTimer(double fire_time) override;
+		int GetLongClickDelayMS() override;
+		int GetPanThreshold() override;
+        int GetPixelsPerLine() override;
+        int GetDPI() override;
     };
 }
