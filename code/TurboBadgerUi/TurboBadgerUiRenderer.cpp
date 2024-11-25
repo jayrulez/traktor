@@ -101,13 +101,15 @@ namespace traktor::turbobadgerui
 
 	void TurboBadgerUiRenderer::renderView(TurboBadgerUiView* view, uint32_t width, uint32_t height)
 	{
-		m_renderMutex.wait();
-
 		AlignedVector<TurboBadgerUiBatch> batches;
 
-		TurboBadgerUi::getInstance().renderView(view, width, height, batches);
+		{
+			m_renderMutex.wait();
 
-		m_renderMutex.release();
+			TurboBadgerUi::getInstance().renderView(view, width, height, batches);
+
+			m_renderMutex.release();
+		}
 
 		if (batches.size() == 0)
 			return;
@@ -137,22 +139,11 @@ namespace traktor::turbobadgerui
 						renderContext->draw(ssrb);
 					}
 
-					render::IProgram* program = nullptr;
-
-					std::wstring passName = L"TurboBadgerUi_ColorTexture";
-
 					render::Shader::Permutation permutation(render::handle_t(render::Handle(L"TurboBadgerUi_Default")));
 
-					program = m_rendererResources->m_shader->getProgram(permutation).program;
+					render::IProgram* program = m_rendererResources->m_shader->getProgram(permutation).program;
 
-					Ref< render::ITexture > texture = batch.texture;
-
-					if (!texture)
-					{
-						texture = m_rendererResources->m_defaultTexture;
-					}
-
-					render::NonIndexedRenderBlock* renderBlock = renderContext->allocNamed< render::NonIndexedRenderBlock >(passName);
+					render::NonIndexedRenderBlock* renderBlock = renderContext->allocNamed< render::NonIndexedRenderBlock >(L"TurboBadgerUi_ColorTexture");
 
 					renderBlock->program = program;
 					renderBlock->vertexBuffer = batch.vertexBuffer->getBufferView();
@@ -164,7 +155,9 @@ namespace traktor::turbobadgerui
 					renderBlock->programParams = renderContext->alloc< render::ProgramParameters >();
 					renderBlock->programParams->beginParameters(renderContext);
 
-					renderBlock->programParams->setTextureParameter(render::getParameterHandle(L"TurboBadgerUi_Texture"), texture);
+					renderBlock->programParams->setTextureParameter(
+						render::getParameterHandle(L"TurboBadgerUi_Texture"), 
+						batch.texture ? batch.texture : m_rendererResources->m_defaultTexture);
 
 					Matrix44 transform = Matrix44::identity();
 					Vector4 translation = Vector4::zero();
@@ -176,7 +169,7 @@ namespace traktor::turbobadgerui
 
 					renderContext->draw(renderBlock);
 				}
-				});
+			});
 		}
 	}
 }

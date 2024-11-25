@@ -24,8 +24,13 @@ namespace traktor::turbobadgerui
 {
 	class T_DLLCLASS TurboBadgerUiView : public tb::TBWidget
 	{
+	public:
+
 		// For safe typecasting
 		TBOBJECT_SUBCLASS(TurboBadgerUiView, tb::TBWidget);
+
+		using tb::TBWidget::InvokeKey;
+		using tb::TBWidget::InvokePointerDown;
 
 		void load();
 	};
