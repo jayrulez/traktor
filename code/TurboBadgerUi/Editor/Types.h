@@ -10,7 +10,7 @@
 
 #include "Core/Config.h"
 
-#include "TurboBadgerUi/TurboBadgerUiConfig.h"
+#include "TurboBadgerUi/tb_config.h"
 
 namespace traktor::turbobadgerui
 {
