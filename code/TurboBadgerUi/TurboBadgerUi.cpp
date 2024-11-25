@@ -13,9 +13,9 @@
 #include "Core/Misc/TString.h"
 #include "Core/Log/Log.h"
 
+#include "tb_core.h"
 #include "animation/tb_animation.h"
 #include "animation/tb_widget_animation.h"
-#include "tb_core.h"
 #include "tb_font_renderer.h"
 #include "tb_language.h"
 #include "tb_msg.h"
@@ -57,16 +57,21 @@ namespace traktor::turbobadgerui
 
 		m_backendData = new BackendData(renderSystem);
 
-		m_initialized = tb::tb_core_init(&m_backendData->renderer);
+		m_initialized = tb::tb_core_init(
+			&m_backendData->renderer, 
+			&m_backendData->systemInterface, 
+			&m_backendData->fileInterface,
+			&m_backendData->clipboardInterface
+		);
 
 		// Load language file
-		if (!tb::g_tb_lng->Load("data/Assets/System/TurboBadgerUi/resources/language/lng_en.tb.txt"))
+		if (!tb::get_tb_lng()->Load("data/Assets/System/TurboBadgerUi/resources/language/lng_en.tb.txt"))
 		{
 			log::error << L"TurboBadgerUi: Failed to load language resource." << Endl;
 		}
 
 		// Load the default skin, and override skin that contains the graphics specific to the demo.
-		if (!tb::g_tb_skin->Load("data/Assets/System/TurboBadgerUi/demo/skin/skin.tb.txt", "data/Assets/System/TurboBadgerUi/resources/default_skin/skin.tb.txt"))
+		if (!tb::get_tb_skin()->Load("data/Assets/System/TurboBadgerUi/demo/skin/skin.tb.txt", "data/Assets/System/TurboBadgerUi/resources/default_skin/skin.tb.txt"))
 		{
 			log::error << L"TurboBadgerUi: Failed to skin resources." << Endl;
 		}
@@ -87,22 +92,22 @@ namespace traktor::turbobadgerui
 
 		// Add fonts we can use to the font manager.
 #if defined(TB_FONT_RENDERER_STB) || defined(TB_FONT_RENDERER_FREETYPE)
-		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/vera.ttf", "Vera"))
+		if (!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/vera.ttf", "Vera"))
 		{
 			log::error << L"TurboBadgerUi: Failed to load Vera font." << Endl;
 		}
 #endif
 #ifdef TB_FONT_RENDERER_TBBF
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/default_font/segoe_white_with_shadow.tb.txt", "Segoe"))
+		if(!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/default_font/segoe_white_with_shadow.tb.txt", "Segoe"))
 			log::error << L"TurboBadgerUi: Failed to load Segoe font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/neon.tb.txt", "Neon"))
+		if(!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/neon.tb.txt", "Neon"))
 			log::error << L"TurboBadgerUi: Failed to load Neon font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orangutang.tb.txt", "Orangutang"))
+		if(!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orangutang.tb.txt", "Orangutang"))
 			log::error << L"TurboBadgerUi: Failed to load Orangutang font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orange.tb.txt", "Orange"))
+		if(!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orange.tb.txt", "Orange"))
 			log::error << L"TurboBadgerUi: Failed to load Orange font." << Endl;
 #endif
 
@@ -113,11 +118,11 @@ namespace traktor::turbobadgerui
 #else
 		fd.SetID(TBIDC("Vera"));
 #endif
-		fd.SetSize(tb::g_tb_skin->GetDimensionConverter()->DpToPx(14));
-		tb::g_font_manager->SetDefaultFontDescription(fd);
+		fd.SetSize(tb::get_tb_skin()->GetDimensionConverter()->DpToPx(14));
+		tb::get_font_manager()->SetDefaultFontDescription(fd);
 
 		// Create the font now.
-		tb::TBFontFace* font = tb::g_font_manager->CreateFontFace(tb::g_font_manager->GetDefaultFontDescription());
+		tb::TBFontFace* font = tb::get_font_manager()->CreateFontFace(tb::get_font_manager()->GetDefaultFontDescription());
 
 		// Render some glyphs in one go now since we know we are going to use them. It would work fine
 		// without this since glyphs are rendered when needed, but with some extra updating of the glyph bitmap.
@@ -141,7 +146,7 @@ namespace traktor::turbobadgerui
 
 		tb::TBWidgetsAnimationManager::Shutdown();
 
-		tb::g_tb_skin->UnloadBitmaps();
+		tb::get_tb_skin()->UnloadBitmaps();
 
 		tb::tb_core_shutdown();
 
@@ -161,7 +166,7 @@ namespace traktor::turbobadgerui
 			return nullptr;
 
 		TurboBadgerUiView* view = new TurboBadgerUiView();
-		tb::g_widgets_reader->LoadFile(view, wstombs(resourcePath.getOriginal()).c_str());
+		tb::get_widgets_reader()->LoadFile(view, wstombs(resourcePath.getOriginal()).c_str());
 
 		setupViewDefaults(view, width, height);
 
@@ -176,7 +181,7 @@ namespace traktor::turbobadgerui
 			return nullptr;
 
 		TurboBadgerUiView* view = new TurboBadgerUiView();
-		tb::g_widgets_reader->LoadData(view, reinterpret_cast<const char*>(resourceData));
+		tb::get_widgets_reader()->LoadData(view, reinterpret_cast<const char*>(resourceData));
 
 		setupViewDefaults(view, width, height);
 
@@ -253,13 +258,13 @@ namespace traktor::turbobadgerui
 			tb::TBNode node;
 			if (node.ReadFile("data/Assets/System/TurboBadgerUi/demo/ui_resources/test_ui.tb.txt"))
 			{
-				tb::g_widgets_reader->LoadNodeTree(m_mainWindow, &node);
+				tb::get_widgets_reader()->LoadNodeTree(m_mainWindow, &node);
 
 				// Get title from the WindowInfo section (or use "" if not specified)
 				m_mainWindow->SetText(node.GetValueString("WindowInfo>title", ""));
 
 				const tb::TBRect parent_rect(0, 0, width, height);
-				const tb::TBDimensionConverter* dc = tb::g_tb_skin->GetDimensionConverter();
+				const tb::TBDimensionConverter* dc = tb::get_tb_skin()->GetDimensionConverter();
 				tb::TBRect window_rect = m_mainWindow->GetResizeToFitContentRect();
 
 				// Use specified size or adapt to the preferred content size.

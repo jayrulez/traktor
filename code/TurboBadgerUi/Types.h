@@ -12,7 +12,7 @@
 
 #include "Render/Types.h"
 
-#include "TurboBadgerUiConfig.h"
+#include "tb_config.h"
 
 namespace traktor::render
 {

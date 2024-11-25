@@ -24,7 +24,6 @@ namespace traktor::turbobadgerui
 
 	TBRenderer::~TBRenderer()
 	{
-		//FlushAllInternal();
 	}
 
 	tb::TBBitmap* TBRenderer::CreateBitmap(int width, int height, uint32_t* data)

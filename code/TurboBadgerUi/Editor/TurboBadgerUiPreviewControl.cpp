@@ -32,8 +32,6 @@
 #include "Ui/Application.h"
 #include "Ui/Enums.h"
 
-#include "tb_widgets.h"
-
 namespace
 {
 	using namespace traktor;
@@ -313,8 +311,8 @@ namespace traktor::turbobadgerui
 
 		tb::SPECIAL_KEY specialKey = getSpecialKey(event->getVirtualKey());
 
-		//m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), true);
-		//m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), false);
+		m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), true);
+		m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), false);
 	}
 
 	void TurboBadgerUiPreviewControl::eventKeyDown(ui::KeyDownEvent* event)
@@ -326,7 +324,7 @@ namespace traktor::turbobadgerui
 
 		tb::SPECIAL_KEY specialKey = getSpecialKey(event->getVirtualKey());
 
-		//m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), true);
+		m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), true);
 	}
 
 	void TurboBadgerUiPreviewControl::eventKeyUp(ui::KeyUpEvent* event)
@@ -338,7 +336,7 @@ namespace traktor::turbobadgerui
 
 		tb::SPECIAL_KEY specialKey = getSpecialKey(event->getVirtualKey());
 
-		//m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), false);
+		m_view->InvokeKey(key, specialKey, getModifierKeys(event->getKeyState()), false);
 	}
 
 	void TurboBadgerUiPreviewControl::eventButtonDown(ui::MouseButtonDownEvent* event)
@@ -346,7 +344,7 @@ namespace traktor::turbobadgerui
 		if (!m_view)
 			return;
 
-		//m_view->InvokePointerDown(event->getPosition().x, event->getPosition().y, 1, getModifierKeys(event->getKeyState()), false);
+		m_view->InvokePointerDown(event->getPosition().x, event->getPosition().y, 1, getModifierKeys(event->getKeyState()), false);
 	}
 
 	void TurboBadgerUiPreviewControl::eventButtonUp(ui::MouseButtonUpEvent* event)
@@ -354,7 +352,7 @@ namespace traktor::turbobadgerui
 		if (!m_view)
 			return;
 
-		//m_view->InvokePointerUp(event->getPosition().x, event->getPosition().y, getModifierKeys(event->getKeyState()), false);
+		m_view->InvokePointerUp(event->getPosition().x, event->getPosition().y, getModifierKeys(event->getKeyState()), false);
 	}
 
 	void TurboBadgerUiPreviewControl::eventMouseMove(ui::MouseMoveEvent* event)
@@ -362,7 +360,7 @@ namespace traktor::turbobadgerui
 		if (!m_view)
 			return;
 
-		//m_view->InvokePointerMove(event->getPosition().x, event->getPosition().y, getModifierKeys(event->getKeyState()), false);
+		m_view->InvokePointerMove(event->getPosition().x, event->getPosition().y, getModifierKeys(event->getKeyState()), false);
 	}
 
 	void TurboBadgerUiPreviewControl::eventMouseWheel(ui::MouseWheelEvent* event)
@@ -370,6 +368,6 @@ namespace traktor::turbobadgerui
 		if (!m_view)
 			return;
 
-		//m_view->InvokeWheel(event->getPosition().x, event->getPosition().y, 0, event->getRotation(), getModifierKeys(event->getKeyState()));
+		m_view->InvokeWheel(event->getPosition().x, event->getPosition().y, 0, event->getRotation(), getModifierKeys(event->getKeyState()));
 	}
 }

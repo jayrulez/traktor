@@ -11,6 +11,9 @@
 #include "TurboBadgerUi/Types.h"
 
 #include "TurboBadgerUi/Backend/TBRenderer.h"
+#include "TurboBadgerUi/Backend/TBSystemInterface.h"
+#include "TurboBadgerUi/Backend/TBFileInterface.h"
+#include "TurboBadgerUi/Backend/TBClipboardInterface.h"
 
 #include "Core/Object.h"
 #include "Core/Singleton/ISingleton.h"
@@ -78,6 +81,9 @@ namespace traktor::turbobadgerui
 			BackendData(render::IRenderSystem* renderSystem);
 
 			TBRenderer renderer;
+			TBSystemInterface systemInterface;
+			TBFileInterface fileInterface;
+			TBClipboardInterface clipboardInterface;
 		};
 
 		BackendData* m_backendData = nullptr;
