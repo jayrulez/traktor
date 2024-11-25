@@ -21197,7 +21197,6 @@
 					</includePaths>
 					<definitions>
 						<item>T_TURBOBADGERUI_EXPORT</item>
-						<item>TB_RUNTIME_DEBUG_INFO</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -21244,7 +21243,6 @@
 					</includePaths>
 					<definitions>
 						<item>T_STATIC</item>
-						<item>TB_RUNTIME_DEBUG_INFO</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -21500,6 +21498,12 @@
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[3]/project/dependencies/item[1]/project"/>
+				</item>
+				<item type="ExternalDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<solutionFileName>ExternWin64.xms</solutionFileName>
+					<projectName>Extern.turbobadger</projectName>
 				</item>
 			</dependencies>
 		</item>
