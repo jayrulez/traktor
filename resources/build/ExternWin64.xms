@@ -6720,17 +6720,13 @@
 			<configurations>
 				<item type="Configuration" version="5">
 					<name>DebugShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions>
-						<item>T_TURBOBADGER_EXPORT</item>
-						<item>TB_RUNTIME_DEBUG_INFO</item>
-						<item>TB_FONT_RENDERER_STB</item>
-					</definitions>
+					<definitions/>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -6745,16 +6741,13 @@
 				</item>
 				<item type="Configuration" version="5">
 					<name>ReleaseShared</name>
-					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
 					<precompiledHeader/>
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions>
-						<item>T_TURBOBADGER_EXPORT</item>
-						<item>TB_FONT_RENDERER_STB</item>
-					</definitions>
+					<definitions/>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -6776,8 +6769,7 @@
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
 					<definitions>
-						<item>TB_RUNTIME_DEBUG_INFO</item>
-						<item>TB_FONT_RENDERER_STB</item>
+						<item>TB_STATIC</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -6800,8 +6792,7 @@
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
 					<definitions>
-						<item>TB_FONT_RENDERER_STB</item>
-						<item>TB_RUNTIME_DEBUG_INFO</item>
+						<item>TB_STATIC</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
