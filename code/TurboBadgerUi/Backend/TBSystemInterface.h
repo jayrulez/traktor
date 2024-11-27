@@ -14,7 +14,7 @@
 #include "Core/Io/IStream.h"
 #include "Core/Io/File.h"
 
-#include "tb_system_interface.h"
+#include "platform/tb_system_interface.h"
 
 namespace traktor::turbobadgerui
 {

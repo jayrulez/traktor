@@ -10,7 +10,7 @@
 
 #include "TurboBadgerUi/Types.h"
 
-#include "tb_clipboard_interface.h"
+#include "platform/tb_clipboard_interface.h"
 
 namespace traktor::turbobadgerui
 {
