@@ -6726,7 +6726,9 @@
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions/>
+					<definitions>
+						<item>TB_COMPILING</item>
+					</definitions>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -6747,7 +6749,9 @@
 					<includePaths>
 						<item>$(TURBOBADGER_SDK)/src/tb</item>
 					</includePaths>
-					<definitions/>
+					<definitions>
+						<item>TB_COMPILING</item>
+					</definitions>
 					<libraryPaths/>
 					<libraries/>
 					<warningLevel>WlCompilerDefault</warningLevel>
@@ -6902,6 +6906,19 @@
 					<fileName>*.cpp</fileName>
 					<excludeFilter>tb_clipboard_dummy.cpp;tb_clipboard_glfw.cpp;tb_clipboard_win.cpp;tb_file_posix.cpp;tb_system_android.cpp;tb_system_linux.cpp;tb_system_win.cpp</excludeFilter>
 					<items/>
+				</item>
+				<item type="Filter">
+					<name>platform</name>
+					<items>
+						<item type="Filter">
+							<name>*.h</name>
+							<items/>
+						</item>
+						<item type="Filter">
+							<name>*.cpp</name>
+							<items/>
+						</item>
+					</items>
 				</item>
 			</items>
 			<dependencies/>
