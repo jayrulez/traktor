@@ -503,7 +503,7 @@ local PACKAGES =
 		type = "GIT",
 		name = "turbobadger",
 		url = "https://github.com/jayrulez/turbobadger.git",
-		branch = "traktor",
+		branch = "turbo",
 		license = "MIT"
 	},
 }
@@ -585,9 +585,9 @@ function update(pkg)
 		if run:exist(name) then
 			stdout:printLn("Updating " .. pkg.url)
 			run:pushd(name)
-			if result and pkg.branch ~= nil then
-			    result = (run:execute(GIT .. " checkout " .. pkg.branch) == 0)
-			end
+			--if result and pkg.branch ~= nil then
+			--    result = (run:execute(GIT .. " checkout " .. pkg.branch) == 0)
+			--end
 			git_pull_cmd = GIT .. " pull --rebase --autostash"
 			if pkg.branch ~= nil then
 			    git_pull_cmd = git_pull_cmd .. " origin " .. pkg.branch
