@@ -35,6 +35,7 @@ namespace traktor::turbobadgerui
 	namespace
 	{
 		const Guid c_idTurboBadgerUiShaderAssets(L"{54D126B8-1E0A-024D-94D7-7D30C5E99F2F}"); // System/TurboBadgerUi/Shaders/ShaderAssets
+		const Guid c_idTurboBadgerUiDefaultResources(L"{2719C20D-0066-0347-BD57-9866C5F7650B}"); // System/TurboBadgerUi/DefaultResources
 	}
 
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.turbobadgerui.TurboBadgerUiPipeline", 0, TurboBadgerUiPipeline, editor::IPipeline)
@@ -83,6 +84,7 @@ namespace traktor::turbobadgerui
 			pipelineDepends->addDependency(traktor::Path(m_assetPath), uiViewAsset->getFileName().getOriginal());
 		}
 		pipelineDepends->addDependency(c_idTurboBadgerUiShaderAssets, editor::PdfBuild | editor::PdfResource);
+		pipelineDepends->addDependency(c_idTurboBadgerUiDefaultResources, editor::PdfBuild | editor::PdfResource);
 		//pipelineDepends->addDependency< render::TextureOutput >();
 		return true;
 	}

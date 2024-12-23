@@ -11,6 +11,7 @@
 #include "TurboBadgerUi/Editor/Types.h"
 
 #include "Editor/IEditorPlugin.h"
+#include "Core/Ref.h"
 
  // import/export mechanism.
 #undef T_DLLCLASS
@@ -19,6 +20,11 @@
 #else
 #	define T_DLLCLASS T_DLLIMPORT
 #endif
+
+namespace traktor::resource
+{
+	class IResourceManager;
+}
 
 namespace traktor::render
 {
@@ -52,5 +58,6 @@ namespace traktor::turbobadgerui
 
 	private:
 		editor::IEditor* m_editor = nullptr;
+		Ref < resource::IResourceManager > m_resourceManager;
 	};
 }
