@@ -12,6 +12,7 @@
 #include "Core/Singleton/SingletonManager.h"
 #include "Core/Misc/TString.h"
 #include "Core/Log/Log.h"
+#include "Resource//IResourceManager.h"
 
 #include "tb_core.h"
 #include "animation/tb_animation.h"
@@ -25,6 +26,10 @@
 
 namespace traktor::turbobadgerui
 {
+	namespace {
+		const resource::Id< resource::FileBundle > c_idTurboBadgerUiDefaultResources(Guid(L"{2719C20D-0066-0347-BD57-9866C5F7650B}")); // System/TurboBadgerUi/DefaultResources
+	}
+
 	T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.turbobadgerui.TurboBadgerUi", 0, TurboBadgerUi, Object)
 
 		TurboBadgerUi::BackendData::BackendData(render::IRenderSystem* renderSystem)
@@ -58,8 +63,8 @@ namespace traktor::turbobadgerui
 		m_backendData = new BackendData(renderSystem);
 
 		m_initialized = tb::tb_core_init(
-			&m_backendData->renderer, 
-			&m_backendData->systemInterface, 
+			&m_backendData->renderer,
+			&m_backendData->systemInterface,
 			&m_backendData->fileInterface,
 			&m_backendData->clipboardInterface
 		);
@@ -71,7 +76,7 @@ namespace traktor::turbobadgerui
 		}
 
 		// Load the default skin, and override skin that contains the graphics specific to the demo.
-		if (!tb::g_tb_skin->Load("data/Assets/System/TurboBadgerUi/demo/skin/skin.tb.txt", "data/Assets/System/TurboBadgerUi/resources/default_skin/skin.tb.txt"))
+		if (!tb::g_tb_skin->Load("data/Assets/System/TurboBadgerUi/resources/default_skin/skin.tb.txt", "data/Assets/System/TurboBadgerUi/demo/skin/skin.tb.txt"))
 		{
 			log::error << L"TurboBadgerUi: Failed to skin resources." << Endl;
 		}
@@ -92,22 +97,22 @@ namespace traktor::turbobadgerui
 
 		// Add fonts we can use to the font manager.
 #if defined(TB_FONT_RENDERER_STB) || defined(TB_FONT_RENDERER_FREETYPE)
-		if (!tb::get_font_manager()->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/vera.ttf", "Vera"))
+		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/vera.ttf", "Vera"))
 		{
 			log::error << L"TurboBadgerUi: Failed to load Vera font." << Endl;
 		}
 #endif
 #ifdef TB_FONT_RENDERER_TBBF
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/default_font/segoe_white_with_shadow.tb.txt", "Segoe"))
+		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/resources/default_font/segoe_white_with_shadow.tb.txt", "Segoe"))
 			log::error << L"TurboBadgerUi: Failed to load Segoe font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/neon.tb.txt", "Neon"))
+		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/neon.tb.txt", "Neon"))
 			log::error << L"TurboBadgerUi: Failed to load Neon font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orangutang.tb.txt", "Orangutang"))
+		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orangutang.tb.txt", "Orangutang"))
 			log::error << L"TurboBadgerUi: Failed to load Orangutang font." << Endl;
 
-		if(!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orange.tb.txt", "Orange"))
+		if (!tb::g_font_manager->AddFontInfo("data/Assets/System/TurboBadgerUi/demo/fonts/orange.tb.txt", "Orange"))
 			log::error << L"TurboBadgerUi: Failed to load Orange font." << Endl;
 #endif
 
@@ -137,6 +142,25 @@ namespace traktor::turbobadgerui
 		}
 
 		return m_initialized;
+		}
+
+	bool TurboBadgerUi::loadDefaultResources(resource::IResourceManager* resourceManager)
+	{
+		if (!resourceManager->bind(c_idTurboBadgerUiDefaultResources, m_defaultResources))
+			return false;
+
+		//tb::g_tb_lng->Load("");
+		std::wstring lang = m_defaultResources->lookup(L"data/Assets/System/TurboBadgerUi/resources/language/lng_en.tb.txt");		
+
+		//tb::g_tb_skin->Load("");
+		std::wstring skin = m_defaultResources->lookup(L"data/Assets/System/TurboBadgerUi/resources/default_skin/skin.tb.txt");
+
+		//tb::g_font_manager->AddFontInfo("", "");
+		std::wstring font1 = m_defaultResources->lookup(L"data/Assets/System/TurboBadgerUi/resources/vera.ttf");
+		//tb::g_font_manager->AddFontInfo("", "");
+		std::wstring font2 = m_defaultResources->lookup(L"data/Assets/System/TurboBadgerUi/resources/default_font/segoe_white_with_shadow.tb.txt");
+
+		return true;
 	}
 
 	void TurboBadgerUi::shutdown()
@@ -297,4 +321,4 @@ namespace traktor::turbobadgerui
 
 		view->SetFocus(tb::WIDGET_FOCUS_REASON_UNKNOWN);
 	}
-}
+	}
