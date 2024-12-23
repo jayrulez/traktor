@@ -20,6 +20,9 @@
 
 #include "tb_window.h"
 
+#include "Resource/Proxy.h"
+#include "Resource/FileBundle.h"
+
  // import/export mechanism.
 #undef T_DLLCLASS
 #if defined(T_TURBOBADGERUI_EXPORT)
@@ -27,6 +30,11 @@
 #else
 #	define T_DLLCLASS T_DLLIMPORT
 #endif
+
+namespace traktor::resource
+{
+	class IResourceManager;
+}
 
 namespace traktor::render
 {
@@ -51,6 +59,8 @@ namespace traktor::turbobadgerui
 		void destroy() override;
 
 		bool initialize(render::IRenderSystem* renderSystem);
+
+		bool loadDefaultResources(resource::IResourceManager* resourceManager);
 		
 		void shutdown();
 
@@ -86,6 +96,7 @@ namespace traktor::turbobadgerui
 			TBClipboardInterface clipboardInterface;
 		};
 
+		resource::Proxy< resource::FileBundle > m_defaultResources;
 		BackendData* m_backendData = nullptr;
 		bool m_initialized = false;
 		AlignedVector<TurboBadgerUiView*> m_views;
