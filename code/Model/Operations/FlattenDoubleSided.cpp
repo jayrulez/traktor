@@ -27,6 +27,8 @@ bool FlattenDoubleSided::apply(Model& model) const
 	for (const auto& polygon : polygons)
 	{
 		const uint32_t materialId = polygon.getMaterial();
+		if (materialId == model::c_InvalidIndex)
+			continue;
 		const Material& material = model.getMaterial(materialId);
 		if (!material.isDoubleSided())
 			continue;
