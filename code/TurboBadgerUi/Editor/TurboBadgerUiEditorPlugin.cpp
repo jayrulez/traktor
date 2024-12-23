@@ -11,7 +11,13 @@
 
 #include "Core/Misc/ObjectStore.h"
 #include "render/IRenderSystem.h"
+#include "Database/Database.h"
 #include "Editor/IEditor.h"
+#include "Resource/ResourceManager.h"
+#include "Core/Settings/PropertyGroup.h"
+#include "Core/Settings/PropertyBoolean.h"
+#include "Core/Misc/SafeDestroy.h"
+#include "Resource/FileBundleResourceFactory.h"
 
 namespace traktor::turbobadgerui
 {
@@ -53,10 +59,15 @@ namespace traktor::turbobadgerui
 
 	void TurboBadgerUiEditorPlugin::handleWorkspaceOpened()
 	{
+		m_resourceManager = new resource::ResourceManager(m_editor->getOutputDatabase(), m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
+		m_resourceManager->addFactory(new resource::FileBundleResourceFactory());
+		TurboBadgerUi::getInstance().loadDefaultResources(m_resourceManager);
 	}
 
 	void TurboBadgerUiEditorPlugin::handleWorkspaceClosed()
 	{
+		if (m_resourceManager)
+			safeDestroy(m_resourceManager);
 	}
 
 	void TurboBadgerUiEditorPlugin::handleEditorClosed()

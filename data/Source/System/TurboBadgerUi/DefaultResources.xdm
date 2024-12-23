@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <object type="traktor.db.LocalInstanceMeta" version="2">
-	<guid>{6B3BFCD5-36A6-3543-9DB3-ECB94E862607}</guid>
+	<guid>{2719C20D-0066-0347-BD57-9866C5F7650B}</guid>
 	<primaryType>traktor.resource.FileBundleAsset</primaryType>
 	<blobs/>
 </object>
