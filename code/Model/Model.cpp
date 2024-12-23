@@ -549,7 +549,7 @@ void Model::validate() const
 	for (const auto& polygon : m_polygons)
 	{
 		T_FATAL_ASSERT(polygon.getVertexCount() > 0);
-		T_FATAL_ASSERT(polygon.getMaterial() < m_materials.size());
+		T_FATAL_ASSERT(polygon.getMaterial() == model::c_InvalidIndex || polygon.getMaterial() < m_materials.size());
 
 		for (auto vertexId : polygon.getVertices())
 			T_FATAL_ASSERT(vertexId < m_vertices.size());
