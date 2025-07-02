@@ -179,10 +179,6 @@ bool convertMaterials(
 			// Base color factor
 			material.setColor(convertColor(pbr->base_color_factor, 4));
 
-			// Metallic and roughness factors
-			material.setMetalness(pbr->metallic_factor);
-			material.setRoughness(pbr->roughness_factor);
-
 			// Base color texture (diffuse)
 			if (pbr->base_color_texture.texture)
 			{
@@ -195,6 +191,10 @@ bool convertMaterials(
 				if (gltfMaterial->alpha_mode == cgltf_alpha_mode_blend || gltfMaterial->alpha_mode == cgltf_alpha_mode_mask)
 					material.setTransparencyMap(Material::Map(textureName, channel, true, Guid(), image));
 			}
+
+			// Metallic and roughness factors
+			material.setMetalness(pbr->metallic_factor);
+			material.setRoughness(pbr->roughness_factor);
 
 			// Metallic-roughness texture
 			if (pbr->metallic_roughness_texture.texture)
@@ -282,16 +282,20 @@ bool convertMaterials(
 		// Double sided
 		material.setDoubleSided(gltfMaterial->double_sided);
 
+		float specularTerm = 1.0f;
+
 		// Handle extensions if needed (PBR Specular Glossiness, etc.)
 		if (gltfMaterial->has_pbr_specular_glossiness)
 		{
 			const cgltf_pbr_specular_glossiness* specGloss = &gltfMaterial->pbr_specular_glossiness;
 
 			// Convert specular-glossiness to metallic-roughness approximation
-			material.setColor(convertColor(specGloss->diffuse_factor, 4));
-			material.setSpecularTerm(std::max({ specGloss->specular_factor[0],
+
+			specularTerm *= std::max({ specGloss->specular_factor[0],
 				specGloss->specular_factor[1],
-				specGloss->specular_factor[2] }));
+				specGloss->specular_factor[2] });
+
+			material.setColor(convertColor(specGloss->diffuse_factor, 4));
 			material.setRoughness(1.0f - specGloss->glossiness_factor);
 
 			if (specGloss->diffuse_texture.texture)
@@ -303,6 +307,33 @@ bool convertMaterials(
 				material.setDiffuseMap(Material::Map(textureName, channel, true, Guid(), image));
 			}
 		}
+
+		if (gltfMaterial->has_specular)
+		{
+			const cgltf_specular* specular = &gltfMaterial->specular;
+
+			specularTerm *= clamp(specular->specular_factor, 0.0f, 1.0f);
+
+			if (specular->specular_texture.texture)
+			{
+				const std::wstring textureName = getTextureName(specular->specular_texture.texture, L"specular_texture");
+				const uint32_t channel = getTextureCoordChannel(&specular->specular_texture, outModel);
+				Ref< drawing::Image > image = loadTextureImage(specular->specular_texture.texture, basePath);
+
+				material.setSpecularMap(Material::Map(textureName, channel, false, Guid(), image));
+			}
+
+			//if (specular->specular_color_texture.texture)
+			//{
+			//	const std::wstring textureName = getTextureName(specular->specular_color_texture.texture, L"specular_color_texture");
+			//	const uint32_t channel = getTextureCoordChannel(&specular->specular_color_texture, outModel);
+			//	Ref< drawing::Image > image = loadTextureImage(specular->specular_color_texture.texture, basePath);
+
+			//	material.setDiffuseMap(Material::Map(textureName, channel, true, Guid(), image));
+			//}
+		}
+
+		material.setSpecularTerm(specularTerm);
 
 		// Add material to model
 		outMaterialMap[i] = outModel.addUniqueMaterial(material);
