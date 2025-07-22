@@ -7132,5 +7132,156 @@
 			</items>
 			<dependencies/>
 		</item>
+		<item type="traktor.sb.Project" version="1">
+			<enable>true</enable>
+			<name>Extern.AngelScript</name>
+			<sourcePath>$(ANGELSCRIPT_SDK)/sdk/angelscript</sourcePath>
+			<configurations>
+				<item type="traktor.sb.Configuration" version="5">
+					<name>DebugShared</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpDebug</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(ANGELSCRIPT_SDK)/sdk/angelscript/include</item>
+					</includePaths>
+					<definitions>
+						<item>T_ANGELSCRIPT_EXPORT</item>
+						<item>AS_DEBUG</item>
+						<item>ANGELSCRIPT_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+				<item type="traktor.sb.Configuration" version="5">
+					<name>ReleaseShared</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpRelease</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(ANGELSCRIPT_SDK)/sdk/angelscript/include</item>
+					</includePaths>
+					<definitions>
+						<item>T_ANGELSCRIPT_EXPORT</item>
+						<item>AS_DEBUG</item>
+						<item>ANGELSCRIPT_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems/>
+					<consumerLibraryPath/>
+				</item>
+				<item type="traktor.sb.Configuration" version="5">
+					<name>DebugStatic</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpDebug</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(ANGELSCRIPT_SDK)/sdk/angelscript/include</item>
+					</includePaths>
+					<definitions>
+						<item>AS_DEBUG</item>
+						<item>ANGELSCRIPT_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Extern.AngelScript.pdb</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Extern.AngelScript.lib</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath/>
+				</item>
+				<item type="traktor.sb.Configuration" version="5">
+					<name>ReleaseStatic</name>
+					<targetFormat>TfStaticLibrary</targetFormat>
+					<targetProfile>TpRelease</targetProfile>
+					<precompiledHeader/>
+					<includePaths>
+						<item>$(ANGELSCRIPT_SDK)/sdk/angelscript/include</item>
+					</includePaths>
+					<definitions>
+						<item>AS_DEBUG</item>
+						<item>ANGELSCRIPT_EXPORT</item>
+					</definitions>
+					<libraryPaths/>
+					<libraries/>
+					<warningLevel>WlCompilerDefault</warningLevel>
+					<additionalCompilerOptions/>
+					<additionalLinkerOptions/>
+					<debugExecutable/>
+					<debugArguments/>
+					<debugEnvironment/>
+					<debugWorkingDirectory/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Extern.AngelScript.pdb</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Extern.AngelScript.lib</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath/>
+				</item>
+			</configurations>
+			<items>
+				<item type="traktor.sb.Filter">
+					<name>include</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>include/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+				<item type="traktor.sb.Filter">
+					<name>source</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>source/*.h</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="traktor.sb.File" version="1">
+							<fileName>source/*.cpp</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
+				</item>
+			</items>
+			<dependencies/>
+		</item>
 	</projects>
 </object>

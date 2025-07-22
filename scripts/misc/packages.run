@@ -498,4 +498,15 @@ PACKAGES =
 		url = "https://github.com/jrouwe/JoltPhysics.git",
 		license = "MIT"
 	},
+
+	-- angelscript
+	{
+		type = "GET",
+		name = "angelscript",
+		url = "https://www.angelcode.com/angelscript/sdk/files/angelscript_2.37.0.zip",
+		patch = function()
+			run:execute(UNZIP .. " -qq angelscript_2.37.0.zip")
+		end,
+		license = "MIT"
+	},
 }
