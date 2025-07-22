@@ -27,7 +27,8 @@ bool ScriptEditorPlugin::create(editor::IEditor* editor, ui::Widget* parent, edi
 {
 	m_editor = editor;
 
-	const TypeInfo* scriptManagerType = TypeInfo::find(L"traktor.script.ScriptManagerLua");
+	//const TypeInfo* scriptManagerType = TypeInfo::find(L"traktor.script.ScriptManagerLua");
+	const TypeInfo* scriptManagerType = TypeInfo::find(L"traktor.script.ScriptManagerAngelScript");
 	if (scriptManagerType)
 	{
 		m_scriptManager = mandatory_non_null_type_cast< IScriptManager* >(scriptManagerType->createInstance());
