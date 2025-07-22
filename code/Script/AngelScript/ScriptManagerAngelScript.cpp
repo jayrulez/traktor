@@ -56,7 +56,7 @@ ScriptManagerAngelScript::ScriptManagerAngelScript()
 	}
 
 	// Set memory functions
-	asSetGlobalMemoryFunctions(scriptAlloc, scriptFree);
+	//asSetGlobalMemoryFunctions(scriptAlloc, scriptFree);
 
 	// Set message callback for compilation errors
 	m_engine->SetMessageCallback(asFUNCTION(messageCallback), this, asCALL_CDECL);
@@ -116,10 +116,48 @@ void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 	rc.runtimeClass = runtimeClass;
 
 	// Convert class name for AngelScript
-	std::string className = convertTypeName(exportType.getName());
+	std::string qualifiedClassName = wstombs(exportType.getName());
+
+	// Find the last dot
+	size_t lastDot = qualifiedClassName.rfind('.');
+
+	std::string ns;
+	std::string className;
+
+	if (lastDot == std::string::npos)
+	{
+		// No namespace
+		ns = "";
+		className = qualifiedClassName;
+	}
+	else
+	{
+		// Extract namespace and class name
+		ns = qualifiedClassName.substr(0, lastDot);
+		className = qualifiedClassName.substr(lastDot + 1);
+
+		// Replace dots with :: in namespace
+		for (size_t i = 0; i < ns.length(); ++i)
+		{
+			if (ns[i] == '.')
+			{
+				ns[i] = ':';
+				ns.insert(i + 1, ":");
+				++i;
+			}
+		}
+	}
+
+	std::string fullName;
+	if (!ns.empty())
+		fullName = ns + "::" + className;
+	else
+		fullName = className;
 
 	// Determine object flags
 	asQWORD flags = asOBJ_REF | asOBJ_GC;
+
+	m_engine->SetDefaultNamespace(ns.c_str());
 
 	// Register the object type
 	int result = m_engine->RegisterObjectType(className.c_str(), 0, flags);
@@ -137,7 +175,7 @@ void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 	// Register methods, properties, and static methods using reflection
 	registerMethodsFromReflection(className, runtimeClass);
 	registerPropertiesFromReflection(className, runtimeClass);
-	registerStaticMethodsFromReflection(className, runtimeClass);
+	registerStaticMethodsFromReflection(qualifiedClassName, runtimeClass);
 
 	// Store index in TypeInfo tag for fast lookup
 	for (auto derivedType : exportType.findAllOf())
@@ -151,6 +189,7 @@ void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 		}
 		derivedType->setTag(classRegistryIndex + 1);
 	}
+	m_engine->SetDefaultNamespace("");
 }
 
 Ref< IScriptContext > ScriptManagerAngelScript::createContext(bool strict)
@@ -411,10 +450,49 @@ void ScriptManagerAngelScript::registerMethodsFromReflection(const std::string& 
 		// Get signature from Traktor's reflection system
 		StringOutputStream ss;
 		dispatch->signature(ss);
-		std::string traktorSignature = wstombs(ss.str());
+		std::string signature = wstombs(ss.str());
+		size_t firstComma = signature.find(',');
+		std::string qualifiedReturnType;
+		std::string parameters;
 
-		// Convert Traktor signature to AngelScript signature
-		std::string asSignature = convertSignatureToAngelScript(traktorSignature);
+		if (firstComma == std::string::npos)
+		{
+			// No comma, entire string is the return type
+			qualifiedReturnType = signature;
+			parameters = "";
+		}
+		else
+		{
+			// Split at first comma
+			qualifiedReturnType = signature.substr(0, firstComma);
+			parameters = signature.substr(firstComma + 1);
+		}
+		parameters = convertSignatureToAngelScript(parameters);
+		parameters = convertReferenceParameters(parameters);
+
+		// Replace all dots with ::
+		size_t pos = 0;
+		while ((pos = qualifiedReturnType.find('.', pos)) != std::string::npos)
+		{
+			qualifiedReturnType.replace(pos, 1, "::");
+			pos += 2; // Move past the inserted ::
+		}
+
+		pos = 0;
+		while ((pos = parameters.find('.', pos)) != std::string::npos)
+		{
+			parameters.replace(pos, 1, "::");
+			pos += 2; // Move past the inserted ::
+		}
+
+		// convertSignatureToAngelScript(qualifiedReturnType);
+		const std::string methodName = runtimeClass->getMethodName(i);
+
+		std::string asSignature;
+		if (qualifiedReturnType.substr(0, 7) == "traktor")
+			asSignature = "const " + qualifiedReturnType + "&" + " " + methodName + "(" + parameters + ")";
+		else
+			asSignature = qualifiedReturnType + " " + methodName + "(" + parameters + ")";
 #else
 		// Fallback for when signatures aren't available
 		const std::string methodName = runtimeClass->getMethodName(i);
@@ -485,6 +563,23 @@ void ScriptManagerAngelScript::registerPropertiesFromReflection(const std::strin
 
 void ScriptManagerAngelScript::registerStaticMethodsFromReflection(const std::string& className, IRuntimeClass* runtimeClass)
 {
+	const std::string& defaultNS = m_engine->GetDefaultNamespace();
+
+	std::string ns = className;
+
+	// Replace dots with :: in namespace
+	for (size_t i = 0; i < ns.length(); ++i)
+	{
+		if (ns[i] == '.')
+		{
+			ns[i] = ':';
+			ns.insert(i + 1, ":");
+			++i;
+		}
+	}
+
+	m_engine->SetDefaultNamespace(ns.c_str());
+
 	const uint32_t staticMethodCount = runtimeClass->getStaticMethodCount();
 	for (uint32_t i = 0; i < staticMethodCount; ++i)
 	{
@@ -495,8 +590,47 @@ void ScriptManagerAngelScript::registerStaticMethodsFromReflection(const std::st
 #if defined(T_NEED_RUNTIME_SIGNATURE)
 		StringOutputStream ss;
 		dispatch->signature(ss);
-		std::string traktorSignature = wstombs(ss.str());
-		std::string asSignature = convertSignatureToAngelScript(traktorSignature);
+		std::string signature = wstombs(ss.str());
+		size_t firstComma = signature.find(',');
+
+		std::string qualifiedReturnType;
+		std::string parameters;
+
+		if (firstComma == std::string::npos)
+		{
+			// No comma, entire string is the return type
+			qualifiedReturnType = signature;
+			parameters = "";
+		}
+		else
+		{
+			// Split at first comma
+			qualifiedReturnType = signature.substr(0, firstComma);
+			parameters = signature.substr(firstComma + 1);
+		}
+		// Replace all dots with ::
+		size_t pos = 0;
+		while ((pos = qualifiedReturnType.find('.', pos)) != std::string::npos)
+		{
+			qualifiedReturnType.replace(pos, 1, "::");
+			pos += 2; // Move past the inserted ::
+		}
+
+		pos = 0;
+		while ((pos = parameters.find('.', pos)) != std::string::npos)
+		{
+			parameters.replace(pos, 1, "::");
+			pos += 2; // Move past the inserted ::
+		}
+
+		//convertSignatureToAngelScript(qualifiedReturnType);
+		const std::string methodName = runtimeClass->getStaticMethodName(i);
+
+		std::string asSignature;
+		if (qualifiedReturnType.substr(0, 7) == "traktor")
+			asSignature = "const " + qualifiedReturnType + "&" + " " + methodName + "(" + parameters + ")";
+		else
+			asSignature = qualifiedReturnType + " " + methodName + "(" + parameters + ")";
 #else
 		const std::string methodName = runtimeClass->getStaticMethodName(i);
 		std::string asSignature = methodName + "()";
@@ -512,6 +646,7 @@ void ScriptManagerAngelScript::registerStaticMethodsFromReflection(const std::st
 						 << mbstows(runtimeClass->getStaticMethodName(i))
 						 << L" with signature: " << mbstows(asSignature) << Endl;
 	}
+	m_engine->SetDefaultNamespace(defaultNS.c_str());
 }
 
 // Signature conversion utilities
@@ -568,13 +703,10 @@ std::string ScriptManagerAngelScript::convertTypeToAngelScript(const std::string
 std::string ScriptManagerAngelScript::convertReferenceParameters(const std::string& signature)
 {
 	std::string result = signature;
-
-	// Convert "const Type&" to "const Type &in"
-	result = std::regex_replace(result, std::regex("const\\s+(\\w+)&"), "const $1 &in");
-
-	// Convert "Type&" to "Type &inout"
-	result = std::regex_replace(result, std::regex("(\\w+)&"), "$1 &inout");
-
+	// First pass: mark const references
+	result = std::regex_replace(result, std::regex("const\\s+(\\w+)\\s*&"), "const $1 &in");
+	// Second pass: convert remaining references (that aren't already &in)
+	result = std::regex_replace(result, std::regex("(\\w+)\\s*&(?!in)"), "$1 &inout");
 	return result;
 }
 
