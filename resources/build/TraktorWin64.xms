@@ -21966,7 +21966,6 @@
 					<includePaths/>
 					<definitions>
 						<item>T_SCRIPT_ANGELSCRIPT_EXPORT</item>
-						<item>T_NEED_RUNTIME_SIGNATURE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -22001,7 +22000,6 @@
 					<includePaths/>
 					<definitions>
 						<item>T_SCRIPT_ANGELSCRIPT_EXPORT</item>
-						<item>T_NEED_RUNTIME_SIGNATURE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -22036,7 +22034,6 @@
 					<includePaths/>
 					<definitions>
 						<item>T_STATIC</item>
-						<item>T_NEED_RUNTIME_SIGNATURE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
@@ -22067,7 +22064,6 @@
 					<includePaths/>
 					<definitions>
 						<item>T_STATIC</item>
-						<item>T_NEED_RUNTIME_SIGNATURE</item>
 					</definitions>
 					<libraryPaths/>
 					<libraries/>
