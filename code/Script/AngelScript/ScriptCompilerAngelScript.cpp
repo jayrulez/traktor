@@ -129,6 +129,8 @@ void ScriptCompilerAngelScript::setupCompilationEngine()
 	RegisterStdString(m_engine);
 	RegisterScriptArray(m_engine, true);
 
+	// todo: register Any
+
 	// Register standard functions for compilation validation
 	registerStandardFunctions(m_engine);
 }
