@@ -87,7 +87,7 @@ namespace traktor::turbobadgerui
 			.depth = 1.0f,
 			.stencil = 0
 		};
-		m_renderPassOutput->setOutput(0, cl, render::TfNone, render::TfColor | render::TfDepth);
+		m_renderPassOutput->setOutput(render::RGTargetSet::Output, cl, render::TfNone, render::TfColor | render::TfDepth);
 	}
 
 	void TurboBadgerUiRenderer::endSetup()
