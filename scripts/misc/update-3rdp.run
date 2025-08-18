@@ -23,6 +23,22 @@ WGET  = platform_select("wget", "$(TRAKTOR_HOME)/bin/win64/wget")
 TAR   = platform_select("tar", "tar")
 UNZIP = platform_select("unzip", "$(TRAKTOR_HOME)/bin/win64/unzip")
 
+-- Load packages list from script.
+local packagesFile = "$(RUN_SCRIPT_PATH)/packages.run"
+if run.commandLine ~= nil and run.commandLine:hasOption("packages") then
+	local opt = run.commandLine:getOption("packages")
+	assert(opt ~= nil)
+	packagesFile = opt:getString()
+end
+if not run:loadScript(packagesFile) then
+	stderr:printLn("Unable to load packages script \"" .. packagesFile .. "\".")
+	return
+end
+if PACKAGES == nil then
+	stderr:printLn("No PACKAGES defined in packages script \"" .. packagesFile .. "\".")
+	return
+end
+
 --[[
 	Write text file.
 ]]
