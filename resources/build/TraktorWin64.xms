@@ -21937,12 +21937,12 @@
 				</item>
 			</dependencies>
 		</item>
-		<item type="Project" version="1">
+		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>Traktor.RmlUi</name>
 			<sourcePath>$(TRAKTOR_HOME)/code/RmlUi</sourcePath>
 			<configurations>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -21962,10 +21962,27 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.lib</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.dll</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -21985,10 +22002,27 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.lib</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.dll</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releaseshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -22008,10 +22042,23 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.lib</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugstatic</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -22031,77 +22078,95 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.lib</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.pdb</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releasestatic</consumerLibraryPath>
 				</item>
 			</configurations>
 			<items>
-				<item type="Filter">
+				<item type="traktor.sb.Filter">
 					<name>Backend</name>
 					<items>
-						<item type="File" version="1">
+						<item type="traktor.sb.File" version="1">
 							<fileName>Backend/*.h</fileName>
 							<excludeFilter/>
 							<items/>
 						</item>
-						<item type="File" version="1">
+						<item type="traktor.sb.File" version="1">
 							<fileName>Backend/*.cpp</fileName>
 							<excludeFilter/>
 							<items/>
 						</item>
 					</items>
 				</item>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.h</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.cpp</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
 			</items>
 			<dependencies>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item/dependencies/item/project"/>
-				</item>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
-				</item>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project"/>
-				</item>
-				<item type="ExternalDependency" version="3">
+				<item type="traktor.sb.ExternalDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<solutionFileName>ExternWin64.xms</solutionFileName>
 					<projectName>Extern.RmlUi</projectName>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[2]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item/dependencies/item/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[3]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
 				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
+				</item>
 			</dependencies>
 		</item>
-		<item type="Project" version="1">
+		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>Traktor.RmlUi.Editor</name>
 			<sourcePath>$(TRAKTOR_HOME)/code/RmlUi/Editor</sourcePath>
 			<configurations>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -22121,10 +22186,23 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.lib</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.dll</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.pdb</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -22144,10 +22222,23 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.lib</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.dll</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.pdb</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releaseshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -22167,10 +22258,19 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.lib</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.pdb</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugstatic</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -22190,82 +22290,96 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.lib</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Editor.pdb</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releasestatic</consumerLibraryPath>
 				</item>
 			</configurations>
 			<items>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.h</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.cpp</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
 			</items>
 			<dependencies>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item[1]/dependencies/item[3]/project"/>
-				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[3]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
-					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project"/>
+					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
-					<project ref="/object/projects/item[1]/dependencies/item[7]/project/dependencies/item[12]/project/dependencies/item[7]/project"/>
+					<project ref="/object/projects/item[1]/dependencies/item[3]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
-				</item>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item[106]"/>
-				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[10]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
-					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[1]/project"/>
+					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project"/>
 				</item>
-				<item type="ExternalDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item[1]/dependencies/item[7]/project/dependencies/item[12]/project/dependencies/item[7]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item[107]"/>
+				</item>
+				<item type="traktor.sb.ExternalDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<solutionFileName>ExternWin64.xms</solutionFileName>
 					<projectName>Extern.RmlUi</projectName>
 				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item[1]/dependencies/item[3]/project/dependencies/item[1]/project"/>
+				</item>
 			</dependencies>
 		</item>
-		<item type="Project" version="1">
+		<item type="traktor.sb.Project" version="1">
 			<enable>true</enable>
 			<name>Traktor.RmlUi.Runtime</name>
 			<sourcePath>$(TRAKTOR_HOME)/code/RmlUi/Runtime</sourcePath>
 			<configurations>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -22285,10 +22399,23 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.lib</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.dll</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.pdb</sourceFile>
+							<targetPath>debugshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseShared</name>
 					<targetFormat>TfSharedLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -22308,10 +22435,23 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.lib</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.dll</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.pdb</sourceFile>
+							<targetPath>releaseshared</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releaseshared</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>DebugStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpDebug</targetProfile>
@@ -22331,10 +22471,19 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.lib</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.pdb</sourceFile>
+							<targetPath>debugstatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>debugstatic</consumerLibraryPath>
 				</item>
-				<item type="Configuration" version="5">
+				<item type="traktor.sb.Configuration" version="5">
 					<name>ReleaseStatic</name>
 					<targetFormat>TfStaticLibrary</targetFormat>
 					<targetProfile>TpRelease</targetProfile>
@@ -22354,52 +22503,61 @@
 					<debugArguments/>
 					<debugEnvironment/>
 					<debugWorkingDirectory/>
-					<aggregationItems/>
-					<consumerLibraryPath/>
+					<aggregationItems>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.lib</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+						<item type="traktor.sb.AggregationItem">
+							<sourceFile>Traktor.RmlUi.Runtime.pdb</sourceFile>
+							<targetPath>releasestatic</targetPath>
+						</item>
+					</aggregationItems>
+					<consumerLibraryPath>releasestatic</consumerLibraryPath>
 				</item>
 			</configurations>
 			<items>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.h</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
-				<item type="File" version="1">
+				<item type="traktor.sb.File" version="1">
 					<fileName>*.cpp</fileName>
 					<excludeFilter/>
 					<items/>
 				</item>
 			</items>
 			<dependencies>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item[61]/dependencies/item[14]/project"/>
-				</item>
-				<item type="ProjectDependency" version="3">
-					<inheritIncludePaths>true</inheritIncludePaths>
-					<link>LnkYes</link>
-					<project ref="/object/projects/item[106]"/>
-				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item[14]"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project"/>
 				</item>
-				<item type="ProjectDependency" version="3">
+				<item type="traktor.sb.ProjectDependency" version="3">
 					<inheritIncludePaths>true</inheritIncludePaths>
 					<link>LnkYes</link>
 					<project ref="/object/projects/item/dependencies/item[1]/project/dependencies/item[1]/project/dependencies/item[1]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item[61]/dependencies/item[14]/project"/>
+				</item>
+				<item type="traktor.sb.ProjectDependency" version="3">
+					<inheritIncludePaths>true</inheritIncludePaths>
+					<link>LnkYes</link>
+					<project ref="/object/projects/item[107]"/>
 				</item>
 			</dependencies>
 		</item>
