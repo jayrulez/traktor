@@ -10,14 +10,14 @@
 
 #if defined(T_STATIC)
 #	include "RmlUi/Runtime/RmlUiClassFactory.h"
-#	include "RmlUi/Runtime/RuntimePlugin.h"
+#	include "RmlUi/Runtime/RmlUiRuntimePlugin.h"
 
 namespace traktor::rmlui
 {
 
 	extern "C" void __module__Traktor_RmlUi_Runtime()
 	{
-		T_FORCE_LINK_REF(RuntimePlugin);
+		T_FORCE_LINK_REF(RmlUiRuntimePlugin);
 	}
 
 }
