@@ -498,4 +498,13 @@ PACKAGES =
 		url = "https://github.com/jrouwe/JoltPhysics.git",
 		license = "MIT"
 	},
+    
+	-- TurboBadger
+	{
+		type = "GIT",
+		name = "turbobadger",
+		url = "https://github.com/jayrulez/turbobadger.git",
+		branch = "turbo",
+		license = "MIT"
+	},
 }
