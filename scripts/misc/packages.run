@@ -498,4 +498,12 @@ PACKAGES =
 		url = "https://github.com/jrouwe/JoltPhysics.git",
 		license = "MIT"
 	},
+
+	-- RmlUi
+	{
+		type = "GIT",
+		name = "RmlUi",
+		url = "https://github.com/mikke89/RmlUi.git",
+		license = "MIT"
+	},
 }
