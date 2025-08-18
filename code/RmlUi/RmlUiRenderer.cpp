@@ -134,7 +134,7 @@ namespace traktor::rmlui
 				.depth = 1.0f,
 				.stencil = 0
 			};
-			m_renderPassOutput->setOutput(0, cl, render::TfNone, render::TfColor | render::TfDepth);
+			m_renderPassOutput->setOutput(render::RGTargetSet::Output, cl, render::TfNone, render::TfColor | render::TfDepth);
 		}
 		else
 		{
@@ -143,7 +143,7 @@ namespace traktor::rmlui
 				.mask = render::CfStencil,
 				.stencil = 0
 			};
-			m_renderPassOutput->setOutput(0, cl, render::TfColor | render::TfDepth, render::TfColor | render::TfDepth);
+			m_renderPassOutput->setOutput(render::RGTargetSet::Output, cl, render::TfColor | render::TfDepth, render::TfColor | render::TfDepth);
 		}
 	}
 
