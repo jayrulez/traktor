@@ -52,6 +52,7 @@ namespace traktor::scene
 {
 
 class Camera;
+class CameraPreviewControl;
 class SceneEditorContext;
 
 class PerspectiveRenderControl : public ISceneRenderControl
@@ -127,6 +128,7 @@ private:
 	Vector4 m_movement;
 	ui::Rect m_selectionRectangle;
 	ui::Size m_dirtySize = ui::Size(0, 0);
+	Ref< CameraPreviewControl > m_cameraPreview;
 
 	void updateWorldRenderer();
 
