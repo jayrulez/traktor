@@ -10,6 +10,7 @@
 
 #include "Core/Log/Log.h"
 #include "Core/Math/Format.h"
+#include "Scene/Editor/CameraPreviewControl.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Misc/SafeDestroy.h"
 #include "Core/Misc/String.h"
@@ -181,6 +182,15 @@ bool PerspectiveRenderControl::create(ui::Widget* parent, SceneEditorContext* co
 	m_dirtySize.cy = m_renderView->getHeight();
 
 	m_renderWidget->startTimer(1000 / 60);
+
+	// Create camera preview control
+	m_cameraPreview = new CameraPreviewControl();
+	if (!m_cameraPreview->create(m_context))
+	{
+		m_cameraPreview = nullptr;
+		// Not a fatal error, continue without camera preview
+	}
+
 	return true;
 }
 
@@ -194,6 +204,7 @@ void PerspectiveRenderControl::destroy()
 
 	m_renderContext = nullptr;
 
+	safeDestroy(m_cameraPreview);
 	safeDestroy(m_renderGraph);
 	safeDestroy(m_worldRenderer);
 	safeDestroy(m_primitiveRenderer);
@@ -686,6 +697,10 @@ void PerspectiveRenderControl::eventPaint(ui::PaintEvent* event)
 				m_primitiveRenderer->popDepthState();
 				m_primitiveRenderer->setProjection(projection);
 			}
+
+			// Draw camera preview if available and a camera is selected
+			if (m_cameraPreview)
+				m_cameraPreview->render(m_primitiveRenderer, sz);
 
 			// Draw guides.
 			if (m_guideEnable)
