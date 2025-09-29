@@ -10,7 +10,11 @@
 
 #include "Core/RefArray.h"
 #include "Core/Object.h"
+#include "Core/Math/Matrix44.h"
+#include "Core/Timer/Timer.h"
 #include "Ui/Size.h"
+#include "World/WorldRenderView.h"
+#include "Render/Frame/RenderGraphTypes.h"
 
 // import/export mechanism.
 #undef T_DLLCLASS
@@ -22,7 +26,16 @@
 
 namespace traktor::render
 {
+class IRenderTargetSet;
+class ITexture;
 class PrimitiveRenderer;
+class RenderContext;
+class RenderGraph;
+}
+
+namespace traktor::world
+{
+class IWorldRenderer;
 }
 
 namespace traktor::scene
@@ -44,17 +57,30 @@ class T_DLLCLASS CameraPreviewControl : public Object
 public:
 	CameraPreviewControl();
 
-	bool create(SceneEditorContext* context);
+	bool create(SceneEditorContext* context, const TypeInfo& worldRendererType);
 
 	void destroy();
 
-	/*! Update and render the camera preview if a camera is selected */
-	void render(render::PrimitiveRenderer* primitiveRenderer, const ui::Size& viewportSize);
+	/*! Update and render the camera preview if a camera is selected 
+	 * @param primitiveRenderer The primitive renderer to use
+	 * @param viewportSize The size of the main viewport
+	 * @param mainProjection The main viewport's projection matrix to restore after rendering
+	 */
+	void render(render::PrimitiveRenderer* primitiveRenderer, const ui::Size& viewportSize, const Matrix44& mainProjection);
 
 private:
 	SceneEditorContext* m_context;
+	const TypeInfo* m_worldRendererType;
+	Ref<render::IRenderTargetSet> m_renderTarget;
+	Ref<render::RenderContext> m_renderContext;
+	Ref<render::RenderGraph> m_renderGraph;
+	Ref<world::IWorldRenderer> m_worldRenderer;
+	world::WorldRenderView m_worldRenderView;
+	uint32_t m_worldRendererHash;
 	RefArray<EntityAdapter> m_cameraEntities;
+	Timer m_timer;
 
+	void updateWorldRenderer();
 	EntityAdapter* getSelectedCameraEntity();
 };
 

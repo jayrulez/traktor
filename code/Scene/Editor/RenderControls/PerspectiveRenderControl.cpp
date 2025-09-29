@@ -185,7 +185,7 @@ bool PerspectiveRenderControl::create(ui::Widget* parent, SceneEditorContext* co
 
 	// Create camera preview control
 	m_cameraPreview = new CameraPreviewControl();
-	if (!m_cameraPreview->create(m_context))
+	if (!m_cameraPreview->create(m_context, worldRendererType))
 	{
 		m_cameraPreview = nullptr;
 		// Not a fatal error, continue without camera preview
@@ -700,7 +700,7 @@ void PerspectiveRenderControl::eventPaint(ui::PaintEvent* event)
 
 			// Draw camera preview if available and a camera is selected
 			if (m_cameraPreview)
-				m_cameraPreview->render(m_primitiveRenderer, sz);
+				m_cameraPreview->render(m_primitiveRenderer, sz, projection);
 
 			// Draw guides.
 			if (m_guideEnable)
