@@ -7278,6 +7278,11 @@
 							<excludeFilter/>
 							<items/>
 						</item>
+						<item type="traktor.sb.File" version="1">
+							<fileName>source/as_callfunc_x64_msvc_asm.asm</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
 					</items>
 				</item>
 			</items>
