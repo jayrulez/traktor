@@ -22,6 +22,44 @@
 
 namespace traktor::script
 {
+	namespace
+	{
+
+const wchar_t* getErrorString(int errorCode)
+{
+	switch (errorCode)
+	{
+	case asSUCCESS: return L"Success";
+	case asERROR: return L"Error";
+	case asINVALID_ARG: return L"Invalid argument";
+	case asNO_FUNCTION: return L"No function";
+	case asNOT_SUPPORTED: return L"Not supported";
+	case asINVALID_NAME: return L"Invalid name";
+	case asNAME_TAKEN: return L"Name already taken";
+	case asINVALID_DECLARATION: return L"Invalid declaration";
+	case asINVALID_OBJECT: return L"Invalid object";
+	case asINVALID_TYPE: return L"Invalid type";
+	case asALREADY_REGISTERED: return L"Already registered";
+	case asMULTIPLE_FUNCTIONS: return L"Multiple functions";
+	case asNO_MODULE: return L"No module";
+	case asNO_GLOBAL_VAR: return L"No global variable";
+	case asINVALID_CONFIGURATION: return L"Invalid configuration";
+	case asINVALID_INTERFACE: return L"Invalid interface";
+	case asCANT_BIND_ALL_FUNCTIONS: return L"Can't bind all functions";
+	case asLOWER_ARRAY_DIMENSION_NOT_REGISTERED: return L"Lower array dimension not registered";
+	case asWRONG_CONFIG_GROUP: return L"Wrong config group";
+	case asCONFIG_GROUP_IS_IN_USE: return L"Config group is in use";
+	case asILLEGAL_BEHAVIOUR_FOR_TYPE: return L"Illegal behaviour for type";
+	case asWRONG_CALLING_CONV: return L"Wrong calling convention";
+	case asBUILD_IN_PROGRESS: return L"Build in progress";
+	case asINIT_GLOBAL_VARS_FAILED: return L"Init global vars failed";
+	case asOUT_OF_MEMORY: return L"Out of memory";
+	case asMODULE_IS_IN_USE: return L"Module is in use";
+	default: return L"Unknown error";
+	}
+}
+
+	}
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.script.ScriptManagerAngelScript", 0, ScriptManagerAngelScript, IScriptManager)
 
@@ -95,14 +133,59 @@ void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 	// - Properties (RegisterObjectProperty)
 	// - Operators (RegisterObjectMethod with operator overloads)
 
-	const std::string className = wstombs(Utf8Encoding(), exportType.getName());
+	// Parse RTTI path (e.g., "traktor.subnamespace.ClassName")
+	// Convert to AngelScript namespace format ("::" separator)
+	std::wstring fullName = exportType.getName();
+	std::string fullNameStr = wstombs(Utf8Encoding(), fullName);
+
+	// Replace '.' with '::' for AngelScript namespace syntax
+	size_t pos = 0;
+	while ((pos = fullNameStr.find('.', pos)) != std::string::npos)
+	{
+		fullNameStr.replace(pos, 1, "::");
+		pos += 2;
+	}
+
+	// Extract namespace and class name
+	size_t lastSep = fullNameStr.find_last_of(':');
+	std::string namespaceName;
+	std::string className;
+
+	if (lastSep != std::string::npos && lastSep > 0)
+	{
+		namespaceName = fullNameStr.substr(0, lastSep - 1); // -1 to skip the second ':'
+		className = fullNameStr.substr(lastSep + 1);
+	}
+	else
+	{
+		className = fullNameStr;
+	}
+
+	// Set the namespace for registration
+	int r = m_scriptEngine->SetDefaultNamespace(namespaceName.c_str());
+	if (r < 0)
+	{
+		log::error << L"Failed to set namespace \"" << mbstows(namespaceName) << L"\" for class \"" << mbstows(className) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+		m_scriptEngine->SetDefaultNamespace(""); // Reset to global namespace
+		return;
+	}
 
 	// Register the type as a reference type
-	m_scriptEngine->RegisterObjectType(className.c_str(), 0, asOBJ_REF);
+	r = m_scriptEngine->RegisterObjectType(className.c_str(), 0, asOBJ_REF);
+	if (r < 0)
+	{
+		log::error << L"Failed to register class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+		m_scriptEngine->SetDefaultNamespace(""); // Reset to global namespace
+		return;
+	}
 
 	// TODO: Register behaviors, methods, properties, etc.
 
+	// Get the type ID (must be done while still in the namespace)
 	rc.typeId = m_scriptEngine->GetTypeIdByDecl(className.c_str());
+
+	// Reset to global namespace
+	m_scriptEngine->SetDefaultNamespace("");
 }
 
 Ref< IScriptContext > ScriptManagerAngelScript::createContext(bool strict)
