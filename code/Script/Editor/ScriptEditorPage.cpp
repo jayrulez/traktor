@@ -54,6 +54,7 @@
 #include "Ui/StyleSheet.h"
 #include "Ui/SyntaxRichEdit/SyntaxLanguageLua.h"
 #include "Ui/SyntaxRichEdit/SyntaxRichEdit.h"
+#include "Ui/Autocomplete/LuaAutocompleteProvider.h"
 #include "Ui/Tab.h"
 #include "Ui/TableLayout.h"
 #include "Ui/TabPage.h"
@@ -234,6 +235,14 @@ bool ScriptEditorPage::create(ui::Container* parent)
 			m_scriptOutline = dynamic_type_cast< IScriptOutline* >(scriptOutlineType->createInstance());
 			T_ASSERT(m_scriptOutline);
 		}
+
+		// Setup autocomplete for Lua
+		Ref< ui::LuaAutocompleteProvider > autocompleteProvider = new ui::LuaAutocompleteProvider();
+		m_edit->setAutocompleteProvider(autocompleteProvider);
+
+		// Check if autocomplete is enabled in settings
+		const bool autocompleteEnabled = m_editor->getSettings()->getProperty< bool >(L"Editor.AutocompleteEnabled", true);
+		m_edit->setAutocompleteEnabled(autocompleteEnabled);
 	}
 
 	// Setup compile timer.

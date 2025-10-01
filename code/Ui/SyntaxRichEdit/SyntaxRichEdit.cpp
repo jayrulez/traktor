@@ -13,6 +13,9 @@
 #include "Ui/Application.h"
 #include "Ui/StyleSheet.h"
 #include "Ui/SyntaxRichEdit/SyntaxLanguage.h"
+#include "Ui/Autocomplete/IAutocompleteProvider.h"
+#include "Ui/Autocomplete/AutocompletePopup.h"
+#include "Ui/Events/KeyDownEvent.h"
 
 namespace traktor::ui
 {
@@ -73,6 +76,11 @@ bool SyntaxRichEdit::create(Widget* parent, const std::wstring& text, uint32_t s
 	m_attributeError[1] = addBackgroundAttribute(ColorReference(this, L"background-color-error"));
 
 	addEventHandler< ContentChangeEvent >(this, &SyntaxRichEdit::eventChange);
+	addEventHandler< KeyDownEvent >(this, &SyntaxRichEdit::eventKeyDown);
+
+	// Create autocomplete popup
+	m_autocompletePopup = new AutocompletePopup();
+
 	return true;
 }
 
@@ -275,6 +283,214 @@ void SyntaxRichEdit::contentModified()
 void SyntaxRichEdit::eventChange(ContentChangeEvent* event)
 {
 	updateLanguage();
+
+	// Update autocomplete provider with new content
+	if (m_autocompleteProvider)
+	{
+		m_autocompleteProvider->updateContent(getText());
+	}
+}
+
+void SyntaxRichEdit::setAutocompleteProvider(IAutocompleteProvider* provider)
+{
+	m_autocompleteProvider = provider;
+	if (m_autocompletePopup && provider)
+	{
+		if (!m_autocompletePopup->create(this, provider))
+		{
+			log::warning << L"Failed to create autocomplete popup" << Endl;
+		}
+		else
+		{
+			m_autocompletePopup->addEventHandler< AutocompleteSelectEvent >(this, &SyntaxRichEdit::eventAutocompleteSelect);
+		}
+	}
+}
+
+IAutocompleteProvider* SyntaxRichEdit::getAutocompleteProvider() const
+{
+	return m_autocompleteProvider;
+}
+
+void SyntaxRichEdit::setAutocompleteEnabled(bool enabled)
+{
+	m_autocompleteEnabled = enabled;
+	if (!enabled && m_autocompletePopup)
+		m_autocompletePopup->hide();
+}
+
+bool SyntaxRichEdit::getAutocompleteEnabled() const
+{
+	return m_autocompleteEnabled;
+}
+
+void SyntaxRichEdit::eventKeyDown(KeyDownEvent* event)
+{
+	if (!m_autocompleteEnabled || !m_autocompleteProvider)
+		return;
+
+	const VirtualKey key = event->getVirtualKey();
+
+	// Forward certain keys to autocomplete popup if it's visible
+	if (m_autocompletePopup && m_autocompletePopup->isVisible(false))
+	{
+		switch (key)
+		{
+		case VkUp:
+		case VkDown:
+		case VkReturn:
+		case VkTab:
+		case VkEscape:
+			// Let the popup handle these keys
+			m_autocompletePopup->raiseEvent(event);
+			return;
+		}
+	}
+
+	// Trigger autocomplete on certain conditions
+	bool shouldTrigger = false;
+
+	switch (key)
+	{
+	case VkPeriod:
+		shouldTrigger = true;
+		break;
+
+	default:
+		// Check if it's a letter or number that extends current word
+		if ((key >= VkA && key <= VkZ) || (key >= Vk0 && key <= Vk9) || key == '_')
+		{
+			// Trigger after a small delay to let the character be inserted
+			Application::getInstance()->defer([this]() {
+				triggerAutocomplete();
+			});
+		}
+		else if (key == VkSpace || key == VkBackSpace || key == VkDelete)
+		{
+			// Hide autocomplete on space or deletion
+			hideAutocomplete();
+		}
+		break;
+	}
+
+	if (shouldTrigger)
+	{
+		// Trigger immediately for dot notation
+		Application::getInstance()->defer([this]() {
+			triggerAutocomplete();
+		});
+	}
+}
+
+void SyntaxRichEdit::eventAutocompleteSelect(AutocompleteSelectEvent* event)
+{
+	const AutocompleteSuggestion& suggestion = event->getSuggestion();
+
+	// Find current word boundaries
+	const int32_t caretOffset = getCaretOffset();
+	int32_t wordStart;
+	const std::wstring currentWord = getCurrentWord(caretOffset, wordStart);
+
+	// Replace current word with suggestion
+	const int32_t wordLength = caretOffset - wordStart;
+
+	// Select the partial word by placing caret at end and programmatically creating selection
+	placeCaret(caretOffset, false);
+
+	// Simple approach: select backwards to word start and replace
+	// We'll select by moving caret to start, then treating next insert as replacement
+	std::wstring textBefore = getText().substr(0, wordStart);
+	std::wstring textAfter = getText().substr(caretOffset);
+	std::wstring newText = textBefore + suggestion.name + textAfter;
+
+	// Set new text and place caret after suggestion
+	setText(newText);
+	placeCaret(wordStart + (int32_t)suggestion.name.length(), false);
+
+	hideAutocomplete();
+}
+
+void SyntaxRichEdit::triggerAutocomplete()
+{
+	if (!m_autocompleteEnabled || !m_autocompleteProvider || !m_autocompletePopup)
+		return;
+
+	const int32_t caretOffset = getCaretOffset();
+	int32_t wordStart;
+	const std::wstring currentWord = getCurrentWord(caretOffset, wordStart);
+
+	// Don't show autocomplete for very short words (unless after dot)
+	if (currentWord.length() < 1)
+		return;
+
+	// Check if we're after a dot
+	bool afterDot = false;
+	if (wordStart > 0)
+	{
+		const std::wstring text = getText();
+		if (wordStart - 1 < (int32_t)text.length() && text[wordStart - 1] == L'.')
+			afterDot = true;
+	}
+
+	// Build autocomplete context
+	AutocompleteContext context;
+	context.text = getText();
+	context.caretOffset = caretOffset;
+	context.currentWord = currentWord;
+	context.afterDot = afterDot;
+	context.line = getLineFromOffset(caretOffset);
+	context.column = caretOffset - getLineOffset(context.line);
+
+	// Get suggestions
+	std::vector< AutocompleteSuggestion > suggestions;
+	if (m_autocompleteProvider->getSuggestions(context, suggestions))
+	{
+		// Calculate popup position - approximate caret position
+		const int32_t caretLine = getLineFromOffset(caretOffset);
+		const int32_t lineOffset = getLineOffset(caretLine);
+		const int32_t columnOffset = caretOffset - lineOffset;
+
+		// Simple approximation of caret position
+		const FontMetric fontMetric = getFontMetric();
+		// Use getAdvance for a typical character to estimate width
+		const int32_t charWidth = fontMetric.getAdvance(L'M', L'M'); // Use 'M' as typical wide character
+		const Point caretPos(columnOffset * charWidth, caretLine * fontMetric.getHeight());
+		const Point screenPos = clientToScreen(caretPos);
+		const Point popupPos(screenPos.x, screenPos.y + fontMetric.getHeight());
+
+		m_autocompletePopup->showSuggestions(popupPos, suggestions);
+	}
+	else
+	{
+		hideAutocomplete();
+	}
+}
+
+void SyntaxRichEdit::hideAutocomplete()
+{
+	if (m_autocompletePopup)
+		m_autocompletePopup->hide();
+}
+
+std::wstring SyntaxRichEdit::getCurrentWord(int32_t caretOffset, int32_t& outWordStart) const
+{
+	const std::wstring text = getText();
+
+	// Find start of current word
+	int32_t wordStart = caretOffset;
+	while (wordStart > 0 && isWordCharacter(text[wordStart - 1]))
+		wordStart--;
+
+	outWordStart = wordStart;
+	return text.substr(wordStart, caretOffset - wordStart);
+}
+
+bool SyntaxRichEdit::isWordCharacter(wchar_t ch) const
+{
+	return (ch >= L'a' && ch <= L'z') ||
+		   (ch >= L'A' && ch <= L'Z') ||
+		   (ch >= L'0' && ch <= L'9') ||
+		   ch == L'_';
 }
 
 }
