@@ -24,6 +24,9 @@ namespace traktor::ui
 {
 
 class SyntaxLanguage;
+class IAutocompleteProvider;
+class AutocompletePopup;
+class AutocompleteSelectEvent;
 
 /*! RichEdit control with automatic syntax highlighting.
  * \ingroup UI
@@ -47,6 +50,18 @@ public:
 
 	void updateLanguage();
 
+	/*! Set autocomplete provider. */
+	void setAutocompleteProvider(IAutocompleteProvider* provider);
+
+	/*! Get autocomplete provider. */
+	IAutocompleteProvider* getAutocompleteProvider() const;
+
+	/*! Enable or disable autocomplete. */
+	void setAutocompleteEnabled(bool enabled);
+
+	/*! Check if autocomplete is enabled. */
+	bool getAutocompleteEnabled() const;
+
 private:
 	Ref< const SyntaxLanguage > m_language;
 	int32_t m_attributeDefault[2];
@@ -61,9 +76,27 @@ private:
 	int32_t m_attributePreprocessor[2];
 	int32_t m_attributeError[2];
 
+	Ref< IAutocompleteProvider > m_autocompleteProvider;
+	Ref< AutocompletePopup > m_autocompletePopup;
+	bool m_autocompleteEnabled = true;
+	std::wstring m_lastWord;
+	int32_t m_lastWordOffset = -1;
+
 	virtual void contentModified() override;
 
 	void eventChange(ContentChangeEvent* event);
+
+	void eventKeyDown(KeyDownEvent* event);
+
+	void eventAutocompleteSelect(AutocompleteSelectEvent* event);
+
+	void triggerAutocomplete();
+
+	void hideAutocomplete();
+
+	std::wstring getCurrentWord(int32_t caretOffset, int32_t& outWordStart) const;
+
+	bool isWordCharacter(wchar_t ch) const;
 };
 
 }
