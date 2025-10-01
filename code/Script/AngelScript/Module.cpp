@@ -13,6 +13,8 @@
 
 namespace traktor::script
 {
+
+extern "C" void __module__Traktor_Script_AngelScript()
 {
 	T_FORCE_LINK_REF(ScriptManagerAngelScript);
 }

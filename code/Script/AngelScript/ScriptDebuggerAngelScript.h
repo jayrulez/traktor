@@ -8,13 +8,14 @@
  */
 #pragma once
 
-#include "angelscript.h"
-#include "Core/Class/Any.h"
 #include "Core/Containers/CircularVector.h"
 #include "Core/Containers/SmallMap.h"
 #include "Core/Containers/SmallSet.h"
 #include "Core/Thread/Semaphore.h"
 #include "Script/IScriptDebugger.h"
+
+class asIScriptEngine;
+class asIScriptContext;
 
 namespace traktor::script
 {
@@ -29,7 +30,7 @@ class ScriptDebuggerAngelScript : public IScriptDebugger
 	T_RTTI_CLASS;
 
 public:
-	explicit ScriptDebuggerAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptEngine* engine);
+	explicit ScriptDebuggerAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptEngine* scriptEngine);
 
 	virtual ~ScriptDebuggerAngelScript();
 
@@ -72,24 +73,13 @@ private:
 	};
 
 	ScriptManagerAngelScript* m_scriptManager;
-	asIScriptEngine* m_engine;
+	asIScriptEngine* m_scriptEngine;
 	Semaphore m_lock;
 	SmallMap< int32_t, SmallSet< std::wstring > > m_breakpoints;
 	SmallSet< IListener* > m_listeners;
 	CircularVector< int32_t, 32 > m_breadcrumb;
 	std::wstring m_lastFile;
 	State m_state;
-
-	// AngelScript debug callback
-	static void lineCallback(asIScriptContext* ctx, void* obj);
-
-	void analyzeState(asIScriptContext* ctx);
-	void setupDebugCallbacks();
-	void clearDebugCallbacks();
-
-	// Helper methods for variable inspection
-	Any convertAngelScriptValueToAny(void* value, int typeId) const;
-	std::wstring getTypeName(int typeId) const;
 };
 
 }

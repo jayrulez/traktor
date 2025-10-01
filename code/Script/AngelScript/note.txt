@@ -1,9 +1,0 @@
-For now, add this to Angelscript 3rd party vs project
-
-<ItemGroup>
-  <CustomBuild Include="../../../3rdp/angelscript/sdk/angelscript/source/as_callfunc_x64_msvc_asm.asm">
-    <Command>ml64.exe /c /nologo /Fo$(OutDir)\as_callfunc_x64_msvc_asm.obj /W3 /Zi /Ta %(FullPath)</Command>
-    <Outputs>$(OutDir)\as_callfunc_x64_msvc_asm.obj</Outputs>
-    <Message>Assembling %(Filename)%(Extension)</Message>
-  </CustomBuild>
-</ItemGroup>

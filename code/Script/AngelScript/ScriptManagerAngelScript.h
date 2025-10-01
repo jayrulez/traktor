@@ -8,12 +8,10 @@
  */
 #pragma once
 
-#include "angelscript.h"
-#include "Core/Containers/AlignedVector.h"
 #include "Core/RefArray.h"
-#include "Core/Thread/Semaphore.h"
+#include "Core/Containers/AlignedVector.h"
 #include "Script/IScriptManager.h"
-#include "Script/AngelScript/scriptstdstring.h" // For RegisterStdString
+#include "Core/Thread/Semaphore.h"
 
 // import/export mechanism.
 #undef T_DLLCLASS
@@ -23,9 +21,13 @@
 #	define T_DLLCLASS T_DLLIMPORT
 #endif
 
+class asIScriptEngine;
+
 namespace traktor
 {
+
 class Any;
+
 }
 
 namespace traktor::script
@@ -61,19 +63,15 @@ public:
 
 	virtual void getStatistics(ScriptStatistics& outStatistics) const override final;
 
-	// Argument/return value conversion methods
-	void setArgumentFromAny(asIScriptContext* ctx, uint32_t argIndex, const Any& any);
-	void setArgumentFromObject(asIScriptContext* ctx, uint32_t argIndex, ITypedObject* object);
+	void pushObject(ITypedObject* object);
 
-	Any getReturnValueAsAny(asIScriptContext* ctx, int returnTypeId);
-	ITypedObject* getReturnValueAsObject(asIScriptContext* ctx, int returnTypeId);
+	void pushAny(const Any& any);
 
-	// Generic wrapper conversion utilities
-	Any convertAngelScriptArgToAny(asIScriptGeneric* gen, uint32_t argIndex);
-	void setAngelScriptReturnValue(asIScriptGeneric* gen, const Any& value);
-	ITypedObject* extractObjectFromGeneric(asIScriptGeneric* gen);
+	void pushAny(const Any* anys, int32_t count);
 
-	asIScriptEngine* getEngine() const { return m_engine; }
+	Any toAny(int32_t index);
+
+	void toAny(int32_t base, int32_t count, Any* outAnys);
 
 	void lock(ScriptContextAngelScript* context)
 	{
@@ -86,6 +84,8 @@ public:
 		m_lock.release();
 	}
 
+	asIScriptEngine* getEngine() { return m_scriptEngine; }
+
 private:
 	friend class ScriptContextAngelScript;
 	friend class ScriptDebuggerAngelScript;
@@ -94,10 +94,10 @@ private:
 	struct RegisteredClass
 	{
 		Ref< const IRuntimeClass > runtimeClass;
-		asITypeInfo* typeInfo;
+		int32_t typeId;
 	};
 
-	asIScriptEngine* m_engine;
+	asIScriptEngine* m_scriptEngine;
 	mutable Semaphore m_lock;
 	static ScriptManagerAngelScript* ms_instance;
 	ScriptContextAngelScript* m_lockContext;
@@ -105,43 +105,13 @@ private:
 	RefArray< ScriptContextAngelScript > m_contexts;
 	Ref< ScriptDebuggerAngelScript > m_debugger;
 	Ref< ScriptProfilerAngelScript > m_profiler;
+	size_t m_totalMemoryUse;
 
 	void destroyContext(ScriptContextAngelScript* context);
 
-	// AngelScript callbacks
-	static void messageCallback(const asSMessageInfo* msg, void* param);
-	static void* scriptAlloc(size_t size);
-	static void scriptFree(void* ptr);
+	void collectGarbageFull();
 
-	// Generic method wrappers for runtime dispatch
-	static void genericMethodWrapper(asIScriptGeneric* gen);
-	static void genericConstructorWrapper(asIScriptGeneric* gen);
-	static void genericPropertyGetWrapper(asIScriptGeneric* gen);
-	static void genericPropertySetWrapper(asIScriptGeneric* gen);
-	static void genericStaticMethodWrapper(asIScriptGeneric* gen);
-
-	// Object lifecycle callbacks
-	static void objectDestructor(void* obj);
-	static void objectConstructor(void* obj);
-	static void objectAddRef(void* obj);
-	static void objectRelease(void* obj);
-
-	// Utility functions
-	// Signature conversion utilities
-	std::string convertSignatureToAngelScript(const std::string& traktorSignature);
-	std::string convertPropertySignatureToAngelScript(const std::string& traktorSignature, const std::string& propertyName, bool isGetter);
-	std::string convertTypeToAngelScript(const std::string& traktorType);
-	std::string convertReferenceParameters(const std::string& signature);
-	std::string extractReturnTypeFromSignature(const std::string& signature);
-	std::string extractParameterTypeFromSignature(const std::string& signature);
-
-	// Registration helpers
-	void registerMethodsFromReflection(const std::string& className, IRuntimeClass* runtimeClass);
-	void registerPropertiesFromReflection(const std::string& className, IRuntimeClass* runtimeClass);
-	void registerStaticMethodsFromReflection(const std::string& className, IRuntimeClass* runtimeClass);
-	void registerObjectBehaviors(const std::string& className, IRuntimeClass* runtimeClass);
-
-	std::string convertTypeName(const std::wstring& traktorName) const;
+	void collectGarbagePartial();
 };
 
 }

@@ -8,13 +8,15 @@
  */
 #pragma once
 
-#include "angelscript.h"
 #include "Core/Class/IRuntimeClass.h"
 #include "Core/Containers/AlignedVector.h"
+
+class asITypeInfo;
 
 namespace traktor::script
 {
 
+class ScriptContextAngelScript;
 class ScriptManagerAngelScript;
 
 /*! Runtime representation of a script-side AngelScript class.
@@ -25,7 +27,7 @@ class ScriptClassAngelScript : public IRuntimeClass
 	T_RTTI_CLASS;
 
 public:
-	static Ref< ScriptClassAngelScript > createFromTypeInfo(ScriptManagerAngelScript* scriptManager, asITypeInfo* typeInfo);
+	static Ref< ScriptClassAngelScript > createFromTypeInfo(ScriptManagerAngelScript* scriptManager, ScriptContextAngelScript* scriptContext, asITypeInfo* typeInfo);
 
 	virtual const TypeInfo& getExportType() const override final;
 
@@ -66,19 +68,10 @@ private:
 		Ref< const IRuntimeDispatch > dispatch;
 	};
 
-	struct Property
-	{
-		std::string name;
-		Ref< const IRuntimeDispatch > getDispatch;
-		Ref< const IRuntimeDispatch > setDispatch;
-	};
-
 	ScriptManagerAngelScript* m_scriptManager;
 	asITypeInfo* m_typeInfo;
 	Ref< const IRuntimeDispatch > m_constructor;
 	AlignedVector< Method > m_methods;
-	AlignedVector< Method > m_staticMethods;
-	AlignedVector< Property > m_properties;
 
 	explicit ScriptClassAngelScript(ScriptManagerAngelScript* scriptManager, asITypeInfo* typeInfo);
 };
