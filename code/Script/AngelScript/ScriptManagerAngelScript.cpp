@@ -112,6 +112,15 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 	// Handle Any type - used for marshalling between C++ and script
 	if (type == L"Any" || type == L"traktor.Any") return "traktor::Any";
 
+	// Handle common Traktor base types that need manual registration
+	if (type == L"TypeInfo" || type == L"traktor.TypeInfo") return "traktor::TypeInfo@";
+	if (type == L"Scalar" || type == L"traktor.Scalar") return ""; // Scalar is a template typedef, skip for now
+	if (type == L"Object" || type == L"traktor.Object") return "traktor::Object@";
+	if (type == L"ITypedObject" || type == L"traktor.ITypedObject") return "traktor::ITypedObject@";
+	if (type == L"ISerializable" || type == L"traktor.ISerializable") return "traktor::ISerializable@";
+	if (type == L"IRuntimeDelegate" || type == L"traktor.IRuntimeDelegate") return "traktor::IRuntimeDelegate@";
+	if (type == L"RefArray" || type == L"traktor.RefArray") return ""; // RefArray without template param, skip
+
 	// Handle template types like Ref< Type >, RefArray< Type >, etc.
 	size_t templateStart = type.find(L'<');
 	if (templateStart != std::wstring::npos)
@@ -128,14 +137,34 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 			if (tstart != std::wstring::npos && tend != std::wstring::npos)
 				templateName = templateName.substr(tstart, tend - tstart + 1);
 
+			// Strip whitespace from inner type
+			size_t istart = innerType.find_first_not_of(L" \t");
+			size_t iend = innerType.find_last_not_of(L" \t");
+			if (istart != std::wstring::npos && iend != std::wstring::npos)
+				innerType = innerType.substr(istart, iend - istart + 1);
+
+			// Check if inner type is a placeholder (like "InnerType", "T", etc.)
+			// If so, return empty string to indicate this signature should be skipped
+			if (innerType == L"InnerType" || innerType == L"T" || innerType == L"U" || innerType == L"V")
+				return "";
+
+			// Strip "traktor." prefix from template name for comparison
+			std::wstring templateNameShort = templateName;
+			if (templateName.find(L"traktor.") == 0)
+				templateNameShort = templateName.substr(8);
+
 			// For Ref<>, RefArray<>, etc., just extract and convert the inner type
 			// These are smart pointer wrappers that should map to handles in AngelScript
-			if (templateName == L"Ref" || templateName == L"RefArray" ||
-			    templateName == L"AlignedVector" || templateName == L"SmallSet" ||
-			    templateName == L"SmallMap")
+			if (templateNameShort == L"Ref" || templateNameShort == L"RefArray" ||
+			    templateNameShort == L"AlignedVector" || templateNameShort == L"SmallSet" ||
+			    templateNameShort == L"SmallMap" || templateNameShort == L"StdVector" ||
+			    templateNameShort == L"Range")
 			{
 				// Recursively convert the inner type
-				return convertTraktorTypeToAngelScript(innerType);
+				std::string converted = convertTraktorTypeToAngelScript(innerType);
+				if (converted.empty())
+					return ""; // Inner type couldn't be converted, skip this signature
+				return converted;
 			}
 		}
 	}
@@ -197,15 +226,32 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 		// First part is return type
 		std::string returnType = convertTraktorTypeToAngelScript(parts[0]);
 
+		// Skip this signature if return type couldn't be converted (e.g., template placeholder)
+		if (returnType.empty())
+			continue;
+
 		// Build AngelScript signature: "ReturnType methodName(ArgType1, ArgType2, ...)"
 		std::string signature = returnType + " " + methodName + "(";
 
+		bool skipSignature = false;
 		for (size_t i = 1; i < parts.size(); ++i)
 		{
+			std::string argType = convertTraktorTypeToAngelScript(parts[i]);
+
+			// Skip this signature if any argument type couldn't be converted
+			if (argType.empty())
+			{
+				skipSignature = true;
+				break;
+			}
+
 			if (i > 1)
 				signature += ", ";
-			signature += convertTraktorTypeToAngelScript(parts[i]);
+			signature += argType;
 		}
+
+		if (skipSignature)
+			continue;
 
 		signature += ")";
 		signatures.push_back(signature);
@@ -224,6 +270,19 @@ void asGenericStaticMethodWrapper(asIScriptGeneric* gen)
 
 	// TODO: Convert AngelScript arguments to Any[]
 	// TODO: Call dispatch->invoke()
+	// TODO: Set return value
+}
+
+void asGenericInstanceMethodWrapper(asIScriptGeneric* gen)
+{
+	// Get the dispatch pointer from auxiliary data
+	const IRuntimeDispatch* dispatch = static_cast<const IRuntimeDispatch*>(gen->GetAuxiliary());
+	if (!dispatch)
+		return;
+
+	// TODO: Get the 'this' object from AngelScript
+	// TODO: Convert AngelScript arguments to Any[]
+	// TODO: Call dispatch->invoke() with 'this' object
 	// TODO: Set return value
 }
 
@@ -271,6 +330,27 @@ ScriptManagerAngelScript::ScriptManagerAngelScript()
 		r = m_scriptEngine->RegisterObjectType("Any", sizeof(Any), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
 		if (r < 0)
 			log::warning << L"Failed to register Any type: " << getErrorString(r) << L" (" << r << L")" << Endl;
+
+		// Register common base types as opaque reference types
+		// These will be fully defined when their RTTI classes are registered
+		// Note: TypeInfo is registered through RTTI, don't register manually
+
+		r = m_scriptEngine->RegisterObjectType("Object", 0, asOBJ_REF | asOBJ_NOCOUNT);
+		if (r < 0)
+			log::warning << L"Failed to register Object type: " << getErrorString(r) << L" (" << r << L")" << Endl;
+
+		r = m_scriptEngine->RegisterObjectType("ITypedObject", 0, asOBJ_REF | asOBJ_NOCOUNT);
+		if (r < 0)
+			log::warning << L"Failed to register ITypedObject type: " << getErrorString(r) << L" (" << r << L")" << Endl;
+
+		r = m_scriptEngine->RegisterObjectType("ISerializable", 0, asOBJ_REF | asOBJ_NOCOUNT);
+		if (r < 0)
+			log::warning << L"Failed to register ISerializable type: " << getErrorString(r) << L" (" << r << L")" << Endl;
+
+		r = m_scriptEngine->RegisterObjectType("IRuntimeDelegate", 0, asOBJ_REF | asOBJ_NOCOUNT);
+		if (r < 0)
+			log::warning << L"Failed to register IRuntimeDelegate type: " << getErrorString(r) << L" (" << r << L")" << Endl;
+
 		m_scriptEngine->SetDefaultNamespace("");
 	}
 	else
@@ -476,7 +556,39 @@ void ScriptManagerAngelScript::completeRegistration()
 #endif
 		}
 
-		// TODO: Register instance methods
+		// Register instance methods
+		const uint32_t methodCount = runtimeClass->getMethodCount();
+		for (uint32_t i = 0; i < methodCount; ++i)
+		{
+			const std::string methodName = runtimeClass->getMethodName(i);
+			const IRuntimeDispatch* dispatch = runtimeClass->getMethodDispatch(i);
+
+#if defined(T_NEED_RUNTIME_SIGNATURE)
+			// Build method signatures from dispatch runtime signature (handles overloads)
+			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName);
+
+			// Register each overload as an instance method
+			for (const auto& signature : signatures)
+			{
+				r = m_scriptEngine->RegisterObjectMethod(
+					className.c_str(),
+					signature.c_str(),
+					asFUNCTION(asGenericInstanceMethodWrapper),
+					asCALL_GENERIC,
+					const_cast<void*>(static_cast<const void*>(dispatch))
+				);
+				if (r < 0)
+				{
+					log::warning << L"Failed to register instance method \"" << mbstows(methodName) << L"\" with signature \"" << mbstows(signature) << L"\" for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+				}
+			}
+#else
+			log::error << L"AngelScript backend requires T_NEED_RUNTIME_SIGNATURE to be defined for class registration" << Endl;
+			m_scriptEngine->SetDefaultNamespace("");
+			return;
+#endif
+		}
+
 		// TODO: Register properties
 		// TODO: Register operators
 
