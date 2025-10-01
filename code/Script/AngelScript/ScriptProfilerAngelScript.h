@@ -8,13 +8,12 @@
  */
 #pragma once
 
-#include "angelscript.h"
-#include "Core/Containers/AlignedVector.h"
-#include "Core/Containers/SmallMap.h"
 #include "Core/Containers/SmallSet.h"
-#include "Core/Thread/Semaphore.h"
 #include "Core/Timer/Timer.h"
 #include "Script/IScriptProfiler.h"
+
+class asIScriptEngine;
+class asIScriptContext;
 
 namespace traktor::script
 {
@@ -29,77 +28,30 @@ class ScriptProfilerAngelScript : public IScriptProfiler
 	T_RTTI_CLASS;
 
 public:
-	explicit ScriptProfilerAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptEngine* engine);
-
-	virtual ~ScriptProfilerAngelScript();
+	explicit ScriptProfilerAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptEngine* scriptEngine);
 
 	virtual void addListener(IListener* listener) override final;
 
 	virtual void removeListener(IListener* listener) override final;
 
+	void notifyCallEnter();
+
+	void notifyCallLeave();
+
 private:
 	friend class ScriptManagerAngelScript;
 
-	struct FunctionProfile
+	struct ProfileStack
 	{
-		std::wstring functionName;
-		std::wstring fileName;
-		int32_t line;
-		uint32_t callCount;
-		double inclusiveTime;
-		double exclusiveTime;
-		double lastEnterTime;
-		uint32_t recursionDepth;
-
-		FunctionProfile()
-			: line(0)
-			, callCount(0)
-			, inclusiveTime(0.0)
-			, exclusiveTime(0.0)
-			, lastEnterTime(0.0)
-			, recursionDepth(0)
-		{
-		}
-	};
-
-	struct CallStackEntry
-	{
-		asIScriptFunction* function;
-		double enterTime;
-		double childTime; // Time spent in child functions
-
-		CallStackEntry()
-			: function(nullptr)
-			, enterTime(0.0)
-			, childTime(0.0)
-		{
-		}
+		double timeStamp;
+		double childDuration;
 	};
 
 	ScriptManagerAngelScript* m_scriptManager;
-	asIScriptEngine* m_engine;
-	mutable Semaphore m_lock;
-	SmallMap< asIScriptFunction*, FunctionProfile > m_profiles;
-	AlignedVector< CallStackEntry > m_callStack;
+	asIScriptEngine* m_scriptEngine;
+	AlignedVector< ProfileStack > m_stack;
 	SmallSet< IListener* > m_listeners;
 	Timer m_timer;
-	bool m_enabled;
-	bool m_capturing;
-
-	// AngelScript profiling callbacks
-	static void enterFunctionCallback(asIScriptContext* ctx, void* obj);
-	static void leaveFunctionCallback(asIScriptContext* ctx, void* obj);
-
-	void enable(bool enable);
-	void setupProfilingCallbacks();
-	void clearProfilingCallbacks();
-	void sendMeasurements();
-
-	// Helper methods
-	double getCurrentTime() const;
-	std::wstring getFunctionName(asIScriptFunction* func) const;
-	std::wstring getFileName(asIScriptFunction* func) const;
-	int32_t getLineNumber(asIScriptFunction* func) const;
 };
 
 }

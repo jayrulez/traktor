@@ -10,7 +10,6 @@
 
 #include "Core/Misc/AutoPtr.h"
 #include "Script/IScriptBlob.h"
-#include <string>
 
 namespace traktor::script
 {

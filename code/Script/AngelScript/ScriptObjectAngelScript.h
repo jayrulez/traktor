@@ -8,13 +8,15 @@
  */
 #pragma once
 
-#include "angelscript.h"
 #include "Core/Class/IRuntimeObject.h"
+
+class asIScriptObject;
 
 namespace traktor::script
 {
 
 class ScriptManagerAngelScript;
+class ScriptContextAngelScript;
 
 /*! AngelScript script object runtime interface.
  * \ingroup Script
@@ -24,23 +26,17 @@ class ScriptObjectAngelScript : public IRuntimeObject
 	T_RTTI_CLASS;
 
 public:
-	explicit ScriptObjectAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptObject* scriptObject);
+	explicit ScriptObjectAngelScript(ScriptManagerAngelScript* scriptManager, ScriptContextAngelScript* scriptContext, asIScriptObject* scriptObject);
 
 	virtual ~ScriptObjectAngelScript();
 
 	virtual Ref< const IRuntimeClass > getRuntimeClass() const override final;
 
-	/*! Get the underlying AngelScript object. */
 	asIScriptObject* getScriptObject() const { return m_scriptObject; }
-
-	/*! Get the AngelScript type info for this object. */
-	asITypeInfo* getAngelScriptTypeInfo() const;
-
-	/*! Check if the underlying AngelScript object is valid. */
-	bool isValid() const { return m_scriptObject != nullptr; }
 
 private:
 	ScriptManagerAngelScript* m_scriptManager;
+	ScriptContextAngelScript* m_scriptContext;
 	asIScriptObject* m_scriptObject;
 };
 

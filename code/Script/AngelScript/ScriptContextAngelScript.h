@@ -8,15 +8,18 @@
  */
 #pragma once
 
-#include "angelscript.h"
 #include "Core/Containers/SmallSet.h"
 #include "Script/IScriptContext.h"
+
+class asIScriptModule;
+class asIScriptContext;
 
 namespace traktor::script
 {
 
-class ScriptManagerAngelScript;
 class ScriptDelegateAngelScript;
+class ScriptManagerAngelScript;
+class ScriptObjectAngelScript;
 
 /*! AngelScript scripting context.
  * \ingroup Script
@@ -42,35 +45,25 @@ public:
 
 	virtual Any executeFunction(const std::string& functionName, uint32_t argc, const Any* argv) override final;
 
-	/*! Execute a script delegate function.
-	 * \param delegate Script delegate to execute.
-	 * \param argc Number of arguments.
-	 * \param argv Array of arguments.
-	 * \return Return value from script function.
-	 */
 	Any executeDelegate(ScriptDelegateAngelScript* delegate, uint32_t argc, const Any* argv);
 
-	/*! Create a delegate from a script function.
-	 * \param functionName Name of the script function.
-	 * \return Script delegate or null if function not found.
-	 */
-	Ref< ScriptDelegateAngelScript > createDelegate(const std::string& functionName);
+	Any executeMethod(ScriptObjectAngelScript* self, const std::string& methodName, uint32_t argc, const Any* argv);
+
+	asIScriptModule* getModule() { return m_module; }
 
 private:
+	friend class ScriptDebuggerAngelScript;
 	friend class ScriptManagerAngelScript;
 
 	ScriptManagerAngelScript* m_scriptManager;
-	asIScriptEngine* m_engine;
 	asIScriptModule* m_module;
+	asIScriptContext* m_context;
 	bool m_strict;
+	const Object* m_lastSelf;
 	SmallSet< std::string > m_globals;
+	std::string m_moduleName;
 
-	explicit ScriptContextAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptEngine* engine, bool strict);
-
-	// Helper functions
-	asIScriptFunction* findFunction(const std::string& functionName) const;
-	void setGlobalVariable(const std::string& name, const Any& value);
-	Any getGlobalVariable(const std::string& name) const;
+	explicit ScriptContextAngelScript(ScriptManagerAngelScript* scriptManager, asIScriptModule* module, asIScriptContext* context, bool strict);
 };
 
 }

@@ -8,7 +8,6 @@
  */
 #pragma once
 
-#include "angelscript.h"
 #include "Core/Thread/Semaphore.h"
 #include "Script/IScriptCompiler.h"
 
@@ -19,6 +18,8 @@
 #else
 #	define T_DLLCLASS T_DLLIMPORT
 #endif
+
+class asIScriptEngine;
 
 namespace traktor::script
 {
@@ -39,25 +40,7 @@ public:
 
 private:
 	mutable Semaphore m_lock;
-	asIScriptEngine* m_engine;
-
-	// Compilation error callback
-	static void compilationMessageCallback(const asSMessageInfo* msg, void* param);
-
-	struct CompilationContext
-	{
-		IErrorCallback* errorCallback;
-		bool hasErrors;
-		std::wstring fileName; // Store original filename for error reporting
-	};
-
-	// Helper methods
-	void setupCompilationEngine();
-	void cleanupCompilationEngine();
-
-	static void* scriptAlloc(size_t size);
-
-	static void scriptFree(void* ptr);
+	asIScriptEngine* m_scriptEngine;
 };
 
 }

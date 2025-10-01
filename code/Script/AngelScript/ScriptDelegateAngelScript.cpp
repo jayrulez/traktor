@@ -6,23 +6,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-
-
-#include "Core/Class/IRuntimeObject.h"
+#include <angelscript.h>
 #include "Script/AngelScript/ScriptDelegateAngelScript.h"
-
-#include "angelscript.h"
-#include "Script/AngelScript/ScriptClassAngelScript.h"
 #include "Script/AngelScript/ScriptContextAngelScript.h"
 
 namespace traktor::script
 {
 
-T_IMPLEMENT_RTTI_CLASS(L"traktor.script.ScriptDelegateAngelScript", ScriptDelegateAngelScript, IRuntimeObject)
+T_IMPLEMENT_RTTI_CLASS(L"traktor.script.ScriptDelegateAngelScript", ScriptDelegateAngelScript, IRuntimeDelegate)
 
-ScriptDelegateAngelScript::ScriptDelegateAngelScript(ScriptContextAngelScript* scriptContext, asIScriptFunction* function)
-	: m_scriptContext(scriptContext)
-	, m_function(function)
+ScriptDelegateAngelScript::ScriptDelegateAngelScript(ScriptContextAngelScript* context, asIScriptFunction* function)
+:	m_context(context)
+,	m_function(function)
 {
 	if (m_function)
 		m_function->AddRef();
@@ -39,11 +34,8 @@ ScriptDelegateAngelScript::~ScriptDelegateAngelScript()
 
 Any ScriptDelegateAngelScript::call(int32_t argc, const Any* argv)
 {
-	if (!m_scriptContext || !m_function)
-		return Any();
-
-	// Delegate the call to the script context
-	return m_scriptContext->executeDelegate(this, argc, argv);
+	// TODO: Implement delegate call through context
+	return Any();
 }
 
 }

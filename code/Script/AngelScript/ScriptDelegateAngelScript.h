@@ -8,16 +8,16 @@
  */
 #pragma once
 
-#include "angelscript.h"
 #include "Core/Class/IRuntimeDelegate.h"
-#include "Core/Class/Any.h"
+
+class asIScriptFunction;
 
 namespace traktor::script
 {
 
 class ScriptContextAngelScript;
 
-/*! AngelScript script delegate wrapper.
+/*! AngelScript script delegate runtime interface.
  * \ingroup Script
  */
 class ScriptDelegateAngelScript : public IRuntimeDelegate
@@ -25,23 +25,16 @@ class ScriptDelegateAngelScript : public IRuntimeDelegate
 	T_RTTI_CLASS;
 
 public:
-	explicit ScriptDelegateAngelScript(ScriptContextAngelScript* scriptContext, asIScriptFunction* function);
+	explicit ScriptDelegateAngelScript(ScriptContextAngelScript* context, asIScriptFunction* function);
 
 	virtual ~ScriptDelegateAngelScript();
 
 	virtual Any call(int32_t argc, const Any* argv) override final;
 
-	/*! Get wrapped AngelScript function. */
 	asIScriptFunction* getFunction() const { return m_function; }
 
-	/*! Get script context. */
-	ScriptContextAngelScript* getScriptContext() const { return m_scriptContext; }
-
-	/*! Check if delegate is valid. */
-	bool isValid() const { return m_function != nullptr; }
-
 private:
-	ScriptContextAngelScript* m_scriptContext;
+	ScriptContextAngelScript* m_context;
 	asIScriptFunction* m_function;
 };
 
