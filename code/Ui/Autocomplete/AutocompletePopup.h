@@ -13,6 +13,7 @@
 #include "Ui/Form.h"
 #include "Ui/Events/KeyDownEvent.h"
 #include "Ui/Events/MouseButtonDownEvent.h"
+#include "Ui/Events/MouseWheelEvent.h"
 #include "Ui/Autocomplete/IAutocompleteProvider.h"
 
 // import/export mechanism.
@@ -92,6 +93,8 @@ private:
 	void eventKeyDown(KeyDownEvent* event);
 
 	void eventMouseDown(MouseButtonDownEvent* event);
+
+	void eventMouseWheel(MouseWheelEvent* event);
 
 	void eventListSelect(SelectionChangeEvent* event);
 
