@@ -11,6 +11,7 @@
 #include "Ui/Autocomplete/AutocompletePopup.h"
 #include "Ui/Events/KeyDownEvent.h"
 #include "Ui/Events/MouseButtonDownEvent.h"
+#include "Ui/Events/MouseWheelEvent.h"
 #include "Ui/ListBox/ListBox.h"
 #include "Ui/TableLayout.h"
 
@@ -26,7 +27,7 @@ AutocompletePopup::AutocompletePopup()
 
 bool AutocompletePopup::create(Widget* parent, IAutocompleteProvider* provider)
 {
-	if (!Form::create(L"", Unit(300), Unit(200), WsTop | WsBorder, nullptr, parent))
+	if (!Form::create(L"", Unit(600), Unit(400), WsTop, nullptr, parent))
 		return false;
 
 	m_provider = provider;
@@ -42,6 +43,7 @@ bool AutocompletePopup::create(Widget* parent, IAutocompleteProvider* provider)
 
 	addEventHandler< KeyDownEvent >(this, &AutocompletePopup::eventKeyDown);
 	addEventHandler< MouseButtonDownEvent >(this, &AutocompletePopup::eventMouseDown);
+	addEventHandler< MouseWheelEvent >(this, &AutocompletePopup::eventMouseWheel);
 
 	return true;
 }
@@ -60,9 +62,16 @@ void AutocompletePopup::showSuggestions(const Point& position, const std::vector
 
 	if (!m_filteredIndices.empty())
 	{
-		setRect(Rect(position, Size(300, std::min(200, (int32_t)m_filteredIndices.size() * 20 + 10))));
+		// Calculate height with better minimum and padding
+		const int32_t itemHeight = 22;
+		const int32_t padding = 20; // More generous padding for borders/margins
+		const int32_t minHeight = 50; // Minimum height even for single items
+		const int32_t calculatedHeight = (int32_t)m_filteredIndices.size() * itemHeight + padding;
+		const int32_t finalHeight = std::max(minHeight, std::min(400, calculatedHeight));
+
+		setRect(Rect(position, Size(600, finalHeight)));
 		show();
-		setFocus();
+		// Don't steal focus - let the editor keep focus so typing continues to work
 	}
 	else
 	{
@@ -80,19 +89,29 @@ void AutocompletePopup::hide()
 
 void AutocompletePopup::selectPrevious()
 {
-	if (!m_filteredIndices.empty() && m_selectedIndex > 0)
+	if (!m_filteredIndices.empty())
 	{
-		m_selectedIndex--;
+		if (m_selectedIndex <= 0)
+			m_selectedIndex = (int32_t)m_filteredIndices.size() - 1; // Wrap to last item
+		else
+			m_selectedIndex--;
+
 		m_listBox->select(m_selectedIndex);
+		m_listBox->update(); // Force update to show selection
 	}
 }
 
 void AutocompletePopup::selectNext()
 {
-	if (!m_filteredIndices.empty() && m_selectedIndex < (int32_t)m_filteredIndices.size() - 1)
+	if (!m_filteredIndices.empty())
 	{
-		m_selectedIndex++;
+		if (m_selectedIndex >= (int32_t)m_filteredIndices.size() - 1)
+			m_selectedIndex = 0; // Wrap to first item
+		else
+			m_selectedIndex++;
+
 		m_listBox->select(m_selectedIndex);
+		m_listBox->update(); // Force update to show selection
 	}
 }
 
@@ -166,6 +185,10 @@ void AutocompletePopup::updateDisplay()
 		m_listBox->add(displayText);
 	}
 
+	// Ensure we clear any existing selection state first
+	m_listBox->deselectAll();
+
+	// Then set the proper selection
 	if (m_selectedIndex >= 0 && m_selectedIndex < (int32_t)m_filteredIndices.size())
 		m_listBox->select(m_selectedIndex);
 
@@ -231,6 +254,12 @@ void AutocompletePopup::eventMouseDown(MouseButtonDownEvent* event)
 void AutocompletePopup::eventListSelect(SelectionChangeEvent* event)
 {
 	m_selectedIndex = m_listBox->getSelected();
+}
+
+void AutocompletePopup::eventMouseWheel(MouseWheelEvent* event)
+{
+	// Consume scroll events to prevent them from propagating to the underlying editor
+	event->consume();
 }
 
 void AutocompletePopup::eventListDoubleClick(MouseDoubleClickEvent* event)

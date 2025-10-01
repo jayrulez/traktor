@@ -79,6 +79,7 @@ private:
 	Ref< IAutocompleteProvider > m_autocompleteProvider;
 	Ref< AutocompletePopup > m_autocompletePopup;
 	bool m_autocompleteEnabled = true;
+	bool m_processingAutocomplete = false; // Flag to prevent double-processing of Enter
 	std::wstring m_lastWord;
 	int32_t m_lastWordOffset = -1;
 
@@ -87,6 +88,8 @@ private:
 	void eventChange(ContentChangeEvent* event);
 
 	void eventKeyDown(KeyDownEvent* event);
+
+	void eventKey(KeyEvent* event);
 
 	void eventAutocompleteSelect(AutocompleteSelectEvent* event);
 

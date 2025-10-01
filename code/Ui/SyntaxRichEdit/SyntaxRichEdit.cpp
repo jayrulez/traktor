@@ -16,6 +16,7 @@
 #include "Ui/Autocomplete/IAutocompleteProvider.h"
 #include "Ui/Autocomplete/AutocompletePopup.h"
 #include "Ui/Events/KeyDownEvent.h"
+#include "Ui/Events/KeyEvent.h"
 
 namespace traktor::ui
 {
@@ -77,6 +78,7 @@ bool SyntaxRichEdit::create(Widget* parent, const std::wstring& text, uint32_t s
 
 	addEventHandler< ContentChangeEvent >(this, &SyntaxRichEdit::eventChange);
 	addEventHandler< KeyDownEvent >(this, &SyntaxRichEdit::eventKeyDown);
+	addEventHandler< KeyEvent >(this, &SyntaxRichEdit::eventKey);
 
 	// Create autocomplete popup
 	m_autocompletePopup = new AutocompletePopup();
@@ -326,8 +328,9 @@ bool SyntaxRichEdit::getAutocompleteEnabled() const
 
 void SyntaxRichEdit::eventKeyDown(KeyDownEvent* event)
 {
-	if (!m_autocompleteEnabled || !m_autocompleteProvider)
-		return;
+	// Only handle autocomplete if enabled and provider is set
+	if (m_autocompleteEnabled && m_autocompleteProvider)
+	{
 
 	const VirtualKey key = event->getVirtualKey();
 
@@ -337,12 +340,23 @@ void SyntaxRichEdit::eventKeyDown(KeyDownEvent* event)
 		switch (key)
 		{
 		case VkUp:
+			m_autocompletePopup->selectPrevious();
+			event->consume();
+			return;
 		case VkDown:
+			m_autocompletePopup->selectNext();
+			event->consume();
+			return;
 		case VkReturn:
 		case VkTab:
+			m_processingAutocomplete = true; // Set flag to prevent base class processing
+			m_autocompletePopup->acceptSelection();
+			m_processingAutocomplete = false; // Clear flag after processing
+			event->consume();
+			return;
 		case VkEscape:
-			// Let the popup handle these keys
-			m_autocompletePopup->raiseEvent(event);
+			m_autocompletePopup->hide();
+			event->consume();
 			return;
 		}
 	}
@@ -380,6 +394,24 @@ void SyntaxRichEdit::eventKeyDown(KeyDownEvent* event)
 			triggerAutocomplete();
 		});
 	}
+
+	} // End autocomplete handling
+
+	// Let the base class handle the event unless it was consumed by autocomplete
+	// This is important for normal editor functionality like Enter key processing
+}
+
+void SyntaxRichEdit::eventKey(KeyEvent* event)
+{
+	// Prevent character insertion when autocomplete is processing Enter/Tab
+	if (m_processingAutocomplete)
+	{
+		// Block character insertion during autocomplete operations
+		event->consume();
+		return;
+	}
+
+	// For all other cases, let the base class handle character input normally
 }
 
 void SyntaxRichEdit::eventAutocompleteSelect(AutocompleteSelectEvent* event)
@@ -445,18 +477,31 @@ void SyntaxRichEdit::triggerAutocomplete()
 	std::vector< AutocompleteSuggestion > suggestions;
 	if (m_autocompleteProvider->getSuggestions(context, suggestions))
 	{
-		// Calculate popup position - approximate caret position
+		// Calculate popup position - get actual caret position from RichEdit
 		const int32_t caretLine = getLineFromOffset(caretOffset);
 		const int32_t lineOffset = getLineOffset(caretLine);
 		const int32_t columnOffset = caretOffset - lineOffset;
 
-		// Simple approximation of caret position
+		// Get font metrics for better positioning
 		const FontMetric fontMetric = getFontMetric();
-		// Use getAdvance for a typical character to estimate width
-		const int32_t charWidth = fontMetric.getAdvance(L'M', L'M'); // Use 'M' as typical wide character
-		const Point caretPos(columnOffset * charWidth, caretLine * fontMetric.getHeight());
+		const int32_t charWidth = fontMetric.getAdvance(L'M', L'M');
+		const int32_t lineHeight = fontMetric.getHeight();
+
+		// Account for editor margins and current scroll position
+		const int32_t scrollLine = getScrollLine();
+		const int32_t marginLeft = 4; // Minimal left margin
+		const int32_t marginTop = 2;  // Minimal top margin
+
+		// Calculate caret position relative to editor client area
+		const Point caretPos(
+			marginLeft + columnOffset * charWidth,
+			marginTop + (caretLine - scrollLine) * lineHeight
+		);
+
+		// Convert to screen coordinates and position popup right below caret
 		const Point screenPos = clientToScreen(caretPos);
-		const Point popupPos(screenPos.x, screenPos.y + fontMetric.getHeight());
+		// Position popup immediately below the caret line with minimal gap
+		const Point popupPos(screenPos.x, screenPos.y + lineHeight);
 
 		m_autocompletePopup->showSuggestions(popupPos, suggestions);
 	}
