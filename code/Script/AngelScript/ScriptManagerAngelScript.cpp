@@ -121,6 +121,30 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 	if (type == L"IRuntimeDelegate" || type == L"traktor.IRuntimeDelegate") return "traktor::IRuntimeDelegate@";
 	if (type == L"RefArray" || type == L"traktor.RefArray") return ""; // RefArray without template param, skip
 
+	// Handle boxed types - these wrap value types for the runtime system
+	// Strip "Boxed" prefix and convert to the registered AngelScript type
+	if (type.find(L"Boxed") == 0)
+	{
+		std::wstring unboxedType = type.substr(5); // Remove "Boxed" prefix
+
+		// Map common boxed types to their AngelScript equivalents
+		if (unboxedType == L"Color4f") return "traktor::Color4f@";
+		if (unboxedType == L"Matrix33") return "traktor::Matrix33@";
+		if (unboxedType == L"Matrix44") return "traktor::Matrix44@";
+		if (unboxedType == L"Quaternion") return "traktor::Quaternion@";
+		if (unboxedType == L"Transform") return "traktor::Transform@";
+		if (unboxedType == L"Vector2") return "traktor::Vector2@";
+		if (unboxedType == L"Vector4") return "traktor::Vector4@";
+		if (unboxedType == L"Aabb2") return "traktor::Aabb2@";
+		if (unboxedType == L"Aabb3") return "traktor::Aabb3@";
+		if (unboxedType == L"Frustum") return "traktor::Frustum@";
+		if (unboxedType == L"Ray3") return "traktor::Ray3@";
+		if (unboxedType == L"Plane") return "traktor::Plane@";
+
+		// If we don't recognize this boxed type, try to convert it generically
+		return "traktor::" + wstombs(unboxedType) + "@";
+	}
+
 	// Handle template types like Ref< Type >, RefArray< Type >, etc.
 	size_t templateStart = type.find(L'<');
 	if (templateStart != std::wstring::npos)
@@ -210,7 +234,7 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 	return wstombs(type);
 }
 
-AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntimeDispatch* dispatch, const std::string& methodName)
+AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntimeDispatch* dispatch, const std::string& methodName, bool logSkipped = false)
 {
 	AlignedVector< std::string > signatures;
 
@@ -218,6 +242,9 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 	StringOutputStream ss;
 	dispatch->signature(ss);
 	std::wstring signatureWide = ss.str();
+
+	if (logSkipped)
+		log::info << L"    Raw signature from dispatch: \"" << signatureWide << L"\"" << Endl;
 
 	// Split by semicolon to handle overloads
 	AlignedVector< std::wstring > overloads;
@@ -240,12 +267,17 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 
 		// Skip this signature if return type couldn't be converted (e.g., template placeholder)
 		if (returnType.empty())
+		{
+			if (logSkipped)
+				log::info << L"    Skipped signature due to unconvertible return type: \"" << parts[0] << L"\"" << Endl;
 			continue;
+		}
 
 		// Build AngelScript signature: "ReturnType methodName(ArgType1, ArgType2, ...)"
 		std::string signature = returnType + " " + methodName + "(";
 
 		bool skipSignature = false;
+		std::wstring failedArgType;
 		for (size_t i = 1; i < parts.size(); ++i)
 		{
 			std::string argType = convertTraktorTypeToAngelScript(parts[i]);
@@ -254,6 +286,7 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 			if (argType.empty())
 			{
 				skipSignature = true;
+				failedArgType = parts[i];
 				break;
 			}
 
@@ -263,7 +296,11 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 		}
 
 		if (skipSignature)
+		{
+			if (logSkipped)
+				log::info << L"    Skipped signature due to unconvertible argument type: " << failedArgType << L" (raw signature: " << overload << L")" << Endl;
 			continue;
+		}
 
 		signature += ")";
 		signatures.push_back(signature);
@@ -1003,14 +1040,54 @@ void ScriptManagerAngelScript::completeRegistration()
 #endif
 		}
 
-		// TODO: Register operators
+		// Register operators
+		// Note: Operator dispatches don't have runtime signature information (signature() returns empty),
+		// but like Lua, we can register them as generic wrappers that handle runtime dispatch.
+		// The dispatch->invoke() will try each overload and find the one that accepts the argument types.
+		struct OperatorMapping
+		{
+			IRuntimeClass::Operator traktorOp;
+			const char* asMethodName;
+		};
+
+		const OperatorMapping operators[] = {
+			{ IRuntimeClass::Operator::Add, "opAdd" },
+			{ IRuntimeClass::Operator::Subtract, "opSub" },
+			{ IRuntimeClass::Operator::Multiply, "opMul" },
+			{ IRuntimeClass::Operator::Divide, "opDiv" }
+		};
+
+		for (const auto& op : operators)
+		{
+			const IRuntimeDispatch* dispatch = runtimeClass->getOperatorDispatch(op.traktorOp);
+			if (!dispatch)
+				continue;
+
+			// Register operator with return type matching the class type and accepting the class type as parameter
+			// This is a common pattern for operators - the dispatch will handle overload resolution at runtime
+			// Note: Since we register types as asOBJ_REF (reference/handle types), we need to use @ for handles
+			// AngelScript requires 'const' at the end for const methods
+			std::string signature = className + "@ " + op.asMethodName + "(const " + className + "@) const";
+
+			r = m_scriptEngine->RegisterObjectMethod(
+				className.c_str(),
+				signature.c_str(),
+				asFUNCTION(asGenericInstanceMethodWrapper),
+				asCALL_GENERIC,
+				const_cast<void*>(static_cast<const void*>(dispatch))
+			);
+			if (r < 0)
+			{
+				log::info << L"Skipped operator \"" << mbstows(op.asMethodName) << L"\" for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+			}
+		}
 
 		// Reset to global namespace
 		m_scriptEngine->SetDefaultNamespace("");
 	}
 
 	// Dump registration summary
-	dumpRegistration();
+	//dumpRegistration();
 }
 
 void ScriptManagerAngelScript::dumpRegistration()
@@ -1045,7 +1122,7 @@ void ScriptManagerAngelScript::dumpRegistration()
 
 		log::info << L"Type: " << mbstows(fullName) << Endl;
 
-		// Dump methods
+		// Dump methods (including operators)
 		asUINT methodCount = typeInfo->GetMethodCount();
 		if (methodCount > 0)
 		{
@@ -1056,7 +1133,21 @@ void ScriptManagerAngelScript::dumpRegistration()
 				if (func)
 				{
 					const char* decl = func->GetDeclaration(false, false, false);
-					log::info << L"    " << mbstows(decl) << Endl;
+					std::string declStr(decl);
+
+					// Check if this is an operator method
+					bool isOperator = (declStr.find("opAdd") != std::string::npos ||
+					                   declStr.find("opSub") != std::string::npos ||
+					                   declStr.find("opMul") != std::string::npos ||
+					                   declStr.find("opDiv") != std::string::npos ||
+					                   declStr.find("opEquals") != std::string::npos ||
+					                   declStr.find("opCmp") != std::string::npos ||
+					                   declStr.find("opNeg") != std::string::npos);
+
+					if (isOperator)
+						log::info << L"    " << mbstows(decl) << L" [operator]" << Endl;
+					else
+						log::info << L"    " << mbstows(decl) << Endl;
 				}
 			}
 		}
