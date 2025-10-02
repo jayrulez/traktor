@@ -6,7 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-#include <cctype>
+#include <cwctype>
 #include "Core/Log/Log.h"
 #include "Script/Editor/ScriptOutlineAngelScript.h"
 
@@ -67,24 +67,24 @@ ScriptOutlineAngelScript::Token ScriptOutlineAngelScript::nextToken() const
 	}
 
 	// Numbers
-	if (std::iswdigit(ch))
+	if (iswdigit(ch))
 	{
 		token.type = Token::Number;
 		token.text.clear();
 
-		while (std::iswdigit(peekChar()) || peekChar() == L'.' || peekChar() == L'f')
+		while (iswdigit(peekChar()) || peekChar() == L'.' || peekChar() == L'f')
 			token.text += readChar();
 
 		return token;
 	}
 
 	// Words (identifiers and keywords)
-	if (std::iswalpha(ch) || ch == L'_')
+	if (iswalpha(ch) || ch == L'_')
 	{
 		token.type = Token::Word;
 		token.text.clear();
 
-		while (std::iswalnum(peekChar()) || peekChar() == L'_')
+		while (iswalnum(peekChar()) || peekChar() == L'_')
 			token.text += readChar();
 
 		return token;
@@ -139,7 +139,7 @@ void ScriptOutlineAngelScript::skipWhitespaceAndComments() const
 		wchar_t ch = peekChar();
 
 		// Whitespace
-		if (std::iswspace(ch))
+		if (iswspace(ch))
 		{
 			readChar();
 			continue;
