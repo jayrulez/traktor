@@ -34,8 +34,10 @@ ScriptDelegateAngelScript::~ScriptDelegateAngelScript()
 
 Any ScriptDelegateAngelScript::call(int32_t argc, const Any* argv)
 {
-	// TODO: Implement delegate call through context
-	return Any();
+	if (!m_function || !m_context)
+		return Any();
+
+	return m_context->executeDelegate(this, argc, argv);
 }
 
 }

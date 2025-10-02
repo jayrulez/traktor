@@ -37,8 +37,14 @@ ScriptObjectAngelScript::~ScriptObjectAngelScript()
 
 Ref< const IRuntimeClass > ScriptObjectAngelScript::getRuntimeClass() const
 {
-	// TODO: Return AngelScript class wrapper
-	return nullptr;
+	if (!m_scriptObject)
+		return nullptr;
+
+	asITypeInfo* typeInfo = m_scriptObject->GetObjectType();
+	if (!typeInfo)
+		return nullptr;
+
+	return ScriptClassAngelScript::createFromTypeInfo(m_scriptManager, m_scriptContext, typeInfo);
 }
 
 }

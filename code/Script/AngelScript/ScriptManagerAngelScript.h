@@ -66,16 +66,6 @@ public:
 
 	virtual void getStatistics(ScriptStatistics& outStatistics) const override final;
 
-	void pushObject(ITypedObject* object);
-
-	void pushAny(const Any& any);
-
-	void pushAny(const Any* anys, int32_t count);
-
-	Any toAny(int32_t index);
-
-	void toAny(int32_t base, int32_t count, Any* outAnys);
-
 	void lock(ScriptContextAngelScript* context)
 	{
 		m_lock.wait();

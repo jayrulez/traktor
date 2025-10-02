@@ -34,6 +34,8 @@ public:
 	asIScriptFunction* getFunction() const { return m_function; }
 
 private:
+	friend class ScriptContextAngelScript;
+
 	ScriptContextAngelScript* m_context;
 	asIScriptFunction* m_function;
 };
