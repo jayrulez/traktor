@@ -647,6 +647,19 @@ void ScriptManagerAngelScript::destroy()
 	scriptEngine->ShutDownAndRelease();
 }
 
+// Reference counting behaviors for Traktor objects
+void asObjectAddRef(ITypedObject* obj)
+{
+	if (obj)
+		obj->addRef(nullptr);
+}
+
+void asObjectRelease(ITypedObject* obj)
+{
+	if (obj)
+		obj->release(nullptr);
+}
+
 void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 {
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(m_lock);
@@ -704,6 +717,32 @@ void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 		log::error << L"Failed to register class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
 		m_scriptEngine->SetDefaultNamespace(""); // Reset to global namespace
 		return;
+	}
+
+	// Register AddRef and Release behaviors for reference counting
+	// These are required for all asOBJ_REF types
+	r = m_scriptEngine->RegisterObjectBehaviour(
+		className.c_str(),
+		asBEHAVE_ADDREF,
+		"void f()",
+		asFUNCTION(asObjectAddRef),
+		asCALL_CDECL_OBJFIRST
+	);
+	if (r < 0)
+	{
+		log::error << L"Failed to register AddRef for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+	}
+
+	r = m_scriptEngine->RegisterObjectBehaviour(
+		className.c_str(),
+		asBEHAVE_RELEASE,
+		"void f()",
+		asFUNCTION(asObjectRelease),
+		asCALL_CDECL_OBJFIRST
+	);
+	if (r < 0)
+	{
+		log::error << L"Failed to register Release for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
 	}
 
 	// Get the type ID (must be done while still in the namespace)
@@ -1087,7 +1126,7 @@ void ScriptManagerAngelScript::completeRegistration()
 	}
 
 	// Dump registration summary
-	//dumpRegistration();
+	dumpRegistration();
 }
 
 void ScriptManagerAngelScript::dumpRegistration()
@@ -1281,34 +1320,6 @@ void ScriptManagerAngelScript::collectGarbage(bool full)
 void ScriptManagerAngelScript::getStatistics(ScriptStatistics& outStatistics) const
 {
 	outStatistics.memoryUsage = uint32_t(m_totalMemoryUse);
-}
-
-void ScriptManagerAngelScript::pushObject(ITypedObject* object)
-{
-	// TODO: Implement object pushing to AngelScript stack
-}
-
-void ScriptManagerAngelScript::pushAny(const Any& any)
-{
-	// TODO: Implement Any to AngelScript type conversion
-}
-
-void ScriptManagerAngelScript::pushAny(const Any* anys, int32_t count)
-{
-	for (int32_t i = 0; i < count; ++i)
-		pushAny(anys[i]);
-}
-
-Any ScriptManagerAngelScript::toAny(int32_t index)
-{
-	// TODO: Implement AngelScript type to Any conversion
-	return Any();
-}
-
-void ScriptManagerAngelScript::toAny(int32_t base, int32_t count, Any* outAnys)
-{
-	for (int32_t i = 0; i < count; ++i)
-		outAnys[i] = toAny(base + i);
 }
 
 void ScriptManagerAngelScript::destroyContext(ScriptContextAngelScript* context)

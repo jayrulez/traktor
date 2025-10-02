@@ -35,6 +35,8 @@ public:
 	asIScriptObject* getScriptObject() const { return m_scriptObject; }
 
 private:
+	friend class ScriptContextAngelScript;
+
 	ScriptManagerAngelScript* m_scriptManager;
 	ScriptContextAngelScript* m_scriptContext;
 	asIScriptObject* m_scriptObject;
