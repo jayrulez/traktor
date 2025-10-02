@@ -121,7 +121,14 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 	if (type == L"ITypedObject" || type == L"traktor.ITypedObject") return "traktor::ITypedObject@";
 	if (type == L"ISerializable" || type == L"traktor.ISerializable") return "traktor::ISerializable@";
 	if (type == L"IRuntimeDelegate" || type == L"traktor.IRuntimeDelegate") return "traktor::IRuntimeDelegate@";
-	if (type == L"RefArray" || type == L"traktor.RefArray") return ""; // RefArray without template param, skip
+
+	// Handle non-templated container types - these are actually boxed types with specific RTTI names
+	// BoxedRefArray has RTTI name "traktor.RefArray" (not "traktor.BoxedRefArray")
+	if (type == L"RefArray" || type == L"traktor.RefArray") return "traktor::RefArray@";
+	// BoxedAlignedVector has RTTI name "traktor.AlignedVector"
+	if (type == L"AlignedVector" || type == L"traktor.AlignedVector") return "traktor::AlignedVector@";
+	// BoxedStdVector has RTTI name "traktor.StdVector"
+	if (type == L"StdVector" || type == L"traktor.StdVector") return "traktor::StdVector@";
 
 	// Handle boxed types - these wrap value types for the runtime system
 	// Strip "Boxed" prefix and convert to the registered AngelScript type
@@ -1047,7 +1054,7 @@ void ScriptManagerAngelScript::completeRegistration()
 
 #if defined(T_NEED_RUNTIME_SIGNATURE)
 			// Build method signatures from dispatch runtime signature (handles overloads)
-			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName);
+			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName, true);
 
 			// Log if all signatures were skipped due to unconvertible types
 			if (signatures.empty())
