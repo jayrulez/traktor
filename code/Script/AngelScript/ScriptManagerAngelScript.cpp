@@ -148,17 +148,29 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 			if (innerType == L"InnerType" || innerType == L"T" || innerType == L"U" || innerType == L"V")
 				return "";
 
-			// Strip "traktor." prefix from template name for comparison
+			// Strip namespace prefixes from template name for comparison
+			// Handle both "traktor.Ref" and "resource::Proxy" formats
 			std::wstring templateNameShort = templateName;
+
+			// Strip "traktor." prefix
 			if (templateName.find(L"traktor.") == 0)
 				templateNameShort = templateName.substr(8);
 
-			// For Ref<>, RefArray<>, etc., just extract and convert the inner type
+			// Strip any remaining namespace (e.g., "resource::" -> "")
+			size_t lastColon = templateNameShort.rfind(L"::");
+			if (lastColon != std::wstring::npos)
+				templateNameShort = templateNameShort.substr(lastColon + 2);
+
+			size_t lastDot = templateNameShort.rfind(L'.');
+			if (lastDot != std::wstring::npos)
+				templateNameShort = templateNameShort.substr(lastDot + 1);
+
+			// For Ref<>, RefArray<>, Proxy<>, etc., just extract and convert the inner type
 			// These are smart pointer wrappers that should map to handles in AngelScript
 			if (templateNameShort == L"Ref" || templateNameShort == L"RefArray" ||
 			    templateNameShort == L"AlignedVector" || templateNameShort == L"SmallSet" ||
 			    templateNameShort == L"SmallMap" || templateNameShort == L"StdVector" ||
-			    templateNameShort == L"Range")
+			    templateNameShort == L"Range" || templateNameShort == L"Proxy")
 			{
 				// Recursively convert the inner type
 				std::string converted = convertTraktorTypeToAngelScript(innerType);
@@ -261,6 +273,43 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 }
 #endif
 
+void setAngelScriptReturnValue(asIScriptGeneric* gen, const Any& result)
+{
+	// Set return value based on Any type
+	if (result.isVoid())
+	{
+		// No return value (void)
+		return;
+	}
+	else if (result.isBoolean())
+	{
+		gen->SetReturnByte(result.getBooleanUnsafe() ? 1 : 0);
+	}
+	else if (result.isInt32())
+	{
+		gen->SetReturnDWord(result.getInt32Unsafe());
+	}
+	else if (result.isInt64())
+	{
+		gen->SetReturnQWord(result.getInt64Unsafe());
+	}
+	else if (result.isFloat())
+	{
+		gen->SetReturnFloat(result.getFloatUnsafe());
+	}
+	else if (result.isObject())
+	{
+		// Return object handle
+		ITypedObject* obj = result.getObjectUnsafe();
+		gen->SetReturnObject(obj);
+	}
+	else
+	{
+		// Unknown type, return null/void
+		return;
+	}
+}
+
 void asGenericStaticMethodWrapper(asIScriptGeneric* gen)
 {
 	// Get the dispatch pointer from auxiliary data
@@ -268,9 +317,57 @@ void asGenericStaticMethodWrapper(asIScriptGeneric* gen)
 	if (!dispatch)
 		return;
 
-	// TODO: Convert AngelScript arguments to Any[]
-	// TODO: Call dispatch->invoke()
-	// TODO: Set return value
+	// Convert AngelScript arguments to Any[]
+	const int32_t argCount = gen->GetArgCount();
+	AlignedVector< Any > args;
+	args.resize(argCount);
+
+	for (int32_t i = 0; i < argCount; ++i)
+	{
+		// Get argument type ID
+		int typeId = gen->GetArgTypeId(i);
+
+		// Convert based on type
+		if (typeId == asTYPEID_BOOL)
+			args[i] = Any::fromBoolean(gen->GetArgByte(i) != 0);
+		else if (typeId == asTYPEID_INT8)
+			args[i] = Any::fromInt32(gen->GetArgByte(i));
+		else if (typeId == asTYPEID_INT16)
+			args[i] = Any::fromInt32(gen->GetArgWord(i));
+		else if (typeId == asTYPEID_INT32)
+			args[i] = Any::fromInt32(gen->GetArgDWord(i));
+		else if (typeId == asTYPEID_INT64)
+			args[i] = Any::fromInt64(gen->GetArgQWord(i));
+		else if (typeId == asTYPEID_UINT8)
+			args[i] = Any::fromInt32(gen->GetArgByte(i));
+		else if (typeId == asTYPEID_UINT16)
+			args[i] = Any::fromInt32(gen->GetArgWord(i));
+		else if (typeId == asTYPEID_UINT32)
+			args[i] = Any::fromInt32((int32_t)gen->GetArgDWord(i));
+		else if (typeId == asTYPEID_UINT64)
+			args[i] = Any::fromInt64((int64_t)gen->GetArgQWord(i));
+		else if (typeId == asTYPEID_FLOAT)
+			args[i] = Any::fromFloat(gen->GetArgFloat(i));
+		else if (typeId == asTYPEID_DOUBLE)
+			args[i] = Any::fromFloat((float)gen->GetArgDouble(i));
+		else if (typeId & asTYPEID_OBJHANDLE)
+		{
+			// Object handle (reference type)
+			void* obj = *(void**)gen->GetAddressOfArg(i);
+			args[i] = Any::fromObject((ITypedObject*)obj);
+		}
+		else
+		{
+			// Unknown type, use null
+			args[i] = Any();
+		}
+	}
+
+	// Call dispatch->invoke() with no 'this' object (static method)
+	Any result = dispatch->invoke(nullptr, argCount, argCount > 0 ? args.ptr() : nullptr);
+
+	// Set return value
+	setAngelScriptReturnValue(gen, result);
 }
 
 void asGenericInstanceMethodWrapper(asIScriptGeneric* gen)
@@ -280,10 +377,130 @@ void asGenericInstanceMethodWrapper(asIScriptGeneric* gen)
 	if (!dispatch)
 		return;
 
-	// TODO: Get the 'this' object from AngelScript
-	// TODO: Convert AngelScript arguments to Any[]
-	// TODO: Call dispatch->invoke() with 'this' object
-	// TODO: Set return value
+	// Get the 'this' object from AngelScript
+	void* thisPtr = gen->GetObject();
+	if (!thisPtr)
+		return;
+
+	// Convert AngelScript arguments to Any[]
+	const int32_t argCount = gen->GetArgCount();
+	AlignedVector< Any > args;
+	args.resize(argCount);
+
+	for (int32_t i = 0; i < argCount; ++i)
+	{
+		// Get argument type ID
+		int typeId = gen->GetArgTypeId(i);
+
+		// Convert based on type
+		if (typeId == asTYPEID_BOOL)
+			args[i] = Any::fromBoolean(gen->GetArgByte(i) != 0);
+		else if (typeId == asTYPEID_INT8)
+			args[i] = Any::fromInt32(gen->GetArgByte(i));
+		else if (typeId == asTYPEID_INT16)
+			args[i] = Any::fromInt32(gen->GetArgWord(i));
+		else if (typeId == asTYPEID_INT32)
+			args[i] = Any::fromInt32(gen->GetArgDWord(i));
+		else if (typeId == asTYPEID_INT64)
+			args[i] = Any::fromInt64(gen->GetArgQWord(i));
+		else if (typeId == asTYPEID_UINT8)
+			args[i] = Any::fromInt32(gen->GetArgByte(i));
+		else if (typeId == asTYPEID_UINT16)
+			args[i] = Any::fromInt32(gen->GetArgWord(i));
+		else if (typeId == asTYPEID_UINT32)
+			args[i] = Any::fromInt32((int32_t)gen->GetArgDWord(i));
+		else if (typeId == asTYPEID_UINT64)
+			args[i] = Any::fromInt64((int64_t)gen->GetArgQWord(i));
+		else if (typeId == asTYPEID_FLOAT)
+			args[i] = Any::fromFloat(gen->GetArgFloat(i));
+		else if (typeId == asTYPEID_DOUBLE)
+			args[i] = Any::fromFloat((float)gen->GetArgDouble(i));
+		else if (typeId & asTYPEID_OBJHANDLE)
+		{
+			// Object handle (reference type)
+			void* obj = *(void**)gen->GetAddressOfArg(i);
+			args[i] = Any::fromObject((ITypedObject*)obj);
+		}
+		else
+		{
+			// Unknown type, use null
+			args[i] = Any();
+		}
+	}
+
+	// Call dispatch->invoke() with 'this' object
+	Any result = dispatch->invoke((ITypedObject*)thisPtr, argCount, argCount > 0 ? args.ptr() : nullptr);
+
+	// Set return value
+	setAngelScriptReturnValue(gen, result);
+}
+
+void asGenericPropertyGetWrapper(asIScriptGeneric* gen)
+{
+	// Get the dispatch pointer from auxiliary data
+	const IRuntimeDispatch* dispatch = static_cast<const IRuntimeDispatch*>(gen->GetAuxiliary());
+	if (!dispatch)
+		return;
+
+	// Get the 'this' object from AngelScript
+	void* thisPtr = gen->GetObject();
+	if (!thisPtr)
+		return;
+
+	// Call dispatch->invoke() with 'this' object (no arguments for getter)
+	Any result = dispatch->invoke((ITypedObject*)thisPtr, 0, nullptr);
+
+	// Set return value
+	setAngelScriptReturnValue(gen, result);
+}
+
+void asGenericPropertySetWrapper(asIScriptGeneric* gen)
+{
+	// Get the dispatch pointer from auxiliary data
+	const IRuntimeDispatch* dispatch = static_cast<const IRuntimeDispatch*>(gen->GetAuxiliary());
+	if (!dispatch)
+		return;
+
+	// Get the 'this' object from AngelScript
+	void* thisPtr = gen->GetObject();
+	if (!thisPtr)
+		return;
+
+	// Get the property value from AngelScript (argument 0)
+	int typeId = gen->GetArgTypeId(0);
+	Any value;
+
+	if (typeId == asTYPEID_BOOL)
+		value = Any::fromBoolean(gen->GetArgByte(0) != 0);
+	else if (typeId == asTYPEID_INT8)
+		value = Any::fromInt32(gen->GetArgByte(0));
+	else if (typeId == asTYPEID_INT16)
+		value = Any::fromInt32(gen->GetArgWord(0));
+	else if (typeId == asTYPEID_INT32)
+		value = Any::fromInt32(gen->GetArgDWord(0));
+	else if (typeId == asTYPEID_INT64)
+		value = Any::fromInt64(gen->GetArgQWord(0));
+	else if (typeId == asTYPEID_UINT8)
+		value = Any::fromInt32(gen->GetArgByte(0));
+	else if (typeId == asTYPEID_UINT16)
+		value = Any::fromInt32(gen->GetArgWord(0));
+	else if (typeId == asTYPEID_UINT32)
+		value = Any::fromInt32((int32_t)gen->GetArgDWord(0));
+	else if (typeId == asTYPEID_UINT64)
+		value = Any::fromInt64((int64_t)gen->GetArgQWord(0));
+	else if (typeId == asTYPEID_FLOAT)
+		value = Any::fromFloat(gen->GetArgFloat(0));
+	else if (typeId == asTYPEID_DOUBLE)
+		value = Any::fromFloat((float)gen->GetArgDouble(0));
+	else if (typeId & asTYPEID_OBJHANDLE)
+	{
+		// Object handle (reference type)
+		void* obj = *(void**)gen->GetAddressOfArg(0);
+		value = Any::fromObject((ITypedObject*)obj);
+	}
+
+	// Call dispatch->invoke() with 'this' object and value
+	dispatch->invoke((ITypedObject*)thisPtr, 1, &value);
 }
 
 void asMessageCallback(const asSMessageInfo* msg, void* param)
@@ -508,6 +725,115 @@ void ScriptManagerAngelScript::completeRegistration()
 			continue;
 		}
 
+		// Register constants as global properties within the class namespace
+		// Similar to static methods, we use the class namespace trick (e.g., "traktor::ClassName::CONSTANT")
+		// Note: We need to keep constant values alive for the lifetime of the script engine,
+		// so we store them in the RegisteredClass structure
+		const uint32_t constantCount = runtimeClass->getConstantCount();
+		for (uint32_t i = 0; i < constantCount; ++i)
+		{
+			const std::string constantName = runtimeClass->getConstantName(i);
+			const Any constantValue = runtimeClass->getConstantValue(i);
+
+			// Set namespace to "namespace::ClassName" to make it accessible as "ClassName::CONSTANT"
+			std::string constantNamespace = namespaceName.empty() ? className : namespaceName + "::" + className;
+			r = m_scriptEngine->SetDefaultNamespace(constantNamespace.c_str());
+			if (r < 0)
+			{
+				log::warning << L"Failed to set namespace \"" << mbstows(constantNamespace) << L"\" for constant \"" << mbstows(constantName) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+				m_scriptEngine->SetDefaultNamespace(namespaceName.c_str()); // Restore class namespace
+				continue;
+			}
+
+			// Store constant value in the RegisteredClass to keep it alive
+			// Then register it based on its type
+			void* constantPtr = nullptr;
+			std::string constantDecl;
+
+			if (constantValue.isInt32())
+			{
+				ConstantValue cv;
+				cv.i32 = constantValue.getInt32Unsafe();
+				rc.constantValues.push_back(cv);
+				constantPtr = &rc.constantValues.back().i32;
+				constantDecl = "const int " + constantName;
+			}
+			else if (constantValue.isInt64())
+			{
+				ConstantValue cv;
+				cv.i64 = constantValue.getInt64Unsafe();
+				rc.constantValues.push_back(cv);
+				constantPtr = &rc.constantValues.back().i64;
+				constantDecl = "const int64 " + constantName;
+			}
+			else if (constantValue.isFloat())
+			{
+				ConstantValue cv;
+				cv.f32 = constantValue.getFloatUnsafe();
+				rc.constantValues.push_back(cv);
+				constantPtr = &rc.constantValues.back().f32;
+				constantDecl = "const float " + constantName;
+			}
+			else if (constantValue.isBoolean())
+			{
+				ConstantValue cv;
+				cv.b = constantValue.getBooleanUnsafe();
+				rc.constantValues.push_back(cv);
+				constantPtr = &rc.constantValues.back().b;
+				constantDecl = "const bool " + constantName;
+			}
+			else if (constantValue.isObject())
+			{
+				// For object constants, we need to register them as object handles
+				// Store the object in the constant objects array
+				ITypedObject* obj = constantValue.getObjectUnsafe();
+				if (obj)
+				{
+					// Get the object's type name and convert to AngelScript format
+					const TypeInfo& typeInfo = type_of(obj);
+					std::wstring typeName = typeInfo.getName();
+					std::string typeNameStr = wstombs(typeName);
+
+					// Replace '.' with '::'
+					size_t pos = 0;
+					while ((pos = typeNameStr.find('.', pos)) != std::string::npos)
+					{
+						typeNameStr.replace(pos, 1, "::");
+						pos += 2;
+					}
+
+					// Store raw pointer in constantObjectPointers
+					rc.constantObjectPointers.push_back(obj);
+					constantPtr = &rc.constantObjectPointers.back();
+					constantDecl = "const " + typeNameStr + "@ " + constantName;
+
+					// Also keep a strong reference to prevent deletion
+					rc.constantObjects.push_back(obj);
+				}
+				else
+				{
+					log::info << L"Skipped constant \"" << mbstows(constantName) << L"\" for class \"" << mbstows(fullNameStr) << L"\" (null object constant)" << Endl;
+					m_scriptEngine->SetDefaultNamespace(namespaceName.c_str());
+					continue;
+				}
+			}
+			else
+			{
+				log::info << L"Skipped constant \"" << mbstows(constantName) << L"\" for class \"" << mbstows(fullNameStr) << L"\" (unsupported constant type)" << Endl;
+				m_scriptEngine->SetDefaultNamespace(namespaceName.c_str());
+				continue;
+			}
+
+			r = m_scriptEngine->RegisterGlobalProperty(constantDecl.c_str(), constantPtr);
+			if (r < 0)
+			{
+				log::warning << L"Failed to register constant \"" << mbstows(constantName) << L"\" for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+			}
+
+			// Restore namespace to class level
+			m_scriptEngine->SetDefaultNamespace(namespaceName.c_str());
+		}
+
 		// Register static methods as global functions within the class namespace
 		// AngelScript doesn't support static methods on types, so we register them as global functions
 		// within the fully qualified namespace (e.g., "traktor::ClassName::staticMethod")
@@ -520,6 +846,13 @@ void ScriptManagerAngelScript::completeRegistration()
 #if defined(T_NEED_RUNTIME_SIGNATURE)
 			// Build method signatures from dispatch runtime signature (handles overloads)
 			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName);
+
+			// Log if all signatures were skipped due to unconvertible types
+			if (signatures.empty())
+			{
+				log::info << L"Skipped static method \"" << mbstows(methodName) << L"\" for class \"" << mbstows(fullNameStr) << L"\" (all signatures contain unconvertible types)" << Endl;
+				continue;
+			}
 
 			// Register each overload as a global function within the class namespace
 			// Set namespace to "namespace::ClassName" to make it accessible as "ClassName::staticMethod"
@@ -567,6 +900,13 @@ void ScriptManagerAngelScript::completeRegistration()
 			// Build method signatures from dispatch runtime signature (handles overloads)
 			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName);
 
+			// Log if all signatures were skipped due to unconvertible types
+			if (signatures.empty())
+			{
+				log::info << L"Skipped instance method \"" << mbstows(methodName) << L"\" for class \"" << mbstows(fullNameStr) << L"\" (all signatures contain unconvertible types)" << Endl;
+				continue;
+			}
+
 			// Register each overload as an instance method
 			for (const auto& signature : signatures)
 			{
@@ -589,12 +929,207 @@ void ScriptManagerAngelScript::completeRegistration()
 #endif
 		}
 
-		// TODO: Register properties
+		// Register properties
+		const uint32_t propertyCount = runtimeClass->getPropertiesCount();
+		for (uint32_t i = 0; i < propertyCount; ++i)
+		{
+			const std::string propertyName = runtimeClass->getPropertyName(i);
+			const IRuntimeDispatch* getDispatch = runtimeClass->getPropertyGetDispatch(i);
+			const IRuntimeDispatch* setDispatch = runtimeClass->getPropertySetDispatch(i);
+
+#if defined(T_NEED_RUNTIME_SIGNATURE)
+			// Register getter if available
+			if (getDispatch)
+			{
+				// Get the property type from the getter's return type
+				AlignedVector< std::string > getSignatures = convertRuntimeSignaturesToAngelScript(getDispatch, "get_" + propertyName);
+				if (getSignatures.empty())
+				{
+					// Log if property was skipped due to unconvertible type
+					log::info << L"Skipped property \"" << mbstows(propertyName) << L"\" for class \"" << mbstows(fullNameStr) << L"\" (property type contains unconvertible types)" << Endl;
+					continue;
+				}
+
+				if (!getSignatures.empty())
+				{
+					// Extract return type from first signature (e.g., "ReturnType get_propertyName()")
+					const std::string& getSig = getSignatures[0];
+					size_t spacePos = getSig.find(' ');
+					if (spacePos != std::string::npos)
+					{
+						std::string propertyType = getSig.substr(0, spacePos);
+
+						// Skip if property type couldn't be determined
+						if (!propertyType.empty())
+						{
+							// Register getter method
+							std::string getterSig = propertyType + " get_" + propertyName + "()";
+							r = m_scriptEngine->RegisterObjectMethod(
+								className.c_str(),
+								getterSig.c_str(),
+								asFUNCTION(asGenericPropertyGetWrapper),
+								asCALL_GENERIC,
+								const_cast<void*>(static_cast<const void*>(getDispatch))
+							);
+							if (r < 0)
+							{
+								log::warning << L"Failed to register property getter \"" << mbstows(propertyName) << L"\" with signature \"" << mbstows(getterSig) << L"\" for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+							}
+
+							// Register setter if available
+							if (setDispatch)
+							{
+								std::string setterSig = "void set_" + propertyName + "(" + propertyType + ")";
+								r = m_scriptEngine->RegisterObjectMethod(
+									className.c_str(),
+									setterSig.c_str(),
+									asFUNCTION(asGenericPropertySetWrapper),
+									asCALL_GENERIC,
+									const_cast<void*>(static_cast<const void*>(setDispatch))
+								);
+								if (r < 0)
+								{
+									log::warning << L"Failed to register property setter \"" << mbstows(propertyName) << L"\" with signature \"" << mbstows(setterSig) << L"\" for class \"" << mbstows(fullNameStr) << L"\": " << getErrorString(r) << L" (" << r << L")" << Endl;
+								}
+							}
+						}
+					}
+				}
+			}
+#else
+			log::error << L"AngelScript backend requires T_NEED_RUNTIME_SIGNATURE to be defined for class registration" << Endl;
+			m_scriptEngine->SetDefaultNamespace("");
+			return;
+#endif
+		}
+
 		// TODO: Register operators
 
 		// Reset to global namespace
 		m_scriptEngine->SetDefaultNamespace("");
 	}
+
+	// Dump registration summary
+	dumpRegistration();
+}
+
+void ScriptManagerAngelScript::dumpRegistration()
+{
+	log::info << L"========== AngelScript Registration Summary ==========" << Endl;
+
+	// Get total counts
+	asUINT typeCount = m_scriptEngine->GetObjectTypeCount();
+	asUINT globalFuncCount = m_scriptEngine->GetGlobalFunctionCount();
+	asUINT globalPropCount = m_scriptEngine->GetGlobalPropertyCount();
+
+	log::info << L"Total Types: " << typeCount << Endl;
+	log::info << L"Total Global Functions: " << globalFuncCount << Endl;
+	log::info << L"Total Global Properties: " << globalPropCount << Endl;
+	log::info << L"" << Endl;
+
+	// Dump all registered types
+	for (asUINT i = 0; i < typeCount; i++)
+	{
+		asITypeInfo* typeInfo = m_scriptEngine->GetObjectTypeByIndex(i);
+		if (!typeInfo)
+			continue;
+
+		const char* typeName = typeInfo->GetName();
+		const char* namespaceName = typeInfo->GetNamespace();
+
+		std::string fullName;
+		if (namespaceName && namespaceName[0] != '\0')
+			fullName = std::string(namespaceName) + "::" + typeName;
+		else
+			fullName = typeName;
+
+		log::info << L"Type: " << mbstows(fullName) << Endl;
+
+		// Dump methods
+		asUINT methodCount = typeInfo->GetMethodCount();
+		if (methodCount > 0)
+		{
+			log::info << L"  Methods (" << methodCount << L"):" << Endl;
+			for (asUINT m = 0; m < methodCount; m++)
+			{
+				asIScriptFunction* func = typeInfo->GetMethodByIndex(m);
+				if (func)
+				{
+					const char* decl = func->GetDeclaration(false, false, false);
+					log::info << L"    " << mbstows(decl) << Endl;
+				}
+			}
+		}
+
+		// Dump properties
+		asUINT propCount = typeInfo->GetPropertyCount();
+		if (propCount > 0)
+		{
+			log::info << L"  Properties (" << propCount << L"):" << Endl;
+			for (asUINT p = 0; p < propCount; p++)
+			{
+				const char* propName;
+				int typeId;
+				bool isPrivate;
+				bool isProtected;
+				int offset;
+				bool isReference;
+				asDWORD accessMask;
+				int compositeOffset;
+				bool isCompositeIndirect;
+
+				typeInfo->GetProperty(p, &propName, &typeId, &isPrivate, &isProtected, &offset, &isReference, &accessMask, &compositeOffset, &isCompositeIndirect);
+				log::info << L"    " << mbstows(propName) << Endl;
+			}
+		}
+
+		log::info << L"" << Endl;
+	}
+
+	// Dump global functions (organized by namespace)
+	if (globalFuncCount > 0)
+	{
+		log::info << L"Global Functions (" << globalFuncCount << L"):" << Endl;
+		for (asUINT i = 0; i < globalFuncCount; i++)
+		{
+			asIScriptFunction* func = m_scriptEngine->GetGlobalFunctionByIndex(i);
+			if (func)
+			{
+				const char* decl = func->GetDeclaration(true, true, false);
+				log::info << L"  " << mbstows(decl) << Endl;
+			}
+		}
+		log::info << L"" << Endl;
+	}
+
+	// Dump global properties (constants)
+	if (globalPropCount > 0)
+	{
+		log::info << L"Global Properties (" << globalPropCount << L"):" << Endl;
+		for (asUINT i = 0; i < globalPropCount; i++)
+		{
+			const char* propName;
+			const char* namespaceName;
+			int typeId;
+			bool isConst;
+			const char* configGroup;
+			void* pointer;
+			asDWORD accessMask;
+
+			m_scriptEngine->GetGlobalPropertyByIndex(i, &propName, &namespaceName, &typeId, &isConst, &configGroup, &pointer, &accessMask);
+
+			std::string fullPropName;
+			if (namespaceName && namespaceName[0] != '\0')
+				fullPropName = std::string(namespaceName) + "::" + propName;
+			else
+				fullPropName = propName;
+
+			log::info << L"  " << mbstows(fullPropName) << (isConst ? L" [const]" : L"") << Endl;
+		}
+		log::info << L"" << Endl;
+	}
+
+	log::info << L"=======================================================" << Endl;
 }
 
 Ref< IScriptContext > ScriptManagerAngelScript::createContext(bool strict)
