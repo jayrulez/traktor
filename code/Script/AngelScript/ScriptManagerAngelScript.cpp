@@ -12,6 +12,7 @@
 #include "Core/Io/StringOutputStream.h"
 #include "Core/Io/Utf8Encoding.h"
 #include "Core/Log/Log.h"
+#include "Core/Math/Scalar.h"
 #include "Core/Misc/Split.h"
 #include "Core/Misc/String.h"
 #include "Core/Misc/TString.h"
@@ -114,7 +115,8 @@ std::string convertTraktorTypeToAngelScript(const std::wstring& traktorType)
 
 	// Handle common Traktor base types that need manual registration
 	if (type == L"TypeInfo" || type == L"traktor.TypeInfo") return "traktor::TypeInfo@";
-	if (type == L"Scalar" || type == L"traktor.Scalar") return ""; // Scalar is a template typedef, skip for now
+	// Scalar is registered as a value type, so const Scalar& or Scalar& becomes just Scalar
+	if (type == L"Scalar" || type == L"traktor.Scalar") return "traktor::Scalar";
 	if (type == L"Object" || type == L"traktor.Object") return "traktor::Object@";
 	if (type == L"ITypedObject" || type == L"traktor.ITypedObject") return "traktor::ITypedObject@";
 	if (type == L"ISerializable" || type == L"traktor.ISerializable") return "traktor::ISerializable@";
@@ -243,9 +245,6 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 	dispatch->signature(ss);
 	std::wstring signatureWide = ss.str();
 
-	if (logSkipped)
-		log::info << L"    Raw signature from dispatch: \"" << signatureWide << L"\"" << Endl;
-
 	// Split by semicolon to handle overloads
 	AlignedVector< std::wstring > overloads;
 	Split< std::wstring >::any(signatureWide, L";", overloads, true);
@@ -304,6 +303,12 @@ AlignedVector< std::string > convertRuntimeSignaturesToAngelScript(const IRuntim
 
 		signature += ")";
 		signatures.push_back(signature);
+	}
+
+	// Only log the raw signature if ALL signatures were skipped
+	if (logSkipped && signatures.empty() && !signatureWide.empty())
+	{
+		log::info << L"    Raw signature from dispatch: \"" << signatureWide << L"\"" << Endl;
 	}
 
 	return signatures;
@@ -660,6 +665,69 @@ void asObjectRelease(ITypedObject* obj)
 		obj->release(nullptr);
 }
 
+// Scalar registration helper functions
+void asScalarDefaultConstructor(void* memory)
+{
+	new(memory) Scalar();
+}
+
+void asScalarFloatConstructor(void* memory, float v)
+{
+	new(memory) Scalar(v);
+}
+
+void asScalarCopyConstructor(void* memory, const Scalar& v)
+{
+	new(memory) Scalar(v);
+}
+
+void asScalarDestructor(void* memory)
+{
+	((Scalar*)memory)->~Scalar();
+}
+
+Scalar& asScalarAssign(Scalar* self, const Scalar& other)
+{
+	return *self = other;
+}
+
+float asScalarToFloat(const Scalar* self)
+{
+	return float(*self);
+}
+
+Scalar asScalarAdd(const Scalar* self, const Scalar& other)
+{
+	return *self + other;
+}
+
+Scalar asScalarSub(const Scalar* self, const Scalar& other)
+{
+	return *self - other;
+}
+
+Scalar asScalarMul(const Scalar* self, const Scalar& other)
+{
+	return *self * other;
+}
+
+Scalar asScalarDiv(const Scalar* self, const Scalar& other)
+{
+	return *self / other;
+}
+
+bool asScalarEquals(const Scalar* self, const Scalar& other)
+{
+	return *self == other;
+}
+
+int asScalarCmp(const Scalar* self, const Scalar& other)
+{
+	if (*self < other) return -1;
+	if (*self > other) return 1;
+	return 0;
+}
+
 void ScriptManagerAngelScript::registerClass(IRuntimeClass* runtimeClass)
 {
 	T_ANONYMOUS_VAR(Acquire< Semaphore >)(m_lock);
@@ -760,6 +828,64 @@ void ScriptManagerAngelScript::completeRegistration()
 
 	// PHASE 2: Register all members (methods, properties, operators, etc.)
 	// At this point, all types are registered and can be referenced
+
+	// First, register Scalar as a value type since many classes use it
+	// This must be done before registering members of other classes
+	m_scriptEngine->SetDefaultNamespace("traktor");
+
+	int r = m_scriptEngine->RegisterObjectType("Scalar", sizeof(Scalar), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Scalar>());
+	if (r < 0)
+	{
+		log::warning << L"Failed to register Scalar type: " << getErrorString(r) << Endl;
+	}
+	else
+	{
+		// Default constructor
+		r = m_scriptEngine->RegisterObjectBehaviour("Scalar", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(asScalarDefaultConstructor), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar default constructor: " << getErrorString(r) << Endl;
+
+		// Constructor from float
+		r = m_scriptEngine->RegisterObjectBehaviour("Scalar", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(asScalarFloatConstructor), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar(float) constructor: " << getErrorString(r) << Endl;
+
+		// Copy constructor
+		r = m_scriptEngine->RegisterObjectBehaviour("Scalar", asBEHAVE_CONSTRUCT, "void f(const Scalar &in)", asFUNCTION(asScalarCopyConstructor), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar copy constructor: " << getErrorString(r) << Endl;
+
+		// Destructor (trivial, but required)
+		r = m_scriptEngine->RegisterObjectBehaviour("Scalar", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(asScalarDestructor), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar destructor: " << getErrorString(r) << Endl;
+
+		// Assignment operator
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "Scalar& opAssign(const Scalar &in)", asFUNCTION(asScalarAssign), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opAssign: " << getErrorString(r) << Endl;
+
+		// Conversion to float
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "float opImplConv() const", asFUNCTION(asScalarToFloat), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar float conversion: " << getErrorString(r) << Endl;
+
+		// Arithmetic operators
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "Scalar opAdd(const Scalar &in) const", asFUNCTION(asScalarAdd), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opAdd: " << getErrorString(r) << Endl;
+
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "Scalar opSub(const Scalar &in) const", asFUNCTION(asScalarSub), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opSub: " << getErrorString(r) << Endl;
+
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "Scalar opMul(const Scalar &in) const", asFUNCTION(asScalarMul), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opMul: " << getErrorString(r) << Endl;
+
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "Scalar opDiv(const Scalar &in) const", asFUNCTION(asScalarDiv), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opDiv: " << getErrorString(r) << Endl;
+
+		// Comparison operators
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "bool opEquals(const Scalar &in) const", asFUNCTION(asScalarEquals), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opEquals: " << getErrorString(r) << Endl;
+
+		r = m_scriptEngine->RegisterObjectMethod("Scalar", "int opCmp(const Scalar &in) const", asFUNCTION(asScalarCmp), asCALL_CDECL_OBJFIRST);
+		if (r < 0) log::warning << L"Failed to register Scalar opCmp: " << getErrorString(r) << Endl;
+	}
+
+	m_scriptEngine->SetDefaultNamespace("");
 
 	for (auto& rc : m_classRegistry)
 	{
@@ -974,7 +1100,7 @@ void ScriptManagerAngelScript::completeRegistration()
 
 #if defined(T_NEED_RUNTIME_SIGNATURE)
 			// Build method signatures from dispatch runtime signature (handles overloads)
-			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName);
+			AlignedVector< std::string > signatures = convertRuntimeSignaturesToAngelScript(dispatch, methodName, true);
 
 			// Log if all signatures were skipped due to unconvertible types
 			if (signatures.empty())
@@ -1018,7 +1144,7 @@ void ScriptManagerAngelScript::completeRegistration()
 			if (getDispatch)
 			{
 				// Get the property type from the getter's return type
-				AlignedVector< std::string > getSignatures = convertRuntimeSignaturesToAngelScript(getDispatch, "get_" + propertyName);
+				AlignedVector< std::string > getSignatures = convertRuntimeSignaturesToAngelScript(getDispatch, "get_" + propertyName, true);
 				if (getSignatures.empty())
 				{
 					// Log if property was skipped due to unconvertible type
@@ -1126,7 +1252,7 @@ void ScriptManagerAngelScript::completeRegistration()
 	}
 
 	// Dump registration summary
-	dumpRegistration();
+	//dumpRegistration();
 }
 
 void ScriptManagerAngelScript::dumpRegistration()
