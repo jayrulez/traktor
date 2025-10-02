@@ -35,8 +35,11 @@
 #include "Runtime/IEnvironment.h"
 #include "Runtime/IInputServer.h"
 #include "Runtime/IRenderServer.h"
+#include "Runtime/IScriptServer.h"
 #include "Runtime/UpdateControl.h"
 #include "Runtime/UpdateInfo.h"
+#include "Script/IScriptContext.h"
+#include "Script/IScriptManager.h"
 #include "Runtime/Engine/AudioLayer.h"
 #include "Runtime/Engine/DebugLayer.h"
 #include "Runtime/Engine/ScreenLayer.h"
@@ -242,6 +245,11 @@ void GameClassFactory::createClasses(IRuntimeClassRegistrar* registrar) const
 	auto classResourceServer = new AutoRuntimeClass< IResourceServer >();
 	classResourceServer->addProperty< resource::IResourceManager* >("resourceManager", 0, &IResourceServer::getResourceManager);
 	registrar->registerClass(classResourceServer);
+
+	auto classScriptServer = new AutoRuntimeClass< IScriptServer >();
+	classScriptServer->addProperty< script::IScriptManager* >("scriptManager", 0, &IScriptServer::getScriptManager);
+	classScriptServer->addProperty< script::IScriptContext* >("scriptContext", 0, &IScriptServer::getScriptContext);
+	registrar->registerClass(classScriptServer);
 
 	auto classWorldServer = new AutoRuntimeClass< IWorldServer >();
 	classWorldServer->addProperty< const world::IEntityFactory* >("entityFactory", 0, &IWorldServer::getEntityFactory);

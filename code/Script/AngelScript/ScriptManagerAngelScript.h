@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Core/RefArray.h"
+#include "Core/Class/Any.h"
 #include "Core/Containers/AlignedVector.h"
 #include "Script/IScriptManager.h"
 #include "Core/Thread/Semaphore.h"
@@ -93,10 +94,24 @@ private:
 	friend class ScriptDebuggerAngelScript;
 	friend class ScriptProfilerAngelScript;
 
+	struct ConstantValue
+	{
+		union
+		{
+			int32_t i32;
+			int64_t i64;
+			float f32;
+			bool b;
+		};
+	};
+
 	struct RegisteredClass
 	{
 		Ref< const IRuntimeClass > runtimeClass;
 		int32_t typeId;
+		AlignedVector< ConstantValue > constantValues;      // Storage for primitive constant values
+		RefArray< ITypedObject > constantObjects;           // Storage for object constant values (strong refs to keep alive)
+		AlignedVector< ITypedObject* > constantObjectPointers;  // Raw pointers to objects for AngelScript
 	};
 
 	asIScriptEngine* m_scriptEngine;
@@ -114,6 +129,8 @@ private:
 	void collectGarbageFull();
 
 	void collectGarbagePartial();
+
+	void dumpRegistration();
 };
 
 }
