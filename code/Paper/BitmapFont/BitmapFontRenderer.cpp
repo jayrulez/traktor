@@ -6,6 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+#include "Core/Log/Log.h"
 #include "Core/Math/Color4ub.h"
 #include "Core/Math/Vector4.h"
 #include "Paper/BitmapFont/BitmapFont.h"
@@ -66,11 +67,17 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 	// Load the font texture if not already loaded
 	resource::Proxy< render::ITexture > texture;
 	if (!m_resourceManager->bind(resource::Id< render::ITexture >(bitmapFont->getTextureId()), texture))
+	{
+		log::warning << L"BitmapFontRenderer: Failed to bind texture " << bitmapFont->getTextureId().format() << Endl;
 		return;
+	}
 
 	render::ITexture* texturePtr = texture.getResource();
 	if (!texturePtr)
+	{
+		log::warning << L"BitmapFontRenderer: Texture resource is null" << Endl;
 		return;
+	}
 
 	// Convert color to Color4ub for PrimitiveRenderer
 	Color4ub colorUb(
@@ -81,6 +88,7 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 	);
 
 	Vector2 currentPos = position;
+	int glyphsDrawn = 0;
 
 	for (wchar_t ch : text)
 	{
@@ -93,7 +101,10 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 
 		const BitmapFont::Glyph* glyph = bitmapFont->getGlyph((uint32_t)ch);
 		if (!glyph)
+		{
+			log::warning << L"BitmapFontRenderer: No glyph for character " << (uint32_t)ch << L" ('" << ch << L"')" << Endl;
 			continue;
+		}
 
 		// Skip glyphs with no size (whitespace)
 		if (glyph->bounds.getExtent().x <= 0.0f || glyph->bounds.getExtent().y <= 0.0f)
@@ -122,8 +133,11 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 			texturePtr
 		);
 
+		glyphsDrawn++;
 		currentPos.x += glyph->advance;
 	}
+
+	log::info << L"BitmapFontRenderer: Drew " << glyphsDrawn << L" glyphs for text of length " << text.length() << Endl;
 }
 
 }

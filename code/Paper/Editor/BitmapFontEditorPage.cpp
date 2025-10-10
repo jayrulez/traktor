@@ -37,7 +37,7 @@ BitmapFontEditorPage::BitmapFontEditorPage(editor::IEditor* editor, editor::IEdi
 bool BitmapFontEditorPage::create(ui::Container* parent)
 {
 	Ref< ui::Container > container = new ui::Container();
-	if (!container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", ui::Unit(0), ui::Unit(4))))
+	if (!container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"100,100%", ui::Unit(0), ui::Unit(4))))
 		return false;
 
 	// Create text input for preview text.
@@ -54,6 +54,10 @@ bool BitmapFontEditorPage::create(ui::Container* parent)
 
 	// Initial update to load the font.
 	updatePreview();
+
+	// Set initial preview text
+	if (m_previewControl && m_editPreviewText)
+		m_previewControl->setPreviewText(m_editPreviewText->getText());
 
 	return true;
 }
