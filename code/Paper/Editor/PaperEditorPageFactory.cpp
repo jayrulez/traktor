@@ -7,6 +7,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include "Core/Serialization/DeepClone.h"
+#include "Editor/IDocument.h"
+#include "Paper/Editor/BitmapFontAsset.h"
+#include "Paper/Editor/BitmapFontEditorPage.h"
 #include "Paper/Editor/PaperEditorPageFactory.h"
 #include "Paper/Editor/UIPageAsset.h"
 #include "Paper/Editor/UIPageEditorPage.h"
@@ -19,7 +22,7 @@ T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.PaperEditorPageFactory", 0, Paper
 
 const TypeInfoSet PaperEditorPageFactory::getEditableTypes() const
 {
-	return makeTypeInfoSet< UIPageAsset >();
+	return makeTypeInfoSet< UIPageAsset, BitmapFontAsset >();
 }
 
 bool PaperEditorPageFactory::needOutputResources(const TypeInfo& typeInfo, std::set< Guid >& outDependencies) const
@@ -29,7 +32,16 @@ bool PaperEditorPageFactory::needOutputResources(const TypeInfo& typeInfo, std::
 
 Ref< editor::IEditorPage > PaperEditorPageFactory::createEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document) const
 {
-	return new UIPageEditorPage(editor, site, document);
+	Ref< const ISerializable > asset = document->getObject(0);
+	if (!asset)
+		return nullptr;
+
+	if (is_a< BitmapFontAsset >(asset))
+		return new BitmapFontEditorPage(editor, site, document);
+	else if (is_a< UIPageAsset >(asset))
+		return new UIPageEditorPage(editor, site, document);
+
+	return nullptr;
 }
 
 void PaperEditorPageFactory::getCommands(std::list< ui::Command >& outCommands) const

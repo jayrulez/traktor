@@ -22032,21 +22032,6 @@
 				</item>
 			</configurations>
 			<items>
-				<item type="traktor.sb.Filter">
-					<name>Font</name>
-					<items>
-						<item type="traktor.sb.File" version="1">
-							<fileName>Font/*.h</fileName>
-							<excludeFilter/>
-							<items/>
-						</item>
-						<item type="traktor.sb.File" version="1">
-							<fileName>Font/*.cpp</fileName>
-							<excludeFilter/>
-							<items/>
-						</item>
-					</items>
-				</item>
 				<item type="traktor.sb.File" version="1">
 					<fileName>*.h</fileName>
 					<excludeFilter/>
@@ -22056,6 +22041,16 @@
 					<fileName>*.cpp</fileName>
 					<excludeFilter/>
 					<items/>
+				</item>
+				<item type="traktor.sb.Filter">
+					<name>BitmapFont</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>BitmapFont/*.*</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+					</items>
 				</item>
 			</items>
 			<dependencies>
