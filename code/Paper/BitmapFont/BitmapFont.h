@@ -59,6 +59,8 @@ public:
 
 	const AlignedVector< Glyph >& getGlyphs() const { return m_glyphs; }
 
+	uint32_t getGlyphCount() const { return (uint32_t)m_glyphs.size(); }
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:

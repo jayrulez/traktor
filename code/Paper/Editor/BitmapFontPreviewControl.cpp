@@ -117,6 +117,13 @@ void BitmapFontPreviewControl::destroy()
 void BitmapFontPreviewControl::setBitmapFont(BitmapFont* font)
 {
 	m_font = font;
+	if (m_font)
+	{
+		log::info << L"BitmapFontPreviewControl: Font set, " << m_font->getGlyphCount() << L" glyphs, line height: " << m_font->getLineHeight() << Endl;
+		log::info << L"BitmapFontPreviewControl: Texture ID: " << m_font->getTextureId().format() << Endl;
+	}
+	else
+		log::warning << L"BitmapFontPreviewControl: Font is null" << Endl;
 	update();
 }
 
@@ -147,20 +154,31 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		if (re.type == render::RenderEventType::Lost)
 			m_renderView->reset(sz.cx, sz.cy);
 
-	// Add render passes to render graph.
-	Ref< render::RenderPass > rp = new render::RenderPass(L"Preview");
-	rp->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
-	rp->addBuild([&, sz](const render::RenderGraph&, render::RenderContext* renderContext) {
-		// Render text if we have a font.
-		if (m_font && m_fontRenderer && !m_previewText.empty())
+	if (!m_renderView->beginFrame())
+		return;
+
+	// Setup clear.
+	render::Clear clear;
+	clear.mask = render::CfColor | render::CfDepth | render::CfStencil;
+	clear.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 1.0f);
+	clear.depth = 1.0f;
+	clear.stencil = 0;
+
+	if (!m_renderView->beginPass(&clear, render::TfAll, render::TfAll))
+		return;
+
+	// Render text if we have a font.
+	if (m_font && m_fontRenderer && !m_previewText.empty())
+	{
+		// Create orthographic projection for 2D rendering.
+		const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, (float)sz.cy, 0.0f, 0.0f, 1.0f);
+
+		if (m_primitiveRenderer->begin(0, projection))
 		{
-			// Create orthographic projection for 2D rendering.
-			const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, (float)sz.cy, 0.0f, 0.0f, 1.0f);
-
-			m_primitiveRenderer->begin(0, projection);
-
 			const float x = 20.0f;
 			float y = 40.0f;
+
+			log::info << L"BitmapFontPreviewControl: Rendering text, size: " << sz.cx << L"x" << sz.cy << Endl;
 
 			std::wstring currentLine;
 			for (wchar_t ch : m_previewText)
@@ -169,6 +187,7 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 				{
 					if (!currentLine.empty())
 					{
+						log::info << L"BitmapFontPreviewControl: Drawing line at (" << x << L", " << y << L"): " << currentLine << Endl;
 						m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 						currentLine.clear();
 					}
@@ -180,34 +199,30 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 
 			// Draw remaining text.
 			if (!currentLine.empty())
+			{
+				log::info << L"BitmapFontPreviewControl: Drawing final line at (" << x << L", " << y << L"): " << currentLine << Endl;
 				m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
+			}
 
 			m_primitiveRenderer->end(0);
-
-			auto rb = renderContext->allocNamed< render::LambdaRenderBlock >(L"Text");
-			rb->lambda = [&](render::IRenderView* renderView) {
-				m_primitiveRenderer->render(renderView, 0);
-			};
-			renderContext->draw(rb);
+			m_primitiveRenderer->render(m_renderView, 0);
 		}
-	});
-	m_renderGraph->addPass(rp);
-
-	// Validate render graph.
-	if (!m_renderGraph->validate())
-		return;
-
-	// Build render context.
-	m_renderContext->flush();
-	m_renderGraph->build(m_renderContext, sz.cx, sz.cy);
-
-	// Render frame.
-	if (m_renderView->beginFrame())
-	{
-		m_renderContext->render(m_renderView);
-		m_renderView->endFrame();
-		m_renderView->present();
+		else
+			log::warning << L"BitmapFontPreviewControl: PrimitiveRenderer::begin failed" << Endl;
 	}
+	else
+	{
+		if (!m_font)
+			log::warning << L"BitmapFontPreviewControl: No font set" << Endl;
+		if (!m_fontRenderer)
+			log::warning << L"BitmapFontPreviewControl: No font renderer" << Endl;
+		if (m_previewText.empty())
+			log::warning << L"BitmapFontPreviewControl: Preview text is empty" << Endl;
+	}
+
+	m_renderView->endPass();
+	m_renderView->endFrame();
+	m_renderView->present();
 
 	event->consume();
 }
