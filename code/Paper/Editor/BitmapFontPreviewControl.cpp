@@ -175,6 +175,10 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 
 		if (m_primitiveRenderer->begin(0, projection))
 		{
+			// Setup view and depth state for 2D rendering
+			m_primitiveRenderer->pushView(Matrix44::identity());
+			m_primitiveRenderer->pushDepthState(false, false, false);
+
 			const float x = 20.0f;
 			float y = 40.0f;
 
@@ -204,6 +208,8 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 				m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 
+			m_primitiveRenderer->popDepthState();
+			m_primitiveRenderer->popView();
 			m_primitiveRenderer->end(0);
 			m_primitiveRenderer->render(m_renderView, 0);
 		}
