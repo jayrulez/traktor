@@ -69,7 +69,7 @@
 			</position>
 			<name>TexCoord</name>
 			<usage>Position</usage>
-			<type>DtFloat4</type>
+			<type>DtHalf2</type>
 			<index>0</index>
 		</item>
 		<item type="traktor.render.VertexInput" version="1,traktor.render.Node:1">
