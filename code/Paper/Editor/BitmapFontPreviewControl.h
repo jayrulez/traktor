@@ -40,7 +40,6 @@ namespace traktor::render
 
 class IRenderSystem;
 class IRenderView;
-class PrimitiveRenderer;
 class RenderContext;
 class RenderGraph;
 
@@ -58,6 +57,7 @@ namespace traktor::paper
 
 class BitmapFont;
 class BitmapFontRenderer;
+class Draw2D;
 
 class T_DLLCLASS BitmapFontPreviewControl : public ui::Widget
 {
@@ -84,7 +84,7 @@ private:
 	Ref< render::IRenderView > m_renderView;
 	Ref< render::RenderContext > m_renderContext;
 	Ref< render::RenderGraph > m_renderGraph;
-	Ref< render::PrimitiveRenderer > m_primitiveRenderer;
+	Ref< Draw2D > m_renderer;
 	Ref< BitmapFontRenderer > m_fontRenderer;
 	Ref< BitmapFont > m_font;
 	std::wstring m_previewText;

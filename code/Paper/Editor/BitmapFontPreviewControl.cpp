@@ -21,11 +21,11 @@
 #include "Editor/IEditor.h"
 #include "Paper/BitmapFont/BitmapFont.h"
 #include "Paper/BitmapFont/BitmapFontRenderer.h"
+#include "Paper/Draw2D.h"
 #include "Render/Context/RenderContext.h"
 #include "Render/Frame/RenderGraph.h"
 #include "Render/IRenderSystem.h"
 #include "Render/IRenderView.h"
-#include "Render/PrimitiveRenderer.h"
 #include "Render/Resource/ShaderFactory.h"
 #include "Render/Resource/TextureFactory.h"
 #include "Resource/ResourceManager.h"
@@ -80,13 +80,13 @@ bool BitmapFontPreviewControl::create(ui::Widget* parent)
 	m_resourceManager->addFactory(new render::ShaderFactory(m_renderSystem));
 	m_resourceManager->addFactory(new render::TextureFactory(m_renderSystem, 0));
 
-	// Create primitive renderer.
-	m_primitiveRenderer = new render::PrimitiveRenderer();
-	if (!m_primitiveRenderer->create(m_resourceManager, m_renderSystem, 1))
+	// Create Draw2D renderer.
+	m_renderer = new Draw2D();
+	if (!m_renderer->create(m_resourceManager, m_renderSystem))
 		return false;
 
 	// Create font renderer.
-	m_fontRenderer = new BitmapFontRenderer(m_resourceManager, m_renderSystem, m_primitiveRenderer);
+	m_fontRenderer = new BitmapFontRenderer(m_resourceManager, m_renderSystem, m_renderer);
 
 	// Add widget event handlers.
 	addEventHandler< ui::SizeEvent >(this, &BitmapFontPreviewControl::eventSize);
@@ -103,7 +103,7 @@ void BitmapFontPreviewControl::destroy()
 {
 	ui::Application::getInstance()->removeEventHandler(m_idleEventHandler);
 
-	safeDestroy(m_primitiveRenderer);
+	safeDestroy(m_renderer);
 	safeDestroy(m_renderGraph);
 	safeClose(m_renderView);
 	safeDestroy(m_resourceManager);
@@ -174,10 +174,7 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		Ref< render::RenderPass > textPass = new render::RenderPass(L"Text");
 		textPass->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
 		textPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
-			m_primitiveRenderer->begin(0, projection);
-			m_primitiveRenderer->pushView(Matrix44::identity());
-			m_primitiveRenderer->pushWorld(Matrix44::identity());
-			m_primitiveRenderer->pushDepthState(false, false, false);
+			m_renderer->begin(projection);
 
 			const float x = 20.0f;
 			float y = 40.0f;
@@ -208,14 +205,11 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 				m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 
-			m_primitiveRenderer->popDepthState();
-			m_primitiveRenderer->popWorld();
-			m_primitiveRenderer->popView();
-			m_primitiveRenderer->end(0);
+			m_renderer->end();
 
 			auto rb = renderContext->allocNamed< render::LambdaRenderBlock >(L"Text");
 			rb->lambda = [this](render::IRenderView* renderView) {
-				m_primitiveRenderer->render(renderView, 0);
+				m_renderer->render(renderView);
 			};
 			renderContext->draw(rb);
 		});

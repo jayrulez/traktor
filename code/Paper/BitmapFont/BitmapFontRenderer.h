@@ -23,7 +23,6 @@ namespace traktor::render
 {
 
 class IRenderSystem;
-class PrimitiveRenderer;
 
 }
 
@@ -37,6 +36,8 @@ class IResourceManager;
 namespace traktor::paper
 {
 
+class Draw2D;
+
 /*! Bitmap font renderer implementation.
  * \ingroup Paper
  */
@@ -48,7 +49,7 @@ public:
 	BitmapFontRenderer(
 		resource::IResourceManager* resourceManager,
 		render::IRenderSystem* renderSystem,
-		render::PrimitiveRenderer* primitiveRenderer
+		Draw2D* renderer
 	);
 
 	virtual Vector2 measureText(const IFont* font, const std::wstring& text) const override final;
@@ -58,7 +59,7 @@ public:
 private:
 	Ref< resource::IResourceManager > m_resourceManager;
 	Ref< render::IRenderSystem > m_renderSystem;
-	Ref< render::PrimitiveRenderer > m_primitiveRenderer;
+	Ref< Draw2D > m_renderer;
 };
 
 }
