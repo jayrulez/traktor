@@ -170,8 +170,8 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 	// Render text if we have a font.
 	if (m_font && m_fontRenderer && !m_previewText.empty())
 	{
-		// Create orthographic projection for 2D rendering.
-		const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, (float)sz.cy, 0.0f, 0.0f, 1.0f);
+		// Create orthographic projection for 2D rendering (Y increases downward in screen space).
+		const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, 0.0f, (float)sz.cy, 0.0f, 1.0f);
 
 		if (m_primitiveRenderer->begin(0, projection))
 		{
