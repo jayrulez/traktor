@@ -68,7 +68,7 @@
 				<second>399</second>
 			</position>
 			<name>TexCoord</name>
-			<usage>Position</usage>
+			<usage>Custom</usage>
 			<type>DtHalf2</type>
 			<index>0</index>
 		</item>
@@ -80,7 +80,7 @@
 				<second>678</second>
 			</position>
 			<name>Color</name>
-			<usage>Position</usage>
+			<usage>Color</usage>
 			<type>DtFloat4</type>
 			<index>0</index>
 		</item>

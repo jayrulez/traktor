@@ -26,10 +26,10 @@ namespace
 {
 
 // Shader GUID
-const resource::Id< render::Shader > c_idDraw2DShader(Guid(L"{669BA9CB-B9A7-BB4E-A775-1CA7904163CF}"));
+const resource::Id< render::Shader > c_idDraw2DShader(Guid(L"{A704DB1C-60E6-9D44-AD1D-F7822568242D}"));
 
-static const render::Handle s_handleProjection(L"Projection");
-static const render::Handle s_handleTexture(L"Texture");
+static const render::Handle s_handleProjection(L"Paper_Projection");
+static const render::Handle s_handleTexture(L"Paper_Texture");
 
 const int32_t c_maxVertices = 4096;
 
