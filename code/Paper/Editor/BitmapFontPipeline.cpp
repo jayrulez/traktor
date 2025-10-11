@@ -173,12 +173,15 @@ bool BitmapFontPipeline::buildOutput(
 		}
 
 		// Copy glyph bitmap to atlas with 1-pixel padding
+		// Store alpha in RGB and alpha channels so shader can modulate color properly
 		for (uint32_t y = 0; y < bitmap.rows; ++y)
 		{
 			for (uint32_t x = 0; x < bitmap.width; ++x)
 			{
 				uint8_t alpha = bitmap.buffer[y * bitmap.width + x];
-				Color4f color(1.0f, 1.0f, 1.0f, alpha / 255.0f);
+				float alphaF = alpha / 255.0f;
+				// Store alpha in all RGBA channels - shader will multiply by vertex color
+				Color4f color(alphaF, alphaF, alphaF, alphaF);
 				atlasImage->setPixel(rect.x + x + 1, rect.y + y + 1, color);
 			}
 		}
@@ -216,10 +219,11 @@ bool BitmapFontPipeline::buildOutput(
 	textureOutput->m_normalMap = false;
 	textureOutput->m_scaleDepth = 0.0f;
 	textureOutput->m_generateMips = false;
-	textureOutput->m_keepZeroAlpha = false;
+	textureOutput->m_keepZeroAlpha = true;  // Keep zero alpha pixels transparent
 	textureOutput->m_textureType = render::Tt2D;
 	textureOutput->m_hasAlpha = true;
 	textureOutput->m_ignoreAlpha = false;
+	textureOutput->m_premultiplyAlpha = false;  // Don't premultiply alpha
 	textureOutput->m_scaleImage = false;
 	textureOutput->m_enableCompression = false;
 	textureOutput->m_systemTexture = true;
