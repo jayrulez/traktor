@@ -154,18 +154,16 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		if (re.type == render::RenderEventType::Lost)
 			m_renderView->reset(sz.cx, sz.cy);
 
-	if (!m_renderView->beginFrame())
-		return;
-
-	// Setup clear.
+	// Setup clear render pass.
 	render::Clear clear;
 	clear.mask = render::CfColor | render::CfDepth | render::CfStencil;
 	clear.colors[0] = Color4f(0.2f, 0.2f, 0.2f, 1.0f);
 	clear.depth = 1.0f;
 	clear.stencil = 0;
 
-	if (!m_renderView->beginPass(&clear, render::TfAll, render::TfAll))
-		return;
+	Ref< render::RenderPass > clearPass = new render::RenderPass(L"Clear");
+	clearPass->setOutput(render::RGTargetSet::Output, clear, render::TfAll, render::TfAll);
+	m_renderGraph->addPass(clearPass);
 
 	// Render text if we have a font.
 	if (m_font && m_fontRenderer && !m_previewText.empty())
@@ -173,9 +171,10 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		// Create orthographic projection for 2D rendering (Y increases downward in screen space).
 		const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, 0.0f, (float)sz.cy, 0.0f, 1.0f);
 
-		if (m_primitiveRenderer->begin(0, projection))
-		{
-			// Setup view and depth state for 2D rendering
+		Ref< render::RenderPass > textPass = new render::RenderPass(L"Text");
+		textPass->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
+		textPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
+			m_primitiveRenderer->begin(0, projection);
 			m_primitiveRenderer->pushView(Matrix44::identity());
 			m_primitiveRenderer->pushDepthState(false, false, false);
 
@@ -211,10 +210,14 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 			m_primitiveRenderer->popDepthState();
 			m_primitiveRenderer->popView();
 			m_primitiveRenderer->end(0);
-			m_primitiveRenderer->render(m_renderView, 0);
-		}
-		else
-			log::warning << L"BitmapFontPreviewControl: PrimitiveRenderer::begin failed" << Endl;
+
+			auto rb = renderContext->allocNamed< render::LambdaRenderBlock >(L"Text");
+			rb->lambda = [this](render::IRenderView* renderView) {
+				m_primitiveRenderer->render(renderView, 0);
+			};
+			renderContext->draw(rb);
+		});
+		m_renderGraph->addPass(textPass);
 	}
 	else
 	{
@@ -226,9 +229,20 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 			log::warning << L"BitmapFontPreviewControl: Preview text is empty" << Endl;
 	}
 
-	m_renderView->endPass();
-	m_renderView->endFrame();
-	m_renderView->present();
+	// Validate and build render graph.
+	if (!m_renderGraph->validate())
+		return;
+
+	m_renderContext->flush();
+	m_renderGraph->build(m_renderContext, sz.cx, sz.cy);
+
+	// Render frame.
+	if (m_renderView->beginFrame())
+	{
+		m_renderContext->render(m_renderView);
+		m_renderView->endFrame();
+		m_renderView->present();
+	}
 
 	event->consume();
 }
