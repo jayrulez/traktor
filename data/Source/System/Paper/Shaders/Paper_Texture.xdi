@@ -2,5 +2,5 @@
 <object type="traktor.render.UniformDeclaration">
 	<type>Texture2D</type>
 	<length>0</length>
-	<frequency>Once</frequency>
+	<frequency>Draw</frequency>
 </object>
