@@ -7,8 +7,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include <cstring>
-#include <set>
 #include <ft2build.h>
+#include <set>
 #include FT_FREETYPE_H
 
 #include "Core/Io/FileSystem.h"
@@ -24,9 +24,9 @@
 #include "Editor/IPipelineDepends.h"
 #include "Editor/IPipelineSettings.h"
 #include "Paper/BitmapFont/BitmapFont.h"
-#include "Paper/Packer.h"
 #include "Paper/Editor/BitmapFontAsset.h"
 #include "Paper/Editor/BitmapFontPipeline.h"
+#include "Paper/Packer.h"
 #include "Render/Editor/Texture/TextureOutput.h"
 
 namespace traktor::paper
@@ -64,8 +64,7 @@ bool BitmapFontPipeline::buildDependencies(
 	const db::Instance* sourceInstance,
 	const ISerializable* sourceAsset,
 	const std::wstring& outputPath,
-	const Guid& outputGuid
-) const
+	const Guid& outputGuid) const
 {
 	const BitmapFontAsset* fontAsset = mandatory_non_null_type_cast< const BitmapFontAsset* >(sourceAsset);
 	pipelineDepends->addDependency(Path(m_assetPath), fontAsset->getFileName().getOriginal());
@@ -82,8 +81,7 @@ bool BitmapFontPipeline::buildOutput(
 	const std::wstring& outputPath,
 	const Guid& outputGuid,
 	const Object* buildParams,
-	uint32_t reason
-) const
+	uint32_t reason) const
 {
 	const BitmapFontAsset* fontAsset = mandatory_non_null_type_cast< const BitmapFontAsset* >(sourceAsset);
 
@@ -104,8 +102,7 @@ bool BitmapFontPipeline::buildOutput(
 		library,
 		wstombs(filePath.getPathNameOS()).c_str(),
 		0,
-		&face
-	);
+		&face);
 	if (error)
 	{
 		log::error << L"Unable to load font \"" << filePath.getPathName() << L"\"." << Endl;
@@ -135,8 +132,7 @@ bool BitmapFontPipeline::buildOutput(
 	Ref< drawing::Image > atlasImage = new drawing::Image(
 		drawing::PixelFormat::getR8G8B8A8(),
 		textureSize,
-		textureSize
-	);
+		textureSize);
 	atlasImage->clear(Color4f(0.0f, 0.0f, 0.0f, 0.0f));
 
 	Ref< BitmapFont > bitmapFont = new BitmapFont();
@@ -192,16 +188,13 @@ bool BitmapFontPipeline::buildOutput(
 		glyph.character = ch;
 		glyph.bounds = Aabb2(
 			Vector2((float)slot->bitmap_left, (float)-slot->bitmap_top),
-			Vector2((float)(slot->bitmap_left + bitmap.width), (float)(-slot->bitmap_top + bitmap.rows))
-		);
+			Vector2((float)(slot->bitmap_left + bitmap.width), (float)(-slot->bitmap_top + bitmap.rows)));
 		glyph.uvMin = Vector2(
 			(float)(rect.x + 1) / textureSize,
-			(float)(rect.y + 1) / textureSize
-		);
+			(float)(rect.y + 1) / textureSize);
 		glyph.uvMax = Vector2(
 			(float)(rect.x + 1 + bitmap.width) / textureSize,
-			(float)(rect.y + 1 + bitmap.rows) / textureSize
-		);
+			(float)(rect.y + 1 + bitmap.rows) / textureSize);
 		glyph.advance = (float)(slot->advance.x >> 6);
 
 		bitmapFont->addGlyph(glyph);
@@ -209,6 +202,10 @@ bool BitmapFontPipeline::buildOutput(
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
+
+#if defined(_DEBUG)
+	atlasImage->save(L"PaperFont" + toString(fontAsset->getSize()) + L".png");
+#endif
 
 	// Build texture
 	const Guid textureGuid = outputGuid.permutation(1);
@@ -228,11 +225,10 @@ bool BitmapFontPipeline::buildOutput(
 	textureOutput->m_systemTexture = true;
 
 	if (!pipelineBuilder->buildAdHocOutput(
-		textureOutput,
-		texturePath,
-		textureGuid,
-		atlasImage
-	))
+			textureOutput,
+			texturePath,
+			textureGuid,
+			atlasImage))
 	{
 		log::error << L"Failed to build font texture." << Endl;
 		return false;
@@ -263,8 +259,7 @@ Ref< ISerializable > BitmapFontPipeline::buildProduct(
 	editor::IPipelineBuilder* pipelineBuilder,
 	const db::Instance* sourceInstance,
 	const ISerializable* sourceAsset,
-	const Object* buildParams
-) const
+	const Object* buildParams) const
 {
 	T_FATAL_ERROR;
 	return nullptr;

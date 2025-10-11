@@ -38,8 +38,8 @@ namespace traktor::paper
 T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.BitmapFontPreviewControl", BitmapFontPreviewControl, ui::Widget)
 
 BitmapFontPreviewControl::BitmapFontPreviewControl(editor::IEditor* editor)
-:	m_editor(editor)
-,	m_previewText(L"The quick brown fox jumps over the lazy dog.\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789")
+	: m_editor(editor)
+	, m_previewText(L"The quick brown fox jumps over the lazy dog.\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789")
 {
 }
 
@@ -166,16 +166,17 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 	m_renderGraph->addPass(clearPass);
 
 	// Render text if we have a font.
-	if (m_font && m_fontRenderer && !m_previewText.empty())
+	 if (m_font && m_fontRenderer && !m_previewText.empty())
 	{
 		// Create orthographic projection for 2D rendering (Y increases downward in screen space).
-		const Matrix44 projection = orthoLh(0.0f, (float)sz.cx, 0.0f, (float)sz.cy, 0.0f, 1.0f);
+		const Matrix44 projection = orthoLh(0.0f, 0.0f, (float)sz.cx, -(float)sz.cy, -1.0f, 1.0f);
 
 		Ref< render::RenderPass > textPass = new render::RenderPass(L"Text");
 		textPass->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
 		textPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
 			m_primitiveRenderer->begin(0, projection);
 			m_primitiveRenderer->pushView(Matrix44::identity());
+			m_primitiveRenderer->pushWorld(Matrix44::identity());
 			m_primitiveRenderer->pushDepthState(false, false, false);
 
 			const float x = 20.0f;
@@ -208,6 +209,7 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 			}
 
 			m_primitiveRenderer->popDepthState();
+			m_primitiveRenderer->popWorld();
 			m_primitiveRenderer->popView();
 			m_primitiveRenderer->end(0);
 
@@ -219,7 +221,7 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		});
 		m_renderGraph->addPass(textPass);
 	}
-	else
+	 else
 	{
 		if (!m_font)
 			log::warning << L"BitmapFontPreviewControl: No font set" << Endl;
@@ -228,6 +230,33 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		if (m_previewText.empty())
 			log::warning << L"BitmapFontPreviewControl: Preview text is empty" << Endl;
 	}
+
+#if false
+	{
+	const Matrix44 projection = orthoLh(0.0f, 0.0f, (float)sz.cx, -(float)sz.cy, -1.0f, 1.0f);
+
+	Ref< render::RenderPass > trianglePass = new render::RenderPass(L"Triangle");
+	trianglePass->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
+	trianglePass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
+		m_primitiveRenderer->begin(0, projection);
+		m_primitiveRenderer->pushView(Matrix44::identity());
+		m_primitiveRenderer->pushDepthState(false, false, false);
+
+		m_primitiveRenderer->drawText(Vector4::zero(), 16, 16, L"Hello", Color4ub(255, 255, 255, 255));
+
+		m_primitiveRenderer->popDepthState();
+		m_primitiveRenderer->popView();
+		m_primitiveRenderer->end(0);
+
+		auto rb = renderContext->allocNamed< render::LambdaRenderBlock >(L"TextRB");
+		rb->lambda = [this](render::IRenderView* renderView) {
+			m_primitiveRenderer->render(renderView, 0);
+		};
+		renderContext->draw(rb);
+	});
+	m_renderGraph->addPass(trianglePass);
+}
+#endif
 
 	// Validate and build render graph.
 	if (!m_renderGraph->validate())
