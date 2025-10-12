@@ -82,7 +82,7 @@ bool BitmapFontPreviewControl::create(ui::Widget* parent)
 
 	// Create Draw2D renderer.
 	m_renderer = new Draw2D();
-	if (!m_renderer->create(m_resourceManager, m_renderSystem))
+	if (!m_renderer->create(m_resourceManager, m_renderSystem, 1))
 		return false;
 
 	// Create font renderer.
@@ -174,7 +174,7 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 		Ref< render::RenderPass > textPass = new render::RenderPass(L"Text");
 		textPass->setOutput(render::RGTargetSet::Output, render::TfAll, render::TfAll);
 		textPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
-			m_renderer->begin(projection);
+			m_renderer->begin(0, projection);
 
 			const float x = 20.0f;
 			float y = 40.0f;
@@ -205,11 +205,11 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 				m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 
-			m_renderer->end();
+			m_renderer->end(0);
 
 			auto rb = renderContext->allocNamed< render::LambdaRenderBlock >(L"Text");
 			rb->lambda = [this](render::IRenderView* renderView) {
-				m_renderer->render(renderView);
+				m_renderer->render(renderView, 0);
 			};
 			renderContext->draw(rb);
 		});

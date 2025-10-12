@@ -10,10 +10,15 @@
 
 #include "Core/Object.h"
 #include "Core/Ref.h"
+#include "Core/RefArray.h"
+#include "Core/Containers/AlignedVector.h"
 #include "Core/Math/Color4f.h"
+#include "Core/Math/Half.h"
 #include "Core/Math/Matrix44.h"
 #include "Core/Math/Vector2.h"
 #include "Core/Math/Vector4.h"
+#include "Core/Thread/Semaphore.h"
+#include "Render/Types.h"
 #include "Resource/Proxy.h"
 
 // import/export mechanism.
@@ -49,7 +54,8 @@ namespace traktor::paper
 /*! Draw2D - Simple 2D renderer
  * \ingroup Paper
  *
- * Simple 2D renderer for Paper UI with support for textured quads.
+ * 2D renderer for Paper UI with batching support and transform stacks.
+ * Optimized for 2D rendering without depth testing.
  */
 class T_DLLCLASS Draw2D : public Object
 {
@@ -58,16 +64,27 @@ class T_DLLCLASS Draw2D : public Object
 public:
 	bool create(
 		resource::IResourceManager* resourceManager,
-		render::IRenderSystem* renderSystem
+		render::IRenderSystem* renderSystem,
+		uint32_t frameCount
 	);
 
 	void destroy();
 
-	void begin(const Matrix44& projection);
+	bool begin(uint32_t frame, const Matrix44& projection);
 
-	void end();
+	void end(uint32_t frame);
 
-	void render(render::IRenderView* renderView);
+	void render(render::IRenderView* renderView, uint32_t frame);
+
+	void pushView(const Matrix44& view);
+
+	void popView();
+
+	void pushWorld(const Matrix44& transform);
+
+	void popWorld();
+
+	void setProjection(const Matrix44& projection);
 
 	void drawTexturedQuad(
 		const Vector2& position,
@@ -78,13 +95,58 @@ public:
 		render::ITexture* texture
 	);
 
+	const Matrix44& getProjection() const { return m_currentFrame->projections.back(); }
+
+	const Matrix44& getView() const { return m_view.back(); }
+
+	const Matrix44& getWorld() const { return m_world.back(); }
+
 private:
+	struct Batch
+	{
+		uint32_t projection;
+		Ref< render::Buffer > vertexBuffer;
+		Ref< render::ITexture > texture;
+		render::Primitives primitives;
+	};
+
+	struct Frame
+	{
+		RefArray< render::Buffer > vertexBuffers;
+		AlignedVector< Matrix44 > projections;
+		AlignedVector< Batch > batches;
+	};
+
+	struct Vertex
+	{
+		float position[4];
+		half_t texCoord[2];
+		float color[4];
+
+		void set(const Vector4& pos, const Vector2& uv, const Color4f& col);
+	};
+
+	// System
 	Ref< render::IRenderSystem > m_renderSystem;
 	resource::Proxy< render::Shader > m_shader;
 	Ref< const render::IVertexLayout > m_vertexLayout;
-	Ref< render::Buffer > m_vertexBuffer;
-	Matrix44 m_projection;
-	uint32_t m_vertexCount;
+	RefArray< render::Buffer > m_freeVertexBuffers;
+	Semaphore m_lock;
+
+	// Frame
+	AlignedVector< Frame > m_frames;
+	Frame* m_currentFrame = nullptr;
+
+	// Assembly state
+	AlignedVector< Matrix44 > m_view;
+	AlignedVector< Matrix44 > m_world;
+	Matrix44 m_worldView;
+	Vertex* m_vertexHead = nullptr;
+	Vertex* m_vertexTail = nullptr;
+
+	void updateTransforms();
+
+	Vertex* allocBatch(uint32_t vertexCount, render::ITexture* texture);
 };
 
 }
