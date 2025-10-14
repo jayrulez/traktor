@@ -10,14 +10,16 @@
 #include "Paper/Draw2D.h"
 #include "Paper/FontManager.h"
 #include "Paper/IFontRenderer.h"
+#include "Paper/Ui/UITheme.h"
 
 namespace traktor::paper
 {
 
-UIContext::UIContext(Draw2D* renderer, FontManager* fontManager, IFontRenderer* fontRenderer)
+UIContext::UIContext(Draw2D* renderer, FontManager* fontManager, IFontRenderer* fontRenderer, UITheme* theme)
 	: m_renderer(renderer)
 	, m_fontManager(fontManager)
 	, m_fontRenderer(fontRenderer)
+	, m_theme(theme)
 {
 }
 

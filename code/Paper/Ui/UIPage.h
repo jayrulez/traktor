@@ -23,6 +23,7 @@ namespace traktor::paper
 {
 
 class UIElement;
+class UITheme;
 
 /*! UI Page definition.
  * \ingroup Paper
@@ -49,10 +50,15 @@ public:
 
 	int32_t getHeight() const { return m_height; }
 
+	void setTheme(UITheme* theme) { m_theme = theme; }
+
+	UITheme* getTheme() const { return m_theme; }
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:
 	Ref< UIElement > m_root;
+	Ref< UITheme > m_theme;
 	int32_t m_width = 1920;
 	int32_t m_height = 1080;
 };

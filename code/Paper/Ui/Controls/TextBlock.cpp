@@ -10,6 +10,7 @@
 #include "Core/Serialization/Member.h"
 #include "Paper/Ui/Controls/TextBlock.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/UIStyle.h"
 #include "Paper/IFont.h"
 #include "Paper/IFontRenderer.h"
 #include "Paper/FontManager.h"
@@ -18,6 +19,24 @@ namespace traktor::paper
 {
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.TextBlock", 0, TextBlock, UIElement)
+
+void TextBlock::applyStyle(const UIStyle* style)
+{
+	UIElement::applyStyle(style);
+
+	if (style)
+	{
+		// Apply foreground color from style
+		Color4f foreground;
+		if (style->tryGetColor(L"Foreground", foreground))
+			m_foreground = foreground;
+
+		// Apply font from style
+		Guid fontId;
+		if (style->tryGetFont(L"Font", fontId))
+			m_fontId = fontId;
+	}
+}
 
 Vector2 TextBlock::measure(const Vector2& availableSize, UIContext* context)
 {

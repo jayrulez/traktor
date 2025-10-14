@@ -24,6 +24,7 @@ namespace traktor::paper
 {
 
 class UIContext;
+class UIStyle;
 
 /*! Base class for all UI elements.
  * \ingroup Paper
@@ -37,6 +38,14 @@ class T_DLLCLASS UIElement : public ISerializable
 
 public:
 	virtual ~UIElement() = default;
+
+	/*! Apply a style to this element.
+	 * \param style Style to apply, or nullptr to use default values
+	 *
+	 * Override this method in derived classes to apply style properties
+	 * specific to that element type. Always call base class implementation.
+	 */
+	virtual void applyStyle(const UIStyle* style);
 
 	/*! Measure the desired size of the element.
 	 * \param availableSize Available space for this element.

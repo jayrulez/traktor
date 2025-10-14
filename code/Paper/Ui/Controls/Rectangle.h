@@ -44,6 +44,8 @@ public:
 
 	float getHeight() const { return m_height; }
 
+	virtual void applyStyle(const UIStyle* style) override;
+
 	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
 	virtual void render(UIContext* context) override;

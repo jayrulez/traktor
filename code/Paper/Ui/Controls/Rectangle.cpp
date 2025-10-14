@@ -10,12 +10,36 @@
 #include "Core/Serialization/Member.h"
 #include "Paper/Ui/Controls/Rectangle.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/UIStyle.h"
 #include "Paper/Draw2D.h"
 
 namespace traktor::paper
 {
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.Rectangle", 0, Rectangle, UIElement)
+
+void Rectangle::applyStyle(const UIStyle* style)
+{
+	UIElement::applyStyle(style);
+
+	if (style)
+	{
+		// Apply fill color from style
+		Color4f fill;
+		if (style->tryGetColor(L"Fill", fill))
+			m_fill = fill;
+
+		// Apply width from style
+		float width;
+		if (style->tryGetDimension(L"Width", width))
+			m_width = width;
+
+		// Apply height from style
+		float height;
+		if (style->tryGetDimension(L"Height", height))
+			m_height = height;
+	}
+}
 
 Vector2 Rectangle::measure(const Vector2& availableSize, UIContext* context)
 {
@@ -28,9 +52,14 @@ Vector2 Rectangle::measure(const Vector2& availableSize, UIContext* context)
 
 void Rectangle::render(UIContext* context)
 {
-	// TODO: Render filled rectangle using Draw2D
-	// Draw2D* renderer = context->getRenderer();
-	// renderer->drawFilledQuad(m_actualPosition, m_actualSize, m_fill);
+	if (context)
+	{
+		Draw2D* renderer = context->getRenderer();
+		if (renderer)
+		{
+			renderer->drawQuad(m_actualPosition, m_actualSize, m_fill);
+		}
+	}
 }
 
 void Rectangle::serialize(ISerializer& s)

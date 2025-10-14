@@ -24,6 +24,7 @@ namespace traktor::paper
 class Draw2D;
 class FontManager;
 class IFontRenderer;
+class UITheme;
 
 /*! UI Context.
  * \ingroup Paper
@@ -33,7 +34,7 @@ class IFontRenderer;
 class T_DLLCLASS UIContext
 {
 public:
-	UIContext(Draw2D* renderer, FontManager* fontManager, IFontRenderer* fontRenderer);
+	UIContext(Draw2D* renderer, FontManager* fontManager, IFontRenderer* fontRenderer, UITheme* theme = nullptr);
 
 	Draw2D* getRenderer() const { return m_renderer; }
 
@@ -41,10 +42,13 @@ public:
 
 	IFontRenderer* getFontRenderer() const { return m_fontRenderer; }
 
+	UITheme* getTheme() const { return m_theme; }
+
 private:
 	Ref< Draw2D > m_renderer;
 	Ref< FontManager > m_fontManager;
 	Ref< IFontRenderer > m_fontRenderer;
+	Ref< UITheme > m_theme;
 };
 
 }

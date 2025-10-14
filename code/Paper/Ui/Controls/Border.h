@@ -53,6 +53,8 @@ public:
 
 	const Vector2& getPadding() const { return m_padding; }
 
+	virtual void applyStyle(const UIStyle* style) override;
+
 	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
 	virtual void arrange(const Vector2& position, const Vector2& size) override;

@@ -17,8 +17,12 @@
 #include "Editor/IPipelineSettings.h"
 #include "Paper/Editor/UIPageAsset.h"
 #include "Paper/Ui/UIPage.h"
+#include "Paper/Ui/UITheme.h"
+#include "Paper/Ui/UIStyle.h"
 #include "Paper/Ui/Layouts/StackPanel.h"
 #include "Paper/Ui/Controls/TextBlock.h"
+#include "Paper/Ui/Controls/Rectangle.h"
+#include "Paper/Ui/Controls/Border.h"
 
 namespace traktor::paper
 {
@@ -26,6 +30,81 @@ namespace
 {
 const Guid c_idPaper2DShader(L"{A704DB1C-60E6-9D44-AD1D-F7822568242D}"); // System/Paper/Shaders/Paper2D
 const Guid c_idPaper2DDefaultFont(L"{970AEEAF-EC6F-8F47-883C-700237C278C4}"); // System/Paper/Fonts/Roboto_Bold_16
+
+// Create a nice modern dark theme
+Ref< UITheme > createDarkTheme(const Guid& defaultFontId)
+{
+	Ref< UITheme > theme = new UITheme();
+
+	// Primary Text Style - White text
+	Ref< UIStyle > primaryText = new UIStyle();
+	primaryText->setColor(L"Foreground", Color4f(1.0f, 1.0f, 1.0f, 1.0f));
+	primaryText->setFont(L"Font", defaultFontId);
+	theme->setStyle(L"PrimaryText", primaryText);
+
+	// Secondary Text Style - Light gray text
+	Ref< UIStyle > secondaryText = new UIStyle();
+	secondaryText->setColor(L"Foreground", Color4f(0.7f, 0.7f, 0.7f, 1.0f));
+	secondaryText->setFont(L"Font", defaultFontId);
+	theme->setStyle(L"SecondaryText", secondaryText);
+
+	// Accent Text Style - Cyan accent
+	Ref< UIStyle > accentText = new UIStyle();
+	accentText->setColor(L"Foreground", Color4f(0.3f, 0.8f, 1.0f, 1.0f));
+	accentText->setFont(L"Font", defaultFontId);
+	theme->setStyle(L"AccentText", accentText);
+
+	// Button Style - Dark blue with border
+	Ref< UIStyle > button = new UIStyle();
+	button->setColor(L"Background", Color4f(0.15f, 0.25f, 0.35f, 1.0f));
+	button->setColor(L"BorderBrush", Color4f(0.3f, 0.5f, 0.7f, 1.0f));
+	button->setDimension(L"BorderThickness", 2.0f);
+	button->setVector(L"Padding", Vector2(20.0f, 10.0f));
+	theme->setStyle(L"Button", button);
+
+	// Panel Style - Dark background with subtle border
+	Ref< UIStyle > panel = new UIStyle();
+	panel->setColor(L"Background", Color4f(0.1f, 0.1f, 0.12f, 1.0f));
+	panel->setColor(L"BorderBrush", Color4f(0.2f, 0.2f, 0.25f, 1.0f));
+	panel->setDimension(L"BorderThickness", 1.0f);
+	panel->setVector(L"Padding", Vector2(15.0f, 15.0f));
+	theme->setStyle(L"Panel", panel);
+
+	// Card Style - Lighter background with accent border
+	Ref< UIStyle > card = new UIStyle();
+	card->setColor(L"Background", Color4f(0.15f, 0.15f, 0.18f, 1.0f));
+	card->setColor(L"BorderBrush", Color4f(0.3f, 0.8f, 1.0f, 0.5f));
+	card->setDimension(L"BorderThickness", 2.0f);
+	card->setVector(L"Padding", Vector2(12.0f, 12.0f));
+	theme->setStyle(L"Card", card);
+
+	// Separator Style - Thin accent line
+	Ref< UIStyle > separator = new UIStyle();
+	separator->setColor(L"Fill", Color4f(0.3f, 0.8f, 1.0f, 0.3f));
+	separator->setDimension(L"Height", 2.0f);
+	theme->setStyle(L"Separator", separator);
+
+	// Status Indicator Styles
+	Ref< UIStyle > statusSuccess = new UIStyle();
+	statusSuccess->setColor(L"Fill", Color4f(0.2f, 0.8f, 0.3f, 1.0f));
+	statusSuccess->setDimension(L"Width", 8.0f);
+	statusSuccess->setDimension(L"Height", 8.0f);
+	theme->setStyle(L"StatusSuccess", statusSuccess);
+
+	Ref< UIStyle > statusWarning = new UIStyle();
+	statusWarning->setColor(L"Fill", Color4f(1.0f, 0.7f, 0.2f, 1.0f));
+	statusWarning->setDimension(L"Width", 8.0f);
+	statusWarning->setDimension(L"Height", 8.0f);
+	theme->setStyle(L"StatusWarning", statusWarning);
+
+	Ref< UIStyle > statusError = new UIStyle();
+	statusError->setColor(L"Fill", Color4f(0.9f, 0.2f, 0.2f, 1.0f));
+	statusError->setDimension(L"Width", 8.0f);
+	statusError->setDimension(L"Height", 8.0f);
+	theme->setStyle(L"StatusError", statusError);
+
+	return theme;
+}
 }
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.UIPagePipeline", 0, UIPagePipeline, editor::IPipeline)
@@ -86,55 +165,130 @@ bool UIPagePipeline::buildOutput(
 	uiPage->setWidth(uiPageAsset->getWidth());
 	uiPage->setHeight(uiPageAsset->getHeight());
 
-	// Create root vertical stack panel
-	Ref< StackPanel > rootPanel = new StackPanel();
-	rootPanel->setOrientation(StackPanel::Orientation::Vertical);
-
 	// Default font ID - replace with actual font GUID
 	// TODO: Make this configurable from UIPageAsset
 	const Guid defaultFontId = c_idPaper2DDefaultFont;
 
-	// Create first vertical stack panel with text elements
-	Ref< StackPanel > verticalPanel = new StackPanel();
-	verticalPanel->setOrientation(StackPanel::Orientation::Vertical);
+	// Create and set theme
+	Ref< UITheme > theme = createDarkTheme(defaultFontId);
+	uiPage->setTheme(theme);
 
-	Ref< TextBlock > text1 = new TextBlock();
-	text1->setText(L"First Text");
-	text1->setFontId(defaultFontId);
-	verticalPanel->addChild(text1);
+	// Create root vertical stack panel
+	Ref< StackPanel > rootPanel = new StackPanel();
+	rootPanel->setOrientation(StackPanel::Orientation::Vertical);
 
-	Ref< TextBlock > text2 = new TextBlock();
-	text2->setText(L"Second Text");
-	text2->setFontId(defaultFontId);
-	verticalPanel->addChild(text2);
+	// --- Header Section ---
+	Ref< Border > headerPanel = new Border();
+	headerPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< StackPanel > headerContent = new StackPanel();
+	headerContent->setOrientation(StackPanel::Orientation::Vertical);
 
-	Ref< TextBlock > text3 = new TextBlock();
-	text3->setText(L"Third Text");
-	text3->setFontId(defaultFontId);
-	verticalPanel->addChild(text3);
+	Ref< TextBlock > title = new TextBlock();
+	title->setText(L"UI Theme Demo");
+	title->applyStyle(theme->getStyle(L"AccentText"));
+	headerContent->addChild(title);
 
-	rootPanel->addChild(verticalPanel);
+	Ref< TextBlock > subtitle = new TextBlock();
+	subtitle->setText(L"Showcasing the modern dark theme");
+	subtitle->applyStyle(theme->getStyle(L"SecondaryText"));
+	headerContent->addChild(subtitle);
 
-	// Create second horizontal stack panel with text elements
-	Ref< StackPanel > horizontalPanel = new StackPanel();
-	horizontalPanel->setOrientation(StackPanel::Orientation::Horizontal);
+	headerPanel->setChild(headerContent);
+	rootPanel->addChild(headerPanel);
 
-	Ref< TextBlock > text4 = new TextBlock();
-	text4->setText(L"Horizontal 1");
-	text4->setFontId(defaultFontId);
-	horizontalPanel->addChild(text4);
+	// --- Separator ---
+	Ref< Rectangle > separator1 = new Rectangle();
+	separator1->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator1);
 
-	Ref< TextBlock > text5 = new TextBlock();
-	text5->setText(L"Horizontal 2");
-	text5->setFontId(defaultFontId);
-	horizontalPanel->addChild(text5);
+	// --- Cards Section ---
+	Ref< StackPanel > cardsRow = new StackPanel();
+	cardsRow->setOrientation(StackPanel::Orientation::Horizontal);
 
-	Ref< TextBlock > text6 = new TextBlock();
-	text6->setText(L"Horizontal 3");
-	text6->setFontId(defaultFontId);
-	horizontalPanel->addChild(text6);
+	// Card 1 - Status Success
+	Ref< Border > card1 = new Border();
+	card1->applyStyle(theme->getStyle(L"Card"));
+	Ref< StackPanel > card1Content = new StackPanel();
+	card1Content->setOrientation(StackPanel::Orientation::Horizontal);
+	Ref< Rectangle > statusSuccess = new Rectangle();
+	statusSuccess->applyStyle(theme->getStyle(L"StatusSuccess"));
+	card1Content->addChild(statusSuccess);
+	Ref< TextBlock > card1Text = new TextBlock();
+	card1Text->setText(L" System Online");
+	card1Text->applyStyle(theme->getStyle(L"PrimaryText"));
+	card1Content->addChild(card1Text);
+	card1->setChild(card1Content);
+	cardsRow->addChild(card1);
 
-	rootPanel->addChild(horizontalPanel);
+	// Card 2 - Status Warning
+	Ref< Border > card2 = new Border();
+	card2->applyStyle(theme->getStyle(L"Card"));
+	Ref< StackPanel > card2Content = new StackPanel();
+	card2Content->setOrientation(StackPanel::Orientation::Horizontal);
+	Ref< Rectangle > statusWarning = new Rectangle();
+	statusWarning->applyStyle(theme->getStyle(L"StatusWarning"));
+	card2Content->addChild(statusWarning);
+	Ref< TextBlock > card2Text = new TextBlock();
+	card2Text->setText(L" High Memory Usage");
+	card2Text->applyStyle(theme->getStyle(L"PrimaryText"));
+	card2Content->addChild(card2Text);
+	card2->setChild(card2Content);
+	cardsRow->addChild(card2);
+
+	// Card 3 - Status Error
+	Ref< Border > card3 = new Border();
+	card3->applyStyle(theme->getStyle(L"Card"));
+	Ref< StackPanel > card3Content = new StackPanel();
+	card3Content->setOrientation(StackPanel::Orientation::Horizontal);
+	Ref< Rectangle > statusError = new Rectangle();
+	statusError->applyStyle(theme->getStyle(L"StatusError"));
+	card3Content->addChild(statusError);
+	Ref< TextBlock > card3Text = new TextBlock();
+	card3Text->setText(L" Connection Lost");
+	card3Text->applyStyle(theme->getStyle(L"PrimaryText"));
+	card3Content->addChild(card3Text);
+	card3->setChild(card3Content);
+	cardsRow->addChild(card3);
+
+	rootPanel->addChild(cardsRow);
+
+	// --- Separator ---
+	Ref< Rectangle > separator2 = new Rectangle();
+	separator2->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator2);
+
+	// --- Buttons Section ---
+	Ref< Border > buttonsPanel = new Border();
+	buttonsPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< StackPanel > buttonsRow = new StackPanel();
+	buttonsRow->setOrientation(StackPanel::Orientation::Horizontal);
+
+	Ref< Border > button1 = new Border();
+	button1->applyStyle(theme->getStyle(L"Button"));
+	Ref< TextBlock > button1Text = new TextBlock();
+	button1Text->setText(L"Primary Action");
+	button1Text->applyStyle(theme->getStyle(L"PrimaryText"));
+	button1->setChild(button1Text);
+	buttonsRow->addChild(button1);
+
+	Ref< Border > button2 = new Border();
+	button2->applyStyle(theme->getStyle(L"Button"));
+	Ref< TextBlock > button2Text = new TextBlock();
+	button2Text->setText(L"Secondary Action");
+	button2Text->applyStyle(theme->getStyle(L"SecondaryText"));
+	button2->setChild(button2Text);
+	buttonsRow->addChild(button2);
+
+	Ref< Border > button3 = new Border();
+	button3->applyStyle(theme->getStyle(L"Button"));
+	Ref< TextBlock > button3Text = new TextBlock();
+	button3Text->setText(L"Accent Action");
+	button3Text->applyStyle(theme->getStyle(L"AccentText"));
+	button3->setChild(button3Text);
+	buttonsRow->addChild(button3);
+
+	buttonsPanel->setChild(buttonsRow);
+	rootPanel->addChild(buttonsPanel);
 
 	// Set root
 	uiPage->setRoot(rootPanel);

@@ -11,6 +11,7 @@
 #include "Core/Serialization/MemberRef.h"
 #include "Paper/Ui/UIPage.h"
 #include "Paper/Ui/UIElement.h"
+#include "Paper/Ui/UITheme.h"
 
 namespace traktor::paper
 {
@@ -20,6 +21,7 @@ T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.UIPage", 0, UIPage, ISerializable
 void UIPage::serialize(ISerializer& s)
 {
 	s >> MemberRef< UIElement >(L"root", m_root);
+	s >> MemberRef< UITheme >(L"theme", m_theme);
 	s >> Member< int32_t >(L"width", m_width);
 	s >> Member< int32_t >(L"height", m_height);
 }

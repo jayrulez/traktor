@@ -10,12 +10,19 @@
 #include "Core/Math/Color4f.h"
 #include "Paper/Ui/UIElement.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/UIStyle.h"
 #include "Paper/Draw2D.h"
 
 namespace traktor::paper
 {
 
 T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.UIElement", UIElement, ISerializable)
+
+void UIElement::applyStyle(const UIStyle* style)
+{
+	// Base implementation does nothing
+	// Derived classes override to apply specific style properties
+}
 
 Vector2 UIElement::measure(const Vector2& availableSize, UIContext* context)
 {

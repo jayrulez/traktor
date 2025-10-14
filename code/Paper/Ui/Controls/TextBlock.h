@@ -50,6 +50,8 @@ public:
 
 	const Color4f& getForeground() const { return m_foreground; }
 
+	virtual void applyStyle(const UIStyle* style) override;
+
 	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
 	virtual void render(UIContext* context) override;

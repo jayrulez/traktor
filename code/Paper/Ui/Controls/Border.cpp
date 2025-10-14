@@ -11,12 +11,41 @@
 #include "Core/Serialization/MemberRef.h"
 #include "Paper/Ui/Controls/Border.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/UIStyle.h"
 #include "Paper/Draw2D.h"
 
 namespace traktor::paper
 {
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.Border", 0, Border, UIElement)
+
+void Border::applyStyle(const UIStyle* style)
+{
+	UIElement::applyStyle(style);
+
+	if (style)
+	{
+		// Apply background color from style
+		Color4f background;
+		if (style->tryGetColor(L"Background", background))
+			m_background = background;
+
+		// Apply border brush from style
+		Color4f borderBrush;
+		if (style->tryGetColor(L"BorderBrush", borderBrush))
+			m_borderBrush = borderBrush;
+
+		// Apply border thickness from style
+		float borderThickness;
+		if (style->tryGetDimension(L"BorderThickness", borderThickness))
+			m_borderThickness = borderThickness;
+
+		// Apply padding from style
+		Vector2 padding;
+		if (style->tryGetVector(L"Padding", padding))
+			m_padding = padding;
+	}
+}
 
 Vector2 Border::measure(const Vector2& availableSize, UIContext* context)
 {
@@ -56,10 +85,33 @@ void Border::arrange(const Vector2& position, const Vector2& size)
 
 void Border::render(UIContext* context)
 {
-	// TODO: Render background rectangle
-	// TODO: Render border rectangle
+	if (context)
+	{
+		Draw2D* renderer = context->getRenderer();
+		if (renderer)
+		{
+			// Render background
+			if (m_background.getAlpha() > 0.0f)
+			{
+				renderer->drawQuad(m_actualPosition, m_actualSize, m_background);
+			}
 
-	// Render child
+			// Render border
+			if (m_borderThickness > 0.0f && m_borderBrush.getAlpha() > 0.0f)
+			{
+				// Top border
+				renderer->drawQuad(m_actualPosition, Vector2(m_actualSize.x, m_borderThickness), m_borderBrush);
+				// Bottom border
+				renderer->drawQuad(Vector2(m_actualPosition.x, m_actualPosition.y + m_actualSize.y - m_borderThickness), Vector2(m_actualSize.x, m_borderThickness), m_borderBrush);
+				// Left border
+				renderer->drawQuad(m_actualPosition, Vector2(m_borderThickness, m_actualSize.y), m_borderBrush);
+				// Right border
+				renderer->drawQuad(Vector2(m_actualPosition.x + m_actualSize.x - m_borderThickness, m_actualPosition.y), Vector2(m_borderThickness, m_actualSize.y), m_borderBrush);
+			}
+		}
+	}
+
+	// Render child on top
 	if (m_child)
 		m_child->render(context);
 }
