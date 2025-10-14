@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Core/Serialization/ISerializable.h"
+#include "Core/Ref.h"
 
 // import/export mechanism.
 #undef T_DLLCLASS
@@ -21,8 +22,13 @@
 namespace traktor::paper
 {
 
+class UIElement;
+
 /*! UI Page definition.
  * \ingroup Paper
+ *
+ * A UIPage is a container that holds the root UIElement of a UI hierarchy.
+ * It can be serialized and loaded from assets.
  */
 class T_DLLCLASS UIPage : public ISerializable
 {
@@ -31,7 +37,14 @@ class T_DLLCLASS UIPage : public ISerializable
 public:
 	UIPage() = default;
 
+	void setRoot(UIElement* root) { m_root = root; }
+
+	UIElement* getRoot() const { return m_root; }
+
 	virtual void serialize(ISerializer& s) override final;
+
+private:
+	Ref< UIElement > m_root;
 };
 
 }

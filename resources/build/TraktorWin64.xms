@@ -22068,6 +22068,46 @@
 						</item>
 					</items>
 				</item>
+				<item type="traktor.sb.Filter">
+					<name>Ui</name>
+					<items>
+						<item type="traktor.sb.File" version="1">
+							<fileName>Ui/*.*</fileName>
+							<excludeFilter/>
+							<items/>
+						</item>
+						<item type="traktor.sb.Filter">
+							<name>Layouts</name>
+							<items>
+								<item type="traktor.sb.File" version="1">
+									<fileName>Ui/Layouts/*.*</fileName>
+									<excludeFilter/>
+									<items/>
+								</item>
+							</items>
+						</item>
+						<item type="traktor.sb.Filter">
+							<name>Controls</name>
+							<items>
+								<item type="traktor.sb.File" version="1">
+									<fileName>Ui/Controls/*.*</fileName>
+									<excludeFilter/>
+									<items/>
+								</item>
+							</items>
+						</item>
+						<item type="traktor.sb.Filter">
+							<name>Input</name>
+							<items>
+								<item type="traktor.sb.File" version="1">
+									<fileName>Ui/Input/*.*</fileName>
+									<excludeFilter/>
+									<items/>
+								</item>
+							</items>
+						</item>
+					</items>
+				</item>
 			</items>
 			<dependencies>
 				<item type="traktor.sb.ProjectDependency" version="3">

@@ -8,7 +8,8 @@
  */
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/MemberRef.h"
-#include "Paper/UIPage.h"
+#include "Paper/Ui/UIPage.h"
+#include "Paper/Ui/UIElement.h"
 
 namespace traktor::paper
 {
@@ -17,6 +18,7 @@ T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.UIPage", 0, UIPage, ISerializable
 
 void UIPage::serialize(ISerializer& s)
 {
+	s >> MemberRef< UIElement >(L"root", m_root);
 }
 
 }

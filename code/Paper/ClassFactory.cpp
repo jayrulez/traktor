@@ -10,7 +10,7 @@
 #include "Core/Class/IRuntimeClassRegistrar.h"
 #include "Core/Class/IRuntimeDelegate.h"
 #include "Paper/ClassFactory.h"
-#include "Paper/UIPage.h"
+#include "Paper/Ui/UIPage.h"
 
 namespace traktor::paper
 {

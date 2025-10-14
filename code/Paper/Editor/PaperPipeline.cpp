@@ -12,7 +12,7 @@
 #include "Editor/IPipelineBuilder.h"
 #include "Editor/IPipelineDepends.h"
 #include "Editor/IPipelineSettings.h"
-#include "Paper/UIPage.h"
+#include "Paper/Ui/UIPage.h"
 #include "Paper/Editor/PaperPipeline.h"
 #include "Paper/Editor/UIPageAsset.h"
 
