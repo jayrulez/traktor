@@ -18,6 +18,10 @@
 
 namespace traktor::paper
 {
+namespace
+{
+const Guid c_idPaper2DShader(L"{A704DB1C-60E6-9D44-AD1D-F7822568242D}"); // System/Paper/Shaders/Paper2D
+}
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.PaperPipeline", 0, PaperPipeline, editor::IPipeline)
 
@@ -54,6 +58,7 @@ bool PaperPipeline::buildDependencies(
 	const Guid& outputGuid
 ) const
 {
+	pipelineDepends->addDependency(c_idPaper2DShader, editor::PdfBuild | editor::PdfResource);
 	return true;
 }
 

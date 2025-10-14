@@ -37,8 +37,14 @@ namespace traktor::paper
 
 T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.BitmapFontPreviewControl", BitmapFontPreviewControl, ui::Widget)
 
-BitmapFontPreviewControl::BitmapFontPreviewControl(editor::IEditor* editor)
+BitmapFontPreviewControl::BitmapFontPreviewControl(editor::IEditor* editor,
+	db::Database* database,
+	resource::IResourceManager* resourceManager,
+	render::IRenderSystem* renderSystem)
 	: m_editor(editor)
+	, m_database(database)
+	, m_resourceManager(resourceManager)
+	, m_renderSystem(renderSystem)
 	, m_previewText(L"The quick brown fox jumps over the lazy dog.\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n0123456789")
 {
 }
@@ -48,14 +54,7 @@ bool BitmapFontPreviewControl::create(ui::Widget* parent)
 	if (!ui::Widget::create(parent, ui::WsNoCanvas))
 		return false;
 
-	Ref< db::Database > database = m_editor->getOutputDatabase();
-	if (!database)
-		return false;
-
 	Ref< ObjectStore > objectStore = m_editor->getObjectStore();
-	m_renderSystem = objectStore->get< render::IRenderSystem >();
-	if (!m_renderSystem)
-		return false;
 
 	// Create render view.
 	Ref< const PropertyGroup > settings = m_editor->getSettings();
@@ -74,11 +73,6 @@ bool BitmapFontPreviewControl::create(ui::Widget* parent)
 
 	m_renderContext = new render::RenderContext(4 * 1024 * 1024);
 	m_renderGraph = new render::RenderGraph(m_renderSystem, desc.multiSample);
-
-	// Create resource manager.
-	m_resourceManager = new resource::ResourceManager(database, settings->getProperty< bool >(L"Resource.Verbose", false));
-	m_resourceManager->addFactory(new render::ShaderFactory(m_renderSystem));
-	m_resourceManager->addFactory(new render::TextureFactory(m_renderSystem, 0));
 
 	// Create Draw2D renderer.
 	m_renderer = new Draw2D();

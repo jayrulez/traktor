@@ -31,6 +31,10 @@
 
 namespace traktor::paper
 {
+namespace
+{
+const Guid c_idPaper2DShader(L"{A704DB1C-60E6-9D44-AD1D-F7822568242D}"); // System/Paper/Shaders/Paper2D
+}
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.BitmapFontPipeline", 0, BitmapFontPipeline, editor::IPipeline)
 
@@ -69,6 +73,7 @@ bool BitmapFontPipeline::buildDependencies(
 	const BitmapFontAsset* fontAsset = mandatory_non_null_type_cast< const BitmapFontAsset* >(sourceAsset);
 	pipelineDepends->addDependency(Path(m_assetPath), fontAsset->getFileName().getOriginal());
 	pipelineDepends->addDependency< render::TextureOutput >();
+	pipelineDepends->addDependency(c_idPaper2DShader, editor::PdfBuild | editor::PdfResource);
 	return true;
 }
 

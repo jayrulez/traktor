@@ -27,7 +27,8 @@ const TypeInfoSet PaperEditorPageFactory::getEditableTypes() const
 
 bool PaperEditorPageFactory::needOutputResources(const TypeInfo& typeInfo, std::set< Guid >& outDependencies) const
 {
-	return false;
+	outDependencies.insert(Guid(L"{A704DB1C-60E6-9D44-AD1D-F7822568242D}")); // System/Paper/Shaders/Paper2D
+	return true;
 }
 
 Ref< editor::IEditorPage > PaperEditorPageFactory::createEditorPage(editor::IEditor* editor, editor::IEditorPageSite* site, editor::IDocument* document) const
@@ -46,6 +47,7 @@ Ref< editor::IEditorPage > PaperEditorPageFactory::createEditorPage(editor::IEdi
 
 void PaperEditorPageFactory::getCommands(std::list< ui::Command >& outCommands) const
 {
+	outCommands.push_back(ui::Command(L"Paper.Editor.Reload"));
 }
 
 Ref< ISerializable > PaperEditorPageFactory::cloneAsset(const ISerializable* asset) const

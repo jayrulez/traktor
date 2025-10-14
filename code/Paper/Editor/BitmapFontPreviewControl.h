@@ -64,7 +64,10 @@ class T_DLLCLASS BitmapFontPreviewControl : public ui::Widget
 	T_RTTI_CLASS;
 
 public:
-	explicit BitmapFontPreviewControl(editor::IEditor* editor);
+	explicit BitmapFontPreviewControl(editor::IEditor* editor,
+		db::Database* database,
+		resource::IResourceManager* resourceManager,
+		render::IRenderSystem* renderSystem);
 
 	bool create(ui::Widget* parent);
 
@@ -79,6 +82,7 @@ public:
 private:
 	editor::IEditor* m_editor;
 	Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
+	Ref< db::Database > m_database = nullptr;
 	Ref< resource::IResourceManager > m_resourceManager;
 	Ref< render::IRenderSystem > m_renderSystem;
 	Ref< render::IRenderView > m_renderView;

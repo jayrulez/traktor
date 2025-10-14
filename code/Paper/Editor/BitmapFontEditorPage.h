@@ -38,6 +38,11 @@ class RichEdit;
 
 }
 
+namespace traktor::resource
+{
+class IResourceManager;
+}
+
 namespace traktor::paper
 {
 
@@ -64,6 +69,7 @@ private:
 	editor::IEditor* m_editor;
 	editor::IEditorPageSite* m_site;
 	editor::IDocument* m_document;
+	Ref< resource::IResourceManager > m_resourceManager;
 	Ref< ui::RichEdit > m_editPreviewText;
 	Ref< BitmapFontPreviewControl > m_previewControl;
 	Guid m_fontGuid;
