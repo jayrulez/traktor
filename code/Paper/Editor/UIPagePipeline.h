@@ -21,7 +21,7 @@
 namespace traktor::paper
 {
 
-class T_DLLCLASS PaperPipeline : public editor::IPipeline
+class T_DLLCLASS UIPagePipeline : public editor::IPipeline
 {
 	T_RTTI_CLASS;
 

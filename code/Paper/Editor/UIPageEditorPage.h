@@ -8,6 +8,8 @@
  */
 #pragma once
 
+#include "Core/Guid.h"
+#include "Core/Ref.h"
 #include "Editor/IEditorPage.h"
 
 // import/export mechanism.
@@ -32,6 +34,11 @@ namespace traktor::ui
 
 class Container;
 
+}
+
+namespace traktor::resource
+{
+class IResourceManager;
 }
 
 namespace traktor::paper
@@ -60,7 +67,11 @@ private:
 	editor::IEditor* m_editor;
 	editor::IEditorPageSite* m_site;
 	editor::IDocument* m_document;
+	Ref< resource::IResourceManager > m_resourceManager;
 	Ref< UIPagePreviewControl > m_previewControl;
+	Guid m_uiPageGuid;
+
+	void updatePreview();
 };
 
 }
