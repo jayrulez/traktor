@@ -42,13 +42,28 @@ const BitmapFont::Glyph* BitmapFont::getGlyph(uint32_t character) const
 	return nullptr;
 }
 
+void BitmapFont::addKerning(uint32_t left, uint32_t right, float offset)
+{
+	const uint64_t key = (static_cast<uint64_t>(left) << 32) | right;
+	m_kerningPairs[key] = offset;
+}
+
+float BitmapFont::getKerning(uint32_t left, uint32_t right) const
+{
+	const uint64_t key = (static_cast<uint64_t>(left) << 32) | right;
+	auto it = m_kerningPairs.find(key);
+	return (it != m_kerningPairs.end()) ? it->second : 0.0f;
+}
+
 void BitmapFont::serialize(ISerializer& s)
 {
 	IFont::serialize(s);
 
 	s >> Member< float >(L"lineHeight", m_lineHeight);
+	s >> Member< float >(L"baseline", m_baseline);
 	s >> Member< Guid >(L"textureId", m_textureId);
 	s >> MemberAlignedVector< Glyph, MemberComposite< Glyph > >(L"glyphs", m_glyphs);
+	s >> MemberSmallMap< uint64_t, float >(L"kerningPairs", m_kerningPairs);
 }
 
 }

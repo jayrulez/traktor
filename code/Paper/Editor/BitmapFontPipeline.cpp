@@ -143,6 +143,9 @@ bool BitmapFontPipeline::buildOutput(
 	Ref< BitmapFont > bitmapFont = new BitmapFont();
 	bitmapFont->setLineHeight(lineHeight);
 
+	// Track maximum baseline offset from glyph metrics
+	int32_t baselineOffset = 0;
+
 	for (uint32_t ch : characters)
 	{
 		FT_UInt glyphIndex = FT_Get_Char_Index(face, ch);
@@ -155,6 +158,11 @@ bool BitmapFontPipeline::buildOutput(
 
 		FT_GlyphSlot slot = face->glyph;
 		FT_Bitmap& bitmap = slot->bitmap;
+
+		// Track maximum baseline offset using horiBearingY (same as bitmap_top)
+		const int32_t glyphBaselineOffset = slot->metrics.horiBearingY >> 6;
+		if (glyphBaselineOffset > baselineOffset)
+			baselineOffset = glyphBaselineOffset;
 
 		if (bitmap.width == 0 || bitmap.rows == 0)
 		{
@@ -192,11 +200,20 @@ bool BitmapFontPipeline::buildOutput(
 			}
 		}
 
-		// Create glyph data
+		// Create glyph data:
+		// We need to store bitmap_left and bitmap_top as offsets
+		// BUT Aabb2 expects mn < mx, so we can't store bitmap_top directly
+		//
+		// Solution: Store in bounds:
+		// mn.x = bitmap_left, mn.y = -(bitmap_top) (negative, so min)
+		// mx.x = bitmap_left + width, mx.y = -(bitmap_top - rows) = -bitmap_top + rows
+		//
+		// Then extract: bitmap_left = mn.x, bitmap_top = -mn.y, height = mx.y - mn.y
 		BitmapFont::Glyph glyph;
 		glyph.character = ch;
+
 		glyph.bounds = Aabb2(
-			Vector2((float)slot->bitmap_left, (float)-slot->bitmap_top),
+			Vector2((float)slot->bitmap_left, (float)(-slot->bitmap_top)),
 			Vector2((float)(slot->bitmap_left + bitmap.width), (float)(-slot->bitmap_top + bitmap.rows)));
 		glyph.uvMin = Vector2(
 			(float)(rect.x + 1) / textureSize,
@@ -207,6 +224,48 @@ bool BitmapFontPipeline::buildOutput(
 		glyph.advance = (float)(slot->advance.x >> 6);
 
 		bitmapFont->addGlyph(glyph);
+	}
+
+	// Set baseline to maximum glyph baseline offset
+	bitmapFont->setBaseline((float)baselineOffset);
+
+	// Extract kerning pairs if the font has kerning information
+	if (FT_HAS_KERNING(face))
+	{
+		log::info << L"Font has kerning information, extracting kerning pairs..." << Endl;
+		uint32_t kerningPairsCount = 0;
+
+		for (uint32_t left : characters)
+		{
+			FT_UInt leftIndex = FT_Get_Char_Index(face, left);
+			if (leftIndex == 0)
+				continue;
+
+			for (uint32_t right : characters)
+			{
+				FT_UInt rightIndex = FT_Get_Char_Index(face, right);
+				if (rightIndex == 0)
+					continue;
+
+				FT_Vector kerning;
+				error = FT_Get_Kerning(face, leftIndex, rightIndex, FT_KERNING_DEFAULT, &kerning);
+				if (error)
+					continue;
+
+				if (kerning.x != 0)
+				{
+					float kerningOffset = (float)(kerning.x >> 6);
+					bitmapFont->addKerning(left, right, kerningOffset);
+					kerningPairsCount++;
+				}
+			}
+		}
+
+		log::info << L"Extracted " << kerningPairsCount << L" kerning pairs." << Endl;
+	}
+	else
+	{
+		log::info << L"Font does not have kerning information." << Endl;
 	}
 
 	FT_Done_Face(face);

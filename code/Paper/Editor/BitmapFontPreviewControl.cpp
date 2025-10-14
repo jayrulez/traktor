@@ -173,8 +173,6 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 			const float x = 20.0f;
 			float y = 40.0f;
 
-			log::info << L"BitmapFontPreviewControl: Rendering text, size: " << sz.cx << L"x" << sz.cy << Endl;
-
 			std::wstring currentLine;
 			for (wchar_t ch : m_previewText)
 			{
@@ -182,7 +180,6 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 				{
 					if (!currentLine.empty())
 					{
-						log::info << L"BitmapFontPreviewControl: Drawing line at (" << x << L", " << y << L"): " << currentLine << Endl;
 						m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 						currentLine.clear();
 					}
@@ -195,7 +192,6 @@ void BitmapFontPreviewControl::eventPaint(ui::PaintEvent* event)
 			// Draw remaining text.
 			if (!currentLine.empty())
 			{
-				log::info << L"BitmapFontPreviewControl: Drawing final line at (" << x << L", " << y << L"): " << currentLine << Endl;
 				m_fontRenderer->drawText(m_font, Vector2(x, y), currentLine, Color4f(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 

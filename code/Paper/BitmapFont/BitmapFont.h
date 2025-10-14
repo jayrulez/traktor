@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Core/Containers/AlignedVector.h"
+#include "Core/Containers/SmallMap.h"
 #include "Core/Guid.h"
 #include "Core/Math/Aabb2.h"
 #include "Paper/IFont.h"
@@ -49,6 +50,10 @@ public:
 
 	float getLineHeight() const { return m_lineHeight; }
 
+	void setBaseline(float baseline) { m_baseline = baseline; }
+
+	float getBaseline() const { return m_baseline; }
+
 	void setTextureId(const Guid& textureId) { m_textureId = textureId; }
 
 	const Guid& getTextureId() const { return m_textureId; }
@@ -61,12 +66,18 @@ public:
 
 	uint32_t getGlyphCount() const { return (uint32_t)m_glyphs.size(); }
 
+	void addKerning(uint32_t left, uint32_t right, float offset);
+
+	float getKerning(uint32_t left, uint32_t right) const;
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:
 	float m_lineHeight = 0.0f;
+	float m_baseline = 0.0f;
 	Guid m_textureId;
 	AlignedVector< Glyph > m_glyphs;
+	SmallMap< uint64_t, float > m_kerningPairs;  // Key: (left << 32) | right, Value: kerning offset
 };
 
 }

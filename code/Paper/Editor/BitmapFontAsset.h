@@ -30,14 +30,6 @@ public:
 
 	int32_t getSize() const { return m_size; }
 
-	void setBold(bool bold) { m_bold = bold; }
-
-	bool getBold() const { return m_bold; }
-
-	void setItalic(bool italic) { m_italic = italic; }
-
-	bool getItalic() const { return m_italic; }
-
 	void setTextureSize(int32_t textureSize) { m_textureSize = textureSize; }
 
 	int32_t getTextureSize() const { return m_textureSize; }
@@ -46,8 +38,6 @@ public:
 
 private:
 	int32_t m_size = 16;
-	bool m_bold = false;
-	bool m_italic = false;
 	int32_t m_textureSize = 512;
 };
 

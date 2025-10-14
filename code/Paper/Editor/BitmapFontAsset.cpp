@@ -20,8 +20,6 @@ void BitmapFontAsset::serialize(ISerializer& s)
 	editor::Asset::serialize(s);
 
 	s >> Member< int32_t >(L"size", m_size);
-	s >> Member< bool >(L"bold", m_bold);
-	s >> Member< bool >(L"italic", m_italic);
 	s >> Member< int32_t >(L"textureSize", m_textureSize);
 }
 

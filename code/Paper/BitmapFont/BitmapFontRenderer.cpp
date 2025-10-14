@@ -39,6 +39,7 @@ Vector2 BitmapFontRenderer::measureText(const IFont* font, const std::wstring& t
 
 	Vector2 size(0.0f, bitmapFont->getLineHeight());
 	float x = 0.0f;
+	uint32_t previousChar = 0;
 
 	for (wchar_t ch : text)
 	{
@@ -46,15 +47,27 @@ Vector2 BitmapFontRenderer::measureText(const IFont* font, const std::wstring& t
 		{
 			size.y += bitmapFont->getLineHeight();
 			x = 0.0f;
+			previousChar = 0;
 			continue;
 		}
 
 		const BitmapFont::Glyph* glyph = bitmapFont->getGlyph((uint32_t)ch);
 		if (!glyph)
+		{
+			previousChar = 0;
 			continue;
+		}
+
+		// Apply kerning if we have a previous character
+		if (previousChar != 0)
+		{
+			float kerning = bitmapFont->getKerning(previousChar, (uint32_t)ch);
+			x += kerning;
+		}
 
 		x += glyph->advance;
 		size.x = max(size.x, x);
+		previousChar = (uint32_t)ch;
 	}
 
 	return size;
@@ -81,6 +94,7 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 
 	Vector2 currentPos = position;
 	int glyphsDrawn = 0;
+	uint32_t previousChar = 0;
 
 	for (wchar_t ch : text)
 	{
@@ -88,6 +102,7 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 		{
 			currentPos.y += bitmapFont->getLineHeight();
 			currentPos.x = position.x;
+			previousChar = 0;
 			continue;
 		}
 
@@ -95,7 +110,15 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 		if (!glyph)
 		{
 			log::warning << L"BitmapFontRenderer: No glyph for character " << (uint32_t)ch << L" ('" << ch << L"')" << Endl;
+			previousChar = 0;
 			continue;
+		}
+
+		// Apply kerning if we have a previous character
+		if (previousChar != 0)
+		{
+			float kerning = bitmapFont->getKerning(previousChar, (uint32_t)ch);
+			currentPos.x += kerning;
 		}
 
 		// Skip glyphs with no size (whitespace)
@@ -105,9 +128,19 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 			continue;
 		}
 
-		// Calculate quad position and size
-		const Vector2 quadPos(currentPos.x + glyph->bounds.mn.x, currentPos.y + glyph->bounds.mn.y);
-		const Vector2 quadSize(glyph->bounds.getExtent().x, glyph->bounds.getExtent().y);
+		// Calculate quad position and size:
+		// bounds.mn.y = -bitmap_top (we stored it negated to satisfy Aabb2)
+		// Extract: bitmap_top = -bounds.mn.y
+		// Formula: screenY = currentPos.y + baseline - bitmap_top = currentPos.y + baseline + bounds.mn.y
+		const float baseline = bitmapFont->getBaseline();
+		const Vector2 quadPos(
+			currentPos.x + glyph->bounds.mn.x,
+			currentPos.y + baseline + glyph->bounds.mn.y
+		);
+		const Vector2 quadSize(
+			glyph->bounds.mx.x - glyph->bounds.mn.x,
+			glyph->bounds.mx.y - glyph->bounds.mn.y
+		);
 
 		// Draw textured quad with glyph
 		m_renderer->drawTexturedQuad(
@@ -121,9 +154,8 @@ void BitmapFontRenderer::drawText(const IFont* font, const Vector2& position, co
 
 		glyphsDrawn++;
 		currentPos.x += glyph->advance;
+		previousChar = (uint32_t)ch;
 	}
-
-	log::info << L"BitmapFontRenderer: Drew " << glyphsDrawn << L" glyphs for text of length " << text.length() << Endl;
 }
 
 }
