@@ -131,6 +131,8 @@ void Draw2D::render(render::IRenderView* renderView, uint32_t frame)
 	for (const auto& batch : f.batches)
 	{
 		render::Shader::Permutation perm;
+		m_shader->setCombination(s_handleTexture, batch.texture != nullptr, perm);
+
 		render::IProgram* program = m_shader->getProgram(perm).program;
 		if (!program)
 			continue;
