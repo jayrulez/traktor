@@ -44,9 +44,9 @@ public:
 
 	float getHeight() const { return m_height; }
 
-	virtual Vector2 measure(const Vector2& availableSize) override;
+	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
-	virtual void render(Draw2D* renderer) override;
+	virtual void render(UIContext* context) override;
 
 	virtual void serialize(ISerializer& s) override;
 

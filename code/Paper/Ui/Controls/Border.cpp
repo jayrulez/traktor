@@ -10,6 +10,7 @@
 #include "Core/Serialization/Member.h"
 #include "Core/Serialization/MemberRef.h"
 #include "Paper/Ui/Controls/Border.h"
+#include "Paper/Ui/UIContext.h"
 #include "Paper/Draw2D.h"
 
 namespace traktor::paper
@@ -17,7 +18,7 @@ namespace traktor::paper
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.Border", 0, Border, UIElement)
 
-Vector2 Border::measure(const Vector2& availableSize)
+Vector2 Border::measure(const Vector2& availableSize, UIContext* context)
 {
 	Vector2 childAvailable = availableSize;
 
@@ -28,7 +29,7 @@ Vector2 Border::measure(const Vector2& availableSize)
 
 	Vector2 childSize = Vector2::zero();
 	if (m_child)
-		childSize = m_child->measure(childAvailable);
+		childSize = m_child->measure(childAvailable, context);
 
 	// Add padding and border back to desired size
 	m_desiredSize = childSize + m_padding * 2.0f + Vector2(totalThickness, totalThickness);
@@ -53,14 +54,14 @@ void Border::arrange(const Vector2& position, const Vector2& size)
 	}
 }
 
-void Border::render(Draw2D* renderer)
+void Border::render(UIContext* context)
 {
 	// TODO: Render background rectangle
 	// TODO: Render border rectangle
 
 	// Render child
 	if (m_child)
-		m_child->render(renderer);
+		m_child->render(context);
 }
 
 void Border::serialize(ISerializer& s)

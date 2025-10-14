@@ -9,7 +9,7 @@
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/MemberRefArray.h"
 #include "Paper/Ui/Layouts/Panel.h"
-#include "Paper/Draw2D.h"
+#include "Paper/Ui/UIContext.h"
 
 namespace traktor::paper
 {
@@ -27,13 +27,26 @@ void Panel::removeChild(UIElement* child)
 	m_children.remove(child);
 }
 
-void Panel::render(Draw2D* renderer)
+void Panel::render(UIContext* context)
 {
 	// Render all children
 	for (auto child : m_children)
 	{
 		if (child)
-			child->render(renderer);
+			child->render(context);
+	}
+}
+
+void Panel::renderDebug(UIContext* context)
+{
+	// Render debug for this panel
+	UIElement::renderDebug(context);
+
+	// Render debug for all children
+	for (auto child : m_children)
+	{
+		if (child)
+			child->renderDebug(context);
 	}
 }
 

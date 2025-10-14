@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<object type="traktor.db.LocalInstanceMeta" version="2">
+	<guid>{970AEEAF-EC6F-8F47-883C-700237C278C4}</guid>
+	<primaryType>traktor.paper.BitmapFontAsset</primaryType>
+	<blobs/>
+</object>

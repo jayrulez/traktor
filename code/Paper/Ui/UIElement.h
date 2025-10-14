@@ -23,7 +23,7 @@
 namespace traktor::paper
 {
 
-class Draw2D;
+class UIContext;
 
 /*! Base class for all UI elements.
  * \ingroup Paper
@@ -40,9 +40,10 @@ public:
 
 	/*! Measure the desired size of the element.
 	 * \param availableSize Available space for this element.
+	 * \param context UI context containing layout services.
 	 * \return Desired size of the element.
 	 */
-	virtual Vector2 measure(const Vector2& availableSize);
+	virtual Vector2 measure(const Vector2& availableSize, UIContext* context);
 
 	/*! Arrange the element within the given bounds.
 	 * \param finalRect Final position and size for this element.
@@ -50,9 +51,14 @@ public:
 	virtual void arrange(const Vector2& position, const Vector2& size);
 
 	/*! Render the element.
-	 * \param renderer 2D renderer to use for drawing.
+	 * \param context UI context containing rendering services.
 	 */
-	virtual void render(Draw2D* renderer);
+	virtual void render(UIContext* context);
+
+	/*! Render debug visualization for layout.
+	 * \param context UI context containing rendering services.
+	 */
+	virtual void renderDebug(UIContext* context);
 
 	/*! Get the desired size after measure.
 	 */

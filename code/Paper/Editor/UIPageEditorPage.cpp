@@ -19,6 +19,7 @@
 #include "Paper/Ui/UIPage.h"
 #include "Paper/Editor/UIPageAsset.h"
 #include "Paper/Editor/UIPagePreviewControl.h"
+#include "Paper/BitmapFont/BitmapFontFactory.h"
 #include "Render/Resource/ShaderFactory.h"
 #include "Render/Resource/TextureFactory.h"
 #include "Render/IRenderSystem.h"
@@ -51,6 +52,7 @@ bool UIPageEditorPage::create(ui::Container* parent)
 	m_resourceManager = new resource::ResourceManager(database, m_editor->getSettings()->getProperty< bool >(L"Resource.Verbose", true));
 	m_resourceManager->addFactory(new render::ShaderFactory(renderSystem));
 	m_resourceManager->addFactory(new render::TextureFactory(renderSystem, 0));
+	m_resourceManager->addFactory(new BitmapFontFactory());
 
 	Ref< ui::Container > container = new ui::Container();
 	if (!container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"100%", ui::Unit(0), ui::Unit(0))))
@@ -139,6 +141,12 @@ void UIPageEditorPage::updatePreview()
 		log::info << L"UIPage not yet built; preview unavailable." << Endl;
 		return;
 	}
+
+	log::info << L"UIPageEditorPage: Loaded UIPage from database" << Endl;
+	if (uiPage->getRoot())
+		log::info << L"UIPageEditorPage: UIPage has root element" << Endl;
+	else
+		log::error << L"UIPageEditorPage: UIPage has NO root element after loading!" << Endl;
 
 	m_previewControl->setUIPage(uiPage);
 }

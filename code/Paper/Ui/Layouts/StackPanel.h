@@ -41,7 +41,7 @@ public:
 
 	Orientation getOrientation() const { return m_orientation; }
 
-	virtual Vector2 measure(const Vector2& availableSize) override;
+	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
 	virtual void arrange(const Vector2& position, const Vector2& size) override;
 

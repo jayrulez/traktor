@@ -53,11 +53,11 @@ public:
 
 	const Vector2& getPadding() const { return m_padding; }
 
-	virtual Vector2 measure(const Vector2& availableSize) override;
+	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
 	virtual void arrange(const Vector2& position, const Vector2& size) override;
 
-	virtual void render(Draw2D* renderer) override;
+	virtual void render(UIContext* context) override;
 
 	virtual void serialize(ISerializer& s) override;
 

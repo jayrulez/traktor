@@ -231,6 +231,42 @@ void Draw2D::drawTexturedQuad(
 	vertices[5].set(v3, Vector2(uvMin.x, uvMax.y), color);
 }
 
+void Draw2D::drawQuad(
+	const Vector2& position,
+	const Vector2& size,
+	const Color4f& color
+)
+{
+	// Draw a filled quad without texture (texture = nullptr)
+	Vertex* vertices = allocBatch(6, nullptr);
+	if (!vertices)
+		return;
+
+	const float x0 = position.x;
+	const float y0 = position.y;
+	const float x1 = position.x + size.x;
+	const float y1 = position.y + size.y;
+
+	// Transform vertices by world-view matrix
+	const Vector4 v0 = m_worldView * Vector4(x0, y0, 0.0f, 1.0f);
+	const Vector4 v1 = m_worldView * Vector4(x1, y0, 0.0f, 1.0f);
+	const Vector4 v2 = m_worldView * Vector4(x1, y1, 0.0f, 1.0f);
+	const Vector4 v3 = m_worldView * Vector4(x0, y1, 0.0f, 1.0f);
+
+	// UV coordinates don't matter for non-textured quads, but we still need to provide them
+	const Vector2 uv(0.5f, 0.5f);
+
+	// First triangle
+	vertices[0].set(v0, uv, color);
+	vertices[1].set(v1, uv, color);
+	vertices[2].set(v2, uv, color);
+
+	// Second triangle
+	vertices[3].set(v0, uv, color);
+	vertices[4].set(v2, uv, color);
+	vertices[5].set(v3, uv, color);
+}
+
 void Draw2D::updateTransforms()
 {
 	m_worldView = m_view.back() * m_world.back();

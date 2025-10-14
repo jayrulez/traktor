@@ -95,6 +95,12 @@ public:
 		render::ITexture* texture
 	);
 
+	void drawQuad(
+		const Vector2& position,
+		const Vector2& size,
+		const Color4f& color
+	);
+
 	const Matrix44& getProjection() const { return m_currentFrame->projections.back(); }
 
 	const Matrix44& getView() const { return m_view.back(); }

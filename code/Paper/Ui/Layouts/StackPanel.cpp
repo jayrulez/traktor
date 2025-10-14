@@ -17,7 +17,7 @@ namespace traktor::paper
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.StackPanel", 0, StackPanel, Panel)
 
-Vector2 StackPanel::measure(const Vector2& availableSize)
+Vector2 StackPanel::measure(const Vector2& availableSize, UIContext* context)
 {
 	Vector2 desiredSize = Vector2::zero();
 
@@ -28,7 +28,7 @@ Vector2 StackPanel::measure(const Vector2& availableSize)
 		{
 			if (child)
 			{
-				Vector2 childSize = child->measure(Vector2(availableSize.x, std::numeric_limits< float >::infinity()));
+				Vector2 childSize = child->measure(Vector2(availableSize.x, std::numeric_limits< float >::infinity()), context);
 				desiredSize.x = max(desiredSize.x, childSize.x);
 				desiredSize.y += childSize.y;
 			}
@@ -41,7 +41,7 @@ Vector2 StackPanel::measure(const Vector2& availableSize)
 		{
 			if (child)
 			{
-				Vector2 childSize = child->measure(Vector2(std::numeric_limits< float >::infinity(), availableSize.y));
+				Vector2 childSize = child->measure(Vector2(std::numeric_limits< float >::infinity(), availableSize.y), context);
 				desiredSize.x += childSize.x;
 				desiredSize.y = max(desiredSize.y, childSize.y);
 			}

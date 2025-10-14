@@ -50,9 +50,11 @@ public:
 
 	const Color4f& getForeground() const { return m_foreground; }
 
-	virtual Vector2 measure(const Vector2& availableSize) override;
+	virtual Vector2 measure(const Vector2& availableSize, UIContext* context) override;
 
-	virtual void render(Draw2D* renderer) override;
+	virtual void render(UIContext* context) override;
+
+	virtual void renderDebug(UIContext* context) override;
 
 	virtual void serialize(ISerializer& s) override;
 

@@ -9,6 +9,7 @@
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/Member.h"
 #include "Paper/Ui/Controls/Rectangle.h"
+#include "Paper/Ui/UIContext.h"
 #include "Paper/Draw2D.h"
 
 namespace traktor::paper
@@ -16,7 +17,7 @@ namespace traktor::paper
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.Rectangle", 0, Rectangle, UIElement)
 
-Vector2 Rectangle::measure(const Vector2& availableSize)
+Vector2 Rectangle::measure(const Vector2& availableSize, UIContext* context)
 {
 	// Use explicit width/height if set, otherwise use available size
 	m_desiredSize.x = (m_width > 0.0f) ? m_width : availableSize.x;
@@ -25,9 +26,10 @@ Vector2 Rectangle::measure(const Vector2& availableSize)
 	return m_desiredSize;
 }
 
-void Rectangle::render(Draw2D* renderer)
+void Rectangle::render(UIContext* context)
 {
 	// TODO: Render filled rectangle using Draw2D
+	// Draw2D* renderer = context->getRenderer();
 	// renderer->drawFilledQuad(m_actualPosition, m_actualSize, m_fill);
 }
 

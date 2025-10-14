@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<object type="traktor.paper.BitmapFontAsset">
+	<fileName>f:/Traktor/Traktors/traktor_paper/data/Assets/System/Paper/Fonts/Roboto/static/Roboto-Bold.ttf</fileName>
+	<size>16</size>
+	<textureSize>512</textureSize>
+</object>

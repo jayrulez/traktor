@@ -9,28 +9,65 @@
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/Member.h"
 #include "Paper/Ui/Controls/TextBlock.h"
+#include "Paper/Ui/UIContext.h"
 #include "Paper/IFont.h"
 #include "Paper/IFontRenderer.h"
 #include "Paper/FontManager.h"
-#include "Paper/Draw2D.h"
 
 namespace traktor::paper
 {
 
 T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.TextBlock", 0, TextBlock, UIElement)
 
-Vector2 TextBlock::measure(const Vector2& availableSize)
+Vector2 TextBlock::measure(const Vector2& availableSize, UIContext* context)
 {
-	// TODO: Need FontManager to measure text
-	// For now, return a placeholder size
+	if (context && !m_text.empty())
+	{
+		FontManager* fontManager = context->getFontManager();
+		IFontRenderer* fontRenderer = context->getFontRenderer();
+
+		if (fontManager && fontRenderer)
+		{
+			Ref< const IFont > font = fontManager->getFont(m_fontId);
+			if (font)
+			{
+				// Measure the actual text size using the font renderer
+				m_desiredSize = fontRenderer->measureText(font, m_text);
+				return m_desiredSize;
+			}
+		}
+	}
+
+	// Fallback: return placeholder size
 	m_desiredSize = Vector2(100.0f, 20.0f);
 	return m_desiredSize;
 }
 
-void TextBlock::render(Draw2D* renderer)
+void TextBlock::render(UIContext* context)
 {
-	// TODO: Need FontManager to render text
-	// For now, do nothing
+	if (context && !m_text.empty())
+	{
+		FontManager* fontManager = context->getFontManager();
+		IFontRenderer* fontRenderer = context->getFontRenderer();
+
+		if (fontManager && fontRenderer)
+		{
+			Ref< const IFont > font = fontManager->getFont(m_fontId);
+			if (font)
+			{
+				fontRenderer->drawText(font, m_actualPosition, m_text, m_foreground);
+			}
+		}
+	}
+}
+
+void TextBlock::renderDebug(UIContext* context)
+{
+	// Render debug visualization
+	UIElement::renderDebug(context);
+
+	// Also render the actual text
+	render(context);
 }
 
 void TextBlock::serialize(ISerializer& s)

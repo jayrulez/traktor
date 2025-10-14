@@ -45,7 +45,9 @@ public:
 	 */
 	const RefArray< UIElement >& getChildren() const { return m_children; }
 
-	virtual void render(Draw2D* renderer) override;
+	virtual void render(UIContext* context) override;
+
+	virtual void renderDebug(UIContext* context) override;
 
 	virtual void serialize(ISerializer& s) override;
 

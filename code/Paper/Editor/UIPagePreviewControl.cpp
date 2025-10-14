@@ -19,9 +19,12 @@
 #include "Core/Settings/PropertyInteger.h"
 #include "Database/Database.h"
 #include "Editor/IEditor.h"
+#include "Paper/BitmapFont/BitmapFontRenderer.h"
 #include "Paper/Draw2D.h"
+#include "Paper/FontManager.h"
 #include "Paper/Ui/UIElement.h"
 #include "Paper/Ui/UIPage.h"
+#include "Paper/Ui/UIContext.h"
 #include "Render/Context/RenderContext.h"
 #include "Render/Frame/RenderGraph.h"
 #include "Render/IRenderSystem.h"
@@ -77,6 +80,10 @@ bool UIPagePreviewControl::create(ui::Widget* parent)
 	m_renderer = new Draw2D();
 	if (!m_renderer->create(m_resourceManager, m_renderSystem, 1))
 		return false;
+
+	// Create FontManager and BitmapFontRenderer.
+	m_fontManager = new FontManager(m_resourceManager);
+	m_fontRenderer = new BitmapFontRenderer(m_resourceManager, m_renderSystem, m_renderer);
 
 	// Add widget event handlers.
 	addEventHandler< ui::SizeEvent >(this, &UIPagePreviewControl::eventSize);
@@ -166,14 +173,17 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 		uiPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
 			m_renderer->begin(0, projection);
 
+			// Create UI context
+			UIContext uiContext(m_renderer, m_fontManager, m_fontRenderer);
+
 			// Measure and arrange UI using UIPage dimensions
 			auto root = m_uiPage->getRoot();
 			Vector2 availableSize(pageWidth, pageHeight);
-			root->measure(availableSize);
+			root->measure(availableSize, &uiContext);
 			root->arrange(Vector2::zero(), availableSize);
 
-			// Render UI
-			root->render(m_renderer);
+			// Render UI with debug visualization
+			root->renderDebug(&uiContext);
 
 			m_renderer->end(0);
 

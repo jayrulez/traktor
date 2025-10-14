@@ -56,6 +56,8 @@ namespace traktor::paper
 
 class UIPage;
 class Draw2D;
+class FontManager;
+class BitmapFontRenderer;
 
 class T_DLLCLASS UIPagePreviewControl : public ui::Widget
 {
@@ -83,6 +85,8 @@ private:
 	Ref< render::RenderContext > m_renderContext;
 	Ref< render::RenderGraph > m_renderGraph;
 	Ref< Draw2D > m_renderer;
+	Ref< FontManager > m_fontManager;
+	Ref< BitmapFontRenderer > m_fontRenderer;
 	Ref< UIPage > m_uiPage;
 	Timer m_timer;
 
