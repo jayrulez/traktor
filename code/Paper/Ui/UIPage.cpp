@@ -14,6 +14,8 @@
 #include "Paper/Ui/UIElement.h"
 #include "Paper/Ui/UITheme.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/Controls/Border.h"
+#include "Paper/Ui/Layouts/Panel.h"
 
 namespace traktor::paper
 {
@@ -108,6 +110,9 @@ void UIPage::handleMouseDown(const Vector2& position, MouseButton button)
 	// Perform hit test to find element under mouse
 	UIElement* hitElement = m_root->hitTest(position);
 
+	// Remember which element was pressed for click detection
+	m_pressedElement = hitElement;
+
 	if (hitElement)
 	{
 		MouseEvent downEvent;
@@ -131,7 +136,84 @@ void UIPage::handleMouseUp(const Vector2& position, MouseButton button)
 		upEvent.position = position;
 		upEvent.button = button;
 		hitElement->onMouseUp(upEvent);
+
+		// For click detection, we need to check if the pressed element is in the ancestor chain
+		// of the released element (this allows clicking on children to trigger parent callbacks)
+		if (m_pressedElement && button == MouseButton::Left)
+		{
+			// Build ancestor chain for the hit element
+			UIElement* current = hitElement;
+			while (current)
+			{
+				// Check if this ancestor was the pressed element
+				if (current == m_pressedElement)
+				{
+					// Walk up from the hit element and fire the first callback we find
+					UIElement* callbackElement = hitElement;
+					while (callbackElement)
+					{
+						const ClickCallback& callback = callbackElement->getClickCallback();
+						if (callback)
+						{
+							MouseEvent clickEvent;
+							clickEvent.position = position;
+							clickEvent.button = button;
+							callback(callbackElement, clickEvent);
+							break; // Only fire the first callback found
+						}
+						callbackElement = callbackElement->getParent();
+					}
+					break;
+				}
+				current = current->getParent();
+			}
+		}
 	}
+
+	// Clear pressed element
+	m_pressedElement = nullptr;
+}
+
+UIElement* UIPage::findElementByName(const std::wstring& name)
+{
+	if (!m_root)
+		return nullptr;
+	return findElementByNameRecursive(m_root, name);
+}
+
+UIElement* UIPage::findElementByNameRecursive(UIElement* element, const std::wstring& name)
+{
+	if (!element)
+		return nullptr;
+
+	// Check if this element matches
+	if (element->getName() == name)
+		return element;
+
+	// Check children - need to handle different container types
+	// For Border
+	if (Border* border = dynamic_type_cast<Border*>(element))
+	{
+		if (border->getChild())
+		{
+			UIElement* found = findElementByNameRecursive(border->getChild(), name);
+			if (found)
+				return found;
+		}
+	}
+
+	// For Panel (and StackPanel)
+	if (Panel* panel = dynamic_type_cast<Panel*>(element))
+	{
+		for (auto child : panel->getChildren())
+		{
+			UIElement* found = findElementByNameRecursive(child, name);
+			if (found)
+				return found;
+		}
+	}
+
+	return nullptr;
 }
 
 void UIPage::serialize(ISerializer& s)

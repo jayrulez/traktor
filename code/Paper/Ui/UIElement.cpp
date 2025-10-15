@@ -111,7 +111,7 @@ void UIElement::onMouseLeave(MouseEvent& event)
 
 void UIElement::serialize(ISerializer& s)
 {
-	// Base serialization - derived classes can add their own members
+	s >> Member< std::wstring >(L"name", m_name);
 }
 
 }

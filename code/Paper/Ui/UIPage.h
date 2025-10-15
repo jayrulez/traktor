@@ -85,12 +85,22 @@ public:
 	 */
 	void handleMouseUp(const Vector2& position, MouseButton button);
 
+	/*! Find element by name.
+	 * \param name Element name to search for.
+	 * \return Found element or nullptr.
+	 */
+	UIElement* findElementByName(const std::wstring& name);
+
 	virtual void serialize(ISerializer& s) override final;
+
+private:
+	UIElement* findElementByNameRecursive(UIElement* element, const std::wstring& name);
 
 private:
 	Ref< UIElement > m_root;
 	Ref< UITheme > m_theme;
 	UIElement* m_hoveredElement = nullptr;
+	UIElement* m_pressedElement = nullptr;
 	RefArray< UIElement > m_hoveredAncestors;
 	int32_t m_width = 1920;
 	int32_t m_height = 1080;

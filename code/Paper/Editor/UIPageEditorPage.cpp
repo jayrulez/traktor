@@ -26,6 +26,8 @@
 #include "Resource/ResourceManager.h"
 #include "Ui/Container.h"
 #include "Ui/TableLayout.h"
+#include "Ui/CheckBox.h"
+#include "Ui/Events/ButtonClickEvent.h"
 
 namespace traktor::paper
 {
@@ -55,8 +57,14 @@ bool UIPageEditorPage::create(ui::Container* parent)
 	m_resourceManager->addFactory(new BitmapFontFactory());
 
 	Ref< ui::Container > container = new ui::Container();
-	if (!container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"100%", ui::Unit(0), ui::Unit(0))))
+	if (!container->create(parent, ui::WsNone, new ui::TableLayout(L"100%", L"*,100%", ui::Unit(0), ui::Unit(4))))
 		return false;
+
+	// Create debug visualization checkbox.
+	m_debugVizCheckBox = new ui::CheckBox();
+	m_debugVizCheckBox->create(container, L"Show Debug Visualization");
+	m_debugVizCheckBox->setChecked(true);
+	m_debugVizCheckBox->addEventHandler< ui::ButtonClickEvent >(this, &UIPageEditorPage::eventDebugVizToggle);
 
 	// Create preview control.
 	m_previewControl = new UIPagePreviewControl(m_editor, database, m_resourceManager, renderSystem);
@@ -149,6 +157,15 @@ void UIPageEditorPage::updatePreview()
 		log::error << L"UIPageEditorPage: UIPage has NO root element after loading!" << Endl;
 
 	m_previewControl->setUIPage(uiPage);
+}
+
+void UIPageEditorPage::eventDebugVizToggle(ui::ButtonClickEvent* event)
+{
+	if (m_previewControl && m_debugVizCheckBox)
+	{
+		m_previewControl->setDebugVisualization(m_debugVizCheckBox->isChecked());
+		m_previewControl->update();
+	}
 }
 
 }

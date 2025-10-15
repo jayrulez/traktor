@@ -23,6 +23,7 @@
 #include "Paper/Ui/Controls/TextBlock.h"
 #include "Paper/Ui/Controls/Rectangle.h"
 #include "Paper/Ui/Controls/Border.h"
+#include "Paper/Ui/Controls/Button.h"
 
 namespace traktor::paper
 {
@@ -263,28 +264,28 @@ bool UIPagePipeline::buildOutput(
 	Ref< StackPanel > buttonsRow = new StackPanel();
 	buttonsRow->setOrientation(StackPanel::Orientation::Horizontal);
 
-	Ref< Border > button1 = new Border();
+	// Button 1 - Success
+	Ref< Button > button1 = new Button();
+	button1->setName(L"SuccessButton");
+	button1->setText(L"Success");
+	button1->setFontId(defaultFontId);
 	button1->applyStyle(theme->getStyle(L"Button"));
-	Ref< TextBlock > button1Text = new TextBlock();
-	button1Text->setText(L"Primary Action");
-	button1Text->applyStyle(theme->getStyle(L"PrimaryText"));
-	button1->setChild(button1Text);
 	buttonsRow->addChild(button1);
 
-	Ref< Border > button2 = new Border();
+	// Button 2 - Warning
+	Ref< Button > button2 = new Button();
+	button2->setName(L"WarningButton");
+	button2->setText(L"Warning");
+	button2->setFontId(defaultFontId);
 	button2->applyStyle(theme->getStyle(L"Button"));
-	Ref< TextBlock > button2Text = new TextBlock();
-	button2Text->setText(L"Secondary Action");
-	button2Text->applyStyle(theme->getStyle(L"SecondaryText"));
-	button2->setChild(button2Text);
 	buttonsRow->addChild(button2);
 
-	Ref< Border > button3 = new Border();
+	// Button 3 - Error
+	Ref< Button > button3 = new Button();
+	button3->setName(L"ErrorButton");
+	button3->setText(L"Error");
+	button3->setFontId(defaultFontId);
 	button3->applyStyle(theme->getStyle(L"Button"));
-	Ref< TextBlock > button3Text = new TextBlock();
-	button3Text->setText(L"Accent Action");
-	button3Text->applyStyle(theme->getStyle(L"AccentText"));
-	button3->setChild(button3Text);
 	buttonsRow->addChild(button3);
 
 	buttonsPanel->setChild(buttonsRow);

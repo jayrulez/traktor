@@ -8,6 +8,8 @@
  */
 #pragma once
 
+#include <functional>
+#include <string>
 #include "Core/Serialization/ISerializable.h"
 #include "Core/Ref.h"
 #include "Core/Math/Vector2.h"
@@ -26,6 +28,11 @@ namespace traktor::paper
 
 class UIContext;
 class UIStyle;
+class UIElement;
+
+/*! Click event callback.
+ */
+typedef std::function< void(UIElement*, MouseEvent&) > ClickCallback;
 
 /*! Base class for all UI elements.
  * \ingroup Paper
@@ -131,6 +138,23 @@ public:
 	 */
 	void setParent(UIElement* parent) { m_parent = parent; }
 
+	/*! Set click callback.
+	 * \param callback Function to call when element is clicked.
+	 */
+	void setClickCallback(const ClickCallback& callback) { m_clickCallback = callback; }
+
+	/*! Get click callback.
+	 */
+	const ClickCallback& getClickCallback() const { return m_clickCallback; }
+
+	/*! Set element name (for finding elements).
+	 */
+	void setName(const std::wstring& name) { m_name = name; }
+
+	/*! Get element name.
+	 */
+	const std::wstring& getName() const { return m_name; }
+
 	virtual void serialize(ISerializer& s) override;
 
 protected:
@@ -139,6 +163,8 @@ protected:
 	Vector2 m_actualPosition = Vector2::zero();
 	UIElement* m_parent = nullptr;
 	bool m_isMouseOver = false;
+	std::wstring m_name;
+	ClickCallback m_clickCallback;
 };
 
 }

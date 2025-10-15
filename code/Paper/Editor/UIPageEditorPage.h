@@ -32,6 +32,8 @@ class IEditorPageSite;
 namespace traktor::ui
 {
 
+class ButtonClickEvent;
+class CheckBox;
 class Container;
 
 }
@@ -69,9 +71,12 @@ private:
 	editor::IDocument* m_document;
 	Ref< resource::IResourceManager > m_resourceManager;
 	Ref< UIPagePreviewControl > m_previewControl;
+	Ref< ui::CheckBox > m_debugVizCheckBox;
 	Guid m_uiPageGuid;
 
 	void updatePreview();
+
+	void eventDebugVizToggle(ui::ButtonClickEvent* event);
 };
 
 }

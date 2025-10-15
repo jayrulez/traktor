@@ -75,6 +75,8 @@ public:
 
 	void setUIPage(UIPage* uiPage);
 
+	void setDebugVisualization(bool enabled) { m_debugVisualization = enabled; }
+
 private:
 	editor::IEditor* m_editor;
 	Ref< ui::EventSubject::IEventHandler > m_idleEventHandler;
@@ -89,6 +91,7 @@ private:
 	Ref< BitmapFontRenderer > m_fontRenderer;
 	Ref< UIPage > m_uiPage;
 	Timer m_timer;
+	bool m_debugVisualization = true;
 
 	void eventSize(ui::SizeEvent* event);
 

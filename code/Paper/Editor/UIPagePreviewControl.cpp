@@ -120,7 +120,34 @@ void UIPagePreviewControl::setUIPage(UIPage* uiPage)
 	{
 		log::info << L"UIPagePreviewControl: UIPage set" << Endl;
 		if (m_uiPage->getRoot())
+		{
 			log::info << L"UIPagePreviewControl: Has root element" << Endl;
+
+			// Attach click callbacks to named buttons
+			UIElement* successButton = m_uiPage->findElementByName(L"SuccessButton");
+			if (successButton)
+			{
+				successButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+					log::info << L"Success button clicked!" << Endl;
+				});
+			}
+
+			UIElement* warningButton = m_uiPage->findElementByName(L"WarningButton");
+			if (warningButton)
+			{
+				warningButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+					log::info << L"Warning button clicked!" << Endl;
+				});
+			}
+
+			UIElement* errorButton = m_uiPage->findElementByName(L"ErrorButton");
+			if (errorButton)
+			{
+				errorButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+					log::info << L"Error button clicked!" << Endl;
+				});
+			}
+		}
 		else
 			log::info << L"UIPagePreviewControl: No root element" << Endl;
 	}
@@ -181,7 +208,7 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 
 			// Update layout and render via UIPage
 			m_uiPage->updateLayout(&uiContext);
-			m_uiPage->render(&uiContext, true);  // true = debug visualization
+			m_uiPage->render(&uiContext, m_debugVisualization);
 
 			m_renderer->end(0);
 
