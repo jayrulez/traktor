@@ -62,6 +62,11 @@ public:
 	 */
 	void updateLayout(UIContext* context);
 
+	/*! Update UI elements (animations, etc.).
+	 * \param deltaTime Time elapsed since last update in seconds.
+	 */
+	void update(double deltaTime);
+
 	/*! Render the UI page.
 	 * \param context UI context with renderer, font manager, etc.
 	 * \param debugVisualization If true, renders debug overlays showing element bounds.
@@ -119,6 +124,7 @@ public:
 
 private:
 	UIElement* findElementByNameRecursive(UIElement* element, const std::wstring& name);
+	void updateElementRecursive(UIElement* element, double deltaTime);
 
 private:
 	Ref< UIElement > m_root;

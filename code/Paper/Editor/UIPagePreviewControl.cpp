@@ -218,6 +218,11 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 	// Render UI if we have a UIPage.
 	if (m_uiPage && m_uiPage->getRoot())
 	{
+		// Update UI elements with delta time
+		double deltaTime = m_timer.getElapsedTime();
+		m_timer.reset();
+		m_uiPage->update(deltaTime);
+
 		// Use UIPage dimensions for layout instead of window size
 		const float pageWidth = (float)m_uiPage->getWidth();
 		const float pageHeight = (float)m_uiPage->getHeight();

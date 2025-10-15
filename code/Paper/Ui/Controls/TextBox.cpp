@@ -16,6 +16,7 @@
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/Member.h"
 #include <algorithm>
+#include <cmath>
 
 namespace traktor::paper
 {
@@ -175,17 +176,25 @@ void TextBox::render(UIContext* context)
 		fontRenderer->drawText(font, textPosition, m_placeholder, placeholderColor);
 	}
 
-	// Draw cursor if focused (simple blinking - we'll add animation later)
+	// Draw cursor if focused with blinking animation
 	if (isFocused())
 	{
-		// Measure text up to cursor position
-		std::wstring textBeforeCursor = m_text.substr(0, m_cursorPosition);
-		Vector2 textSize = fontRenderer->measureText(font, textBeforeCursor);
+		// Blink cursor with 0.5 second period (on for 0.5s, off for 0.5s)
+		const double blinkPeriod = 1.0;
+		double blinkPhase = fmod(m_cursorBlinkTime, blinkPeriod);
+		bool cursorVisible = blinkPhase < blinkPeriod / 2.0;
 
-		// Draw cursor line
-		Vector2 cursorPos = textPosition + Vector2(textSize.x, 0.0f);
-		Vector2 cursorSize = Vector2(2.0f, m_actualSize.y - (m_borderThickness + m_padding.y) * 2.0f);
-		renderer->drawQuad(cursorPos, cursorSize, m_foreground);
+		if (cursorVisible)
+		{
+			// Measure text up to cursor position
+			std::wstring textBeforeCursor = m_text.substr(0, m_cursorPosition);
+			Vector2 textSize = fontRenderer->measureText(font, textBeforeCursor);
+
+			// Draw cursor line
+			Vector2 cursorPos = textPosition + Vector2(textSize.x, 0.0f);
+			Vector2 cursorSize = Vector2(2.0f, m_actualSize.y - (m_borderThickness + m_padding.y) * 2.0f);
+			renderer->drawQuad(cursorPos, cursorSize, m_foreground);
+		}
 	}
 }
 
@@ -193,6 +202,13 @@ void TextBox::renderDebug(UIContext* context)
 {
 	// Call base class to draw debug borders
 	UIElement::renderDebug(context);
+}
+
+void TextBox::update(double deltaTime)
+{
+	// Update cursor blink timer
+	if (isFocused())
+		m_cursorBlinkTime += deltaTime;
 }
 
 void TextBox::onMouseDown(MouseEvent& event)
@@ -206,19 +222,46 @@ void TextBox::onMouseDown(MouseEvent& event)
 	clearSelection();
 	m_cursorPosition = clickedIndex;
 	m_isDragging = true;
+	m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 }
 
 void TextBox::onMouseMove(MouseEvent& event)
 {
 	if (m_isDragging)
 	{
-		// TODO: Update selection while dragging
+		// Update selection while dragging
+		Vector2 localPos = event.position - m_actualPosition;
+		int32_t draggedIndex = getCharacterIndexAtPosition(localPos);
+
+		// Set selection from initial cursor position to dragged position
+		m_selectionStart = m_cursorPosition;
+		m_selectionEnd = draggedIndex;
 	}
 }
 
 void TextBox::onMouseUp(MouseEvent& event)
 {
-	m_isDragging = false;
+	if (m_isDragging)
+	{
+		// Finalize selection
+		Vector2 localPos = event.position - m_actualPosition;
+		int32_t releasedIndex = getCharacterIndexAtPosition(localPos);
+
+		// If we didn't drag (clicked in place), clear selection
+		if (releasedIndex == m_cursorPosition)
+		{
+			clearSelection();
+		}
+		else
+		{
+			// Set final selection and move cursor to end of selection
+			m_selectionStart = m_cursorPosition;
+			m_selectionEnd = releasedIndex;
+			m_cursorPosition = releasedIndex;
+		}
+
+		m_isDragging = false;
+	}
 }
 
 void TextBox::onKeyDown(KeyEvent& event)
@@ -276,6 +319,7 @@ void TextBox::onKeyDown(KeyEvent& event)
 		if (m_cursorPosition > 0)
 			m_cursorPosition--;
 		clearSelection();
+		m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 		event.handled = true;
 	}
 	else if (event.virtualKey == 1016) // VkRight
@@ -283,18 +327,21 @@ void TextBox::onKeyDown(KeyEvent& event)
 		if (m_cursorPosition < (int32_t)m_text.length())
 			m_cursorPosition++;
 		clearSelection();
+		m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 		event.handled = true;
 	}
 	else if (event.virtualKey == 1011) // VkHome
 	{
 		m_cursorPosition = 0;
 		clearSelection();
+		m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 		event.handled = true;
 	}
 	else if (event.virtualKey == 1010) // VkEnd
 	{
 		m_cursorPosition = (int32_t)m_text.length();
 		clearSelection();
+		m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 		event.handled = true;
 	}
 	else if (event.character != 0)
@@ -320,9 +367,14 @@ void TextBox::onKeyDown(KeyEvent& event)
 				m_cursorPosition++;
 			}
 			textChanged = true;
+			m_cursorBlinkTime = 0.0; // Reset blink so cursor is visible
 			event.handled = true;
 		}
 	}
+
+	// Reset blink timer whenever text changes or cursor moves
+	if (textChanged)
+		m_cursorBlinkTime = 0.0;
 }
 
 void TextBox::serialize(ISerializer& s)

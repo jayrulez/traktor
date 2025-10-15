@@ -84,6 +84,8 @@ public:
 
 	virtual void renderDebug(UIContext* context) override;
 
+	void update(double deltaTime);
+
 	virtual void onMouseDown(MouseEvent& event) override;
 
 	virtual void onMouseMove(MouseEvent& event) override;

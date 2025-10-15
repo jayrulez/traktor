@@ -15,6 +15,7 @@
 #include "Paper/Ui/UITheme.h"
 #include "Paper/Ui/UIContext.h"
 #include "Paper/Ui/Controls/Border.h"
+#include "Paper/Ui/Controls/TextBox.h"
 #include "Paper/Ui/Layouts/Panel.h"
 
 namespace traktor::paper
@@ -31,6 +32,39 @@ void UIPage::updateLayout(UIContext* context)
 	Vector2 availableSize((float)m_width, (float)m_height);
 	m_root->measure(availableSize, context);
 	m_root->arrange(Vector2::zero(), availableSize);
+}
+
+void UIPage::update(double deltaTime)
+{
+	if (!m_root)
+		return;
+
+	// Recursively update all elements
+	updateElementRecursive(m_root, deltaTime);
+}
+
+void UIPage::updateElementRecursive(UIElement* element, double deltaTime)
+{
+	if (!element)
+		return;
+
+	// Check if this is a TextBox and call its update method
+	if (TextBox* textBox = dynamic_type_cast<TextBox*>(element))
+	{
+		textBox->update(deltaTime);
+	}
+
+	// Recurse into children
+	if (Border* border = dynamic_type_cast<Border*>(element))
+	{
+		if (border->getChild())
+			updateElementRecursive(border->getChild(), deltaTime);
+	}
+	else if (Panel* panel = dynamic_type_cast<Panel*>(element))
+	{
+		for (auto child : panel->getChildren())
+			updateElementRecursive(child, deltaTime);
+	}
 }
 
 void UIPage::render(UIContext* context, bool debugVisualization)
