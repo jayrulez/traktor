@@ -291,6 +291,21 @@ bool UIPagePipeline::buildOutput(
 	buttonsPanel->setChild(buttonsRow);
 	rootPanel->addChild(buttonsPanel);
 
+	// --- Separator ---
+	Ref< Rectangle > separator3 = new Rectangle();
+	separator3->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator3);
+
+	// --- Feedback Section ---
+	Ref< Border > feedbackPanel = new Border();
+	feedbackPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< TextBlock > feedbackText = new TextBlock();
+	feedbackText->setName(L"FeedbackText");
+	feedbackText->setText(L"Click a button to see feedback here...");
+	feedbackText->applyStyle(theme->getStyle(L"AccentText"));
+	feedbackPanel->setChild(feedbackText);
+	rootPanel->addChild(feedbackPanel);
+
 	// Set root
 	uiPage->setRoot(rootPanel);
 

@@ -25,6 +25,7 @@
 #include "Paper/Ui/UIElement.h"
 #include "Paper/Ui/UIPage.h"
 #include "Paper/Ui/UIContext.h"
+#include "Paper/Ui/Controls/TextBlock.h"
 #include "Render/Context/RenderContext.h"
 #include "Render/Frame/RenderGraph.h"
 #include "Render/IRenderSystem.h"
@@ -123,28 +124,47 @@ void UIPagePreviewControl::setUIPage(UIPage* uiPage)
 		{
 			log::info << L"UIPagePreviewControl: Has root element" << Endl;
 
+			// Find the feedback text element
+			UIElement* feedbackElement = m_uiPage->findElementByName(L"FeedbackText");
+			TextBlock* feedbackText = dynamic_type_cast<TextBlock*>(feedbackElement);
+
 			// Attach click callbacks to named buttons
 			UIElement* successButton = m_uiPage->findElementByName(L"SuccessButton");
 			if (successButton)
 			{
-				successButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+				successButton->setClickCallback([this, feedbackText](UIElement* sender, MouseEvent& event) {
 					log::info << L"Success button clicked!" << Endl;
+					if (feedbackText)
+					{
+						feedbackText->setText(L"Success button was clicked!");
+						update();
+					}
 				});
 			}
 
 			UIElement* warningButton = m_uiPage->findElementByName(L"WarningButton");
 			if (warningButton)
 			{
-				warningButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+				warningButton->setClickCallback([this, feedbackText](UIElement* sender, MouseEvent& event) {
 					log::info << L"Warning button clicked!" << Endl;
+					if (feedbackText)
+					{
+						feedbackText->setText(L"Warning button was clicked!");
+						update();
+					}
 				});
 			}
 
 			UIElement* errorButton = m_uiPage->findElementByName(L"ErrorButton");
 			if (errorButton)
 			{
-				errorButton->setClickCallback([](UIElement* sender, MouseEvent& event) {
+				errorButton->setClickCallback([this, feedbackText](UIElement* sender, MouseEvent& event) {
 					log::info << L"Error button clicked!" << Endl;
+					if (feedbackText)
+					{
+						feedbackText->setText(L"Error button was clicked!");
+						update();
+					}
 				});
 			}
 		}
