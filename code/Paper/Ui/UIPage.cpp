@@ -314,7 +314,7 @@ void UIPage::handleKeyUp(int virtualKey)
 	m_focusedElement->onKeyUp(keyEvent);
 }
 
-void UIPage::handleMouseWheel(const Vector2& position, int32_t delta)
+void UIPage::handleMouseWheel(const Vector2& position, int32_t delta, bool shift)
 {
 	if (!m_root)
 		return;
@@ -322,50 +322,21 @@ void UIPage::handleMouseWheel(const Vector2& position, int32_t delta)
 	// Perform hit test to find element under mouse
 	UIElement* hitElement = m_root->hitTest(position);
 
-	log::info << L"UIPage::handleMouseWheel - position: (" << position.x << L", " << position.y << L"), delta: " << delta << Endl;
-
 	if (hitElement)
 	{
-		log::info << L"  Hit element: " << type_name(hitElement) << L" (ptr=" << (int64_t)(void*)hitElement << L")" << Endl;
-
-		// Log parent chain
-		UIElement* temp = hitElement;
-		int depth = 0;
-		while (temp)
-		{
-			log::info << L"    Parent chain[" << depth << L"]: " << type_name(temp) << Endl;
-			temp = temp->getParent();
-			depth++;
-			if (depth > 10) // Safety limit
-			{
-				log::warning << L"    Parent chain too deep, stopping" << Endl;
-				break;
-			}
-		}
-
 		MouseWheelEvent wheelEvent;
 		wheelEvent.position = position;
 		wheelEvent.delta = delta;
+		wheelEvent.shift = shift;
 		wheelEvent.handled = false;
 
 		// Send to hit element and bubble up until handled
 		UIElement* current = hitElement;
 		while (current && !wheelEvent.handled)
 		{
-			log::info << L"  Sending onMouseWheel to: " << type_name(current) << Endl;
 			current->onMouseWheel(wheelEvent);
-			log::info << L"    handled: " << (wheelEvent.handled ? L"true" : L"false") << Endl;
 			current = current->getParent();
 		}
-
-		if (wheelEvent.handled)
-			log::info << L"  Mouse wheel event was handled" << Endl;
-		else
-			log::info << L"  Mouse wheel event was NOT handled" << Endl;
-	}
-	else
-	{
-		log::info << L"  No element hit" << Endl;
 	}
 }
 
@@ -418,9 +389,7 @@ void UIPage::rebuildParentChain(UIElement* element)
 	{
 		if (scrollViewer->getContent())
 		{
-			log::info << L"rebuildParentChain: ScrollViewer (ptr=" << (int64_t)(void*)scrollViewer << L") content (ptr=" << (int64_t)(void*)scrollViewer->getContent() << L")" << Endl;
 			scrollViewer->getContent()->setParent(scrollViewer);
-			log::info << L"  Content parent set to: " << (int64_t)(void*)(scrollViewer->getContent()->getParent()) << Endl;
 			rebuildParentChain(scrollViewer->getContent());
 		}
 	}

@@ -390,8 +390,11 @@ void UIPagePreviewControl::eventMouseWheel(ui::MouseWheelEvent* event)
 	// Get wheel delta
 	int32_t delta = event->getRotation();
 
+	// Detect Shift key for horizontal scrolling
+	bool shift = (event->getKeyState() & ui::KsShift) != 0;
+
 	// Forward to UIPage
-	m_uiPage->handleMouseWheel(uiPosition, delta);
+	m_uiPage->handleMouseWheel(uiPosition, delta, shift);
 
 	// Trigger repaint to show scroll changes
 	update();

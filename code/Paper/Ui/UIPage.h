@@ -107,8 +107,9 @@ public:
 	/*! Handle mouse wheel event.
 	 * \param position Mouse position in UI coordinates.
 	 * \param delta Wheel delta (positive = scroll up).
+	 * \param shift True if shift is held (for horizontal scrolling).
 	 */
-	void handleMouseWheel(const Vector2& position, int32_t delta);
+	void handleMouseWheel(const Vector2& position, int32_t delta, bool shift = false);
 
 	/*! Find element by name.
 	 * \param name Element name to search for.

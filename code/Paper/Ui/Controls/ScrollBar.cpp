@@ -10,6 +10,7 @@
 #include "Paper/Ui/UIContext.h"
 #include "Paper/Ui/UIStyle.h"
 #include "Paper/Draw2D.h"
+#include "Core/Log/Log.h"
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/Member.h"
 #include <algorithm>
@@ -108,20 +109,29 @@ void ScrollBar::onMouseDown(MouseEvent& event)
 {
 	Vector2 localPos = event.position - m_actualPosition;
 
+	log::info << L"ScrollBar::onMouseDown - Orientation: " << (m_orientation == ScrollBarOrientation::Vertical ? L"Vertical" : L"Horizontal") << Endl;
+	log::info << L"  Position: (" << event.position.x << L", " << event.position.y << L")" << Endl;
+	log::info << L"  ActualPosition: (" << m_actualPosition.x << L", " << m_actualPosition.y << L")" << Endl;
+	log::info << L"  ActualSize: (" << m_actualSize.x << L", " << m_actualSize.y << L")" << Endl;
+	log::info << L"  ViewportSize: " << m_viewportSize << Endl;
+
 	// Request mouse capture so we continue to receive events even if mouse moves outside
 	event.capture = true;
 
 	// Check if clicking on thumb
 	if (isPointInThumb(event.position))
 	{
+		log::info << L"  Clicking on thumb, starting drag" << Endl;
 		m_isDragging = true;
 		m_dragStartPos = event.position;
 		m_dragStartValue = m_value;
 	}
 	else
 	{
+		log::info << L"  Clicking on track, jumping to position" << Endl;
 		// Clicked on track - jump to that position
 		float newValue = getValueFromPosition(event.position);
+		log::info << L"  Calculated new value: " << newValue << Endl;
 		setValue(newValue);
 	}
 }
@@ -149,13 +159,20 @@ void ScrollBar::onMouseMove(MouseEvent& event)
 			dragOffset = delta.x;
 		}
 
+		log::info << L"ScrollBar::onMouseMove (dragging) - Orientation: " << (m_orientation == ScrollBarOrientation::Vertical ? L"Vertical" : L"Horizontal") << Endl;
+		log::info << L"  Delta: (" << delta.x << L", " << delta.y << L")" << Endl;
+		log::info << L"  TrackLength: " << trackLength << L", DragOffset: " << dragOffset << Endl;
+
 		// Calculate thumb size to get scrollable range
 		float thumbLength = trackLength * m_viewportSize;
 		float scrollableRange = trackLength - thumbLength;
 
+		log::info << L"  ThumbLength: " << thumbLength << L", ScrollableRange: " << scrollableRange << Endl;
+
 		if (scrollableRange > 0.0f)
 		{
 			float valueDelta = dragOffset / scrollableRange;
+			log::info << L"  ValueDelta: " << valueDelta << L", OldValue: " << m_dragStartValue << L", NewValue: " << (m_dragStartValue + valueDelta) << Endl;
 			setValue(m_dragStartValue + valueDelta);
 		}
 	}

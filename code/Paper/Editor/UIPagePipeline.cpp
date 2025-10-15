@@ -388,6 +388,55 @@ bool UIPagePipeline::buildOutput(
 	scrollPanel->setChild(scrollPanelContent);
 	rootPanel->addChild(scrollPanel);
 
+	// --- Separator ---
+	Ref< Rectangle > separator6 = new Rectangle();
+	separator6->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator6);
+
+	// --- Horizontal ScrollViewer Demo Section ---
+	Ref< Border > hScrollPanel = new Border();
+	hScrollPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< StackPanel > hScrollPanelContent = new StackPanel();
+	hScrollPanelContent->setOrientation(StackPanel::Orientation::Vertical);
+
+	Ref< TextBlock > hScrollLabel = new TextBlock();
+	hScrollLabel->setText(L"Horizontal ScrollViewer (wide content):");
+	hScrollLabel->applyStyle(theme->getStyle(L"PrimaryText"));
+	hScrollPanelContent->addChild(hScrollLabel);
+
+	// Create horizontal ScrollViewer with wide content
+	Ref< ScrollViewer > hScrollViewer = new ScrollViewer();
+	hScrollViewer->setVerticalScrollBarVisibility(ScrollBarVisibility::Hidden);
+	hScrollViewer->setHorizontalScrollBarVisibility(ScrollBarVisibility::Auto);
+	// Set explicit dimensions to constrain the viewport
+	hScrollViewer->setHeight(60.0f);
+	hScrollViewer->setWidth(500.0f);  // Small width to force horizontal scrolling
+
+	// Create wide horizontal content
+	Ref< StackPanel > hScrollContent = new StackPanel();
+	hScrollContent->setOrientation(StackPanel::Orientation::Horizontal);
+
+	// Add multiple cards to demonstrate horizontal scrolling
+	for (int i = 1; i <= 15; ++i)
+	{
+		Ref< Border > wideCard = new Border();
+		wideCard->applyStyle(theme->getStyle(L"Card"));
+		wideCard->setMinWidth(150.0f);
+
+		Ref< TextBlock > cardText = new TextBlock();
+		cardText->setText(std::wstring(L"Card ") + std::to_wstring(i));
+		cardText->applyStyle(theme->getStyle(L"PrimaryText"));
+		wideCard->setChild(cardText);
+
+		hScrollContent->addChild(wideCard);
+	}
+
+	hScrollViewer->setContent(hScrollContent);
+	hScrollPanelContent->addChild(hScrollViewer);
+
+	hScrollPanel->setChild(hScrollPanelContent);
+	rootPanel->addChild(hScrollPanel);
+
 	// Set root
 	uiPage->setRoot(rootPanel);
 

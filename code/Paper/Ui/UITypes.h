@@ -46,6 +46,7 @@ struct MouseWheelEvent
 {
 	Vector2 position;        // Mouse position in UI coordinates
 	int32_t delta;           // Wheel delta (positive = scroll up, negative = scroll down)
+	bool shift = false;      // Shift key held (for horizontal scrolling)
 	bool handled = false;    // Set to true to stop event propagation
 };
 
