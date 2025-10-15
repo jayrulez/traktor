@@ -121,6 +121,18 @@ void UIElement::onBlur()
 	// Derived classes can override to handle focus loss
 }
 
+void UIElement::onKeyDown(KeyEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle key presses
+}
+
+void UIElement::onKeyUp(KeyEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle key releases
+}
+
 void UIElement::serialize(ISerializer& s)
 {
 	s >> Member< std::wstring >(L"name", m_name);

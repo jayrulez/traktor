@@ -221,6 +221,110 @@ void TextBox::onMouseUp(MouseEvent& event)
 	m_isDragging = false;
 }
 
+void TextBox::onKeyDown(KeyEvent& event)
+{
+	// Only handle keyboard input if we're focused
+	if (!isFocused())
+		return;
+
+	bool textChanged = false;
+
+	// Handle special keys
+	if (event.virtualKey == 1024) // VkBackSpace
+	{
+		if (hasSelection())
+		{
+			// Delete selected text
+			int32_t selStart = std::min(m_selectionStart, m_selectionEnd);
+			int32_t selEnd = std::max(m_selectionStart, m_selectionEnd);
+			m_text.erase(selStart, selEnd - selStart);
+			m_cursorPosition = selStart;
+			clearSelection();
+			textChanged = true;
+		}
+		else if (m_cursorPosition > 0)
+		{
+			// Delete character before cursor
+			m_text.erase(m_cursorPosition - 1, 1);
+			m_cursorPosition--;
+			textChanged = true;
+		}
+		event.handled = true;
+	}
+	else if (event.virtualKey == 1023) // VkDelete
+	{
+		if (hasSelection())
+		{
+			// Delete selected text
+			int32_t selStart = std::min(m_selectionStart, m_selectionEnd);
+			int32_t selEnd = std::max(m_selectionStart, m_selectionEnd);
+			m_text.erase(selStart, selEnd - selStart);
+			m_cursorPosition = selStart;
+			clearSelection();
+			textChanged = true;
+		}
+		else if (m_cursorPosition < (int32_t)m_text.length())
+		{
+			// Delete character after cursor
+			m_text.erase(m_cursorPosition, 1);
+			textChanged = true;
+		}
+		event.handled = true;
+	}
+	else if (event.virtualKey == 1014) // VkLeft
+	{
+		if (m_cursorPosition > 0)
+			m_cursorPosition--;
+		clearSelection();
+		event.handled = true;
+	}
+	else if (event.virtualKey == 1016) // VkRight
+	{
+		if (m_cursorPosition < (int32_t)m_text.length())
+			m_cursorPosition++;
+		clearSelection();
+		event.handled = true;
+	}
+	else if (event.virtualKey == 1011) // VkHome
+	{
+		m_cursorPosition = 0;
+		clearSelection();
+		event.handled = true;
+	}
+	else if (event.virtualKey == 1010) // VkEnd
+	{
+		m_cursorPosition = (int32_t)m_text.length();
+		clearSelection();
+		event.handled = true;
+	}
+	else if (event.character != 0)
+	{
+		// Handle character input
+		// Filter out control characters (except for printable ones)
+		if (event.character >= 32 || event.character == '\t')
+		{
+			if (hasSelection())
+			{
+				// Replace selected text with new character
+				int32_t selStart = std::min(m_selectionStart, m_selectionEnd);
+				int32_t selEnd = std::max(m_selectionStart, m_selectionEnd);
+				m_text.erase(selStart, selEnd - selStart);
+				m_text.insert(selStart, 1, event.character);
+				m_cursorPosition = selStart + 1;
+				clearSelection();
+			}
+			else
+			{
+				// Insert character at cursor position
+				m_text.insert(m_cursorPosition, 1, event.character);
+				m_cursorPosition++;
+			}
+			textChanged = true;
+			event.handled = true;
+		}
+	}
+}
+
 void TextBox::serialize(ISerializer& s)
 {
 	UIElement::serialize(s);

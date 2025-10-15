@@ -85,6 +85,20 @@ public:
 	 */
 	void handleMouseUp(const Vector2& position, MouseButton button);
 
+	/*! Handle key down event.
+	 * \param character Character input (0 if not a character).
+	 * \param virtualKey Virtual key code.
+	 * \param shift True if shift is held.
+	 * \param control True if control is held.
+	 * \param alt True if alt is held.
+	 */
+	void handleKeyDown(wchar_t character, int virtualKey, bool shift, bool control, bool alt);
+
+	/*! Handle key up event.
+	 * \param virtualKey Virtual key code.
+	 */
+	void handleKeyUp(int virtualKey);
+
 	/*! Find element by name.
 	 * \param name Element name to search for.
 	 * \return Found element or nullptr.

@@ -39,4 +39,16 @@ struct MouseEvent
 	bool handled = false;    // Set to true to stop event propagation
 };
 
+/*! Keyboard event data.
+ */
+struct KeyEvent
+{
+	wchar_t character = 0;   // Character input (0 if not a character key)
+	int virtualKey = 0;      // Virtual key code (from ui::VirtualKey)
+	bool shift = false;      // Shift key held
+	bool control = false;    // Control key held
+	bool alt = false;        // Alt key held
+	bool handled = false;    // Set to true to stop event propagation
+};
+
 }

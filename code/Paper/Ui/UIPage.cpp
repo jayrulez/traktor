@@ -219,6 +219,37 @@ UIElement* UIPage::findElementByNameRecursive(UIElement* element, const std::wst
 	return nullptr;
 }
 
+void UIPage::handleKeyDown(wchar_t character, int virtualKey, bool shift, bool control, bool alt)
+{
+	// Only send keyboard events to the focused element
+	if (!m_focusedElement)
+		return;
+
+	KeyEvent keyEvent;
+	keyEvent.character = character;
+	keyEvent.virtualKey = virtualKey;
+	keyEvent.shift = shift;
+	keyEvent.control = control;
+	keyEvent.alt = alt;
+	keyEvent.handled = false;
+
+	m_focusedElement->onKeyDown(keyEvent);
+}
+
+void UIPage::handleKeyUp(int virtualKey)
+{
+	// Only send keyboard events to the focused element
+	if (!m_focusedElement)
+		return;
+
+	KeyEvent keyEvent;
+	keyEvent.character = 0;
+	keyEvent.virtualKey = virtualKey;
+	keyEvent.handled = false;
+
+	m_focusedElement->onKeyUp(keyEvent);
+}
+
 void UIPage::setFocus(UIElement* element)
 {
 	if (m_focusedElement == element)

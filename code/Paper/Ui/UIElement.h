@@ -134,6 +134,16 @@ public:
 	 */
 	virtual void onBlur();
 
+	/*! Key pressed while element has focus.
+	 * \param event Keyboard event data.
+	 */
+	virtual void onKeyDown(KeyEvent& event);
+
+	/*! Key released while element has focus.
+	 * \param event Keyboard event data.
+	 */
+	virtual void onKeyUp(KeyEvent& event);
+
 	/*! Check if mouse is currently over this element.
 	 */
 	bool isMouseOver() const { return m_isMouseOver; }

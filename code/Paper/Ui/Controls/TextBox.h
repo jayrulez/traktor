@@ -90,6 +90,8 @@ public:
 
 	virtual void onMouseUp(MouseEvent& event) override;
 
+	virtual void onKeyDown(KeyEvent& event) override;
+
 	virtual void serialize(ISerializer& s) override;
 
 private:

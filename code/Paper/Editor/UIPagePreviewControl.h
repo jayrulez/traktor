@@ -104,6 +104,12 @@ private:
 	void eventButtonDown(ui::MouseButtonDownEvent* event);
 
 	void eventButtonUp(ui::MouseButtonUpEvent* event);
+
+	void eventKey(ui::KeyEvent* event);
+
+	void eventKeyDown(ui::KeyDownEvent* event);
+
+	void eventKeyUp(ui::KeyUpEvent* event);
 };
 
 }

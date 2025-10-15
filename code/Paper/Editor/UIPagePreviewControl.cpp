@@ -35,6 +35,10 @@
 #include "Resource/ResourceManager.h"
 #include "Ui/Application.h"
 #include "Ui/Itf/IWidget.h"
+#include "Ui/Events/KeyEvent.h"
+#include "Ui/Events/KeyDownEvent.h"
+#include "Ui/Events/KeyUpEvent.h"
+#include "Ui/Enums.h"
 
 namespace traktor::paper
 {
@@ -54,7 +58,7 @@ UIPagePreviewControl::UIPagePreviewControl(editor::IEditor* editor,
 
 bool UIPagePreviewControl::create(ui::Widget* parent)
 {
-	if (!ui::Widget::create(parent, ui::WsNoCanvas))
+	if (!ui::Widget::create(parent, ui::WsNoCanvas | ui::WsFocus | ui::WsWantAllInput))
 		return false;
 
 	Ref< ObjectStore > objectStore = m_editor->getObjectStore();
@@ -92,6 +96,9 @@ bool UIPagePreviewControl::create(ui::Widget* parent)
 	addEventHandler< ui::MouseMoveEvent >(this, &UIPagePreviewControl::eventMouseMove);
 	addEventHandler< ui::MouseButtonDownEvent >(this, &UIPagePreviewControl::eventButtonDown);
 	addEventHandler< ui::MouseButtonUpEvent >(this, &UIPagePreviewControl::eventButtonUp);
+	addEventHandler< ui::KeyEvent >(this, &UIPagePreviewControl::eventKey);
+	addEventHandler< ui::KeyDownEvent >(this, &UIPagePreviewControl::eventKeyDown);
+	addEventHandler< ui::KeyUpEvent >(this, &UIPagePreviewControl::eventKeyUp);
 
 	// Register idle event handler.
 	m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &UIPagePreviewControl::eventIdle);
@@ -358,6 +365,69 @@ void UIPagePreviewControl::eventButtonUp(ui::MouseButtonUpEvent* event)
 
 	// Trigger repaint
 	update();
+}
+
+void UIPagePreviewControl::eventKey(ui::KeyEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Convert ui::KeyEvent to our KeyEvent format
+	wchar_t character = event->getCharacter();
+	int virtualKey = (int)event->getVirtualKey();
+
+	// Check for modifier keys (we'd need to get key state from the event system)
+	// For now, we'll just pass false for modifiers
+	// TODO: Get actual modifier key state
+	bool shift = false;
+	bool control = false;
+	bool alt = false;
+
+	// Forward to UIPage as key down
+	m_uiPage->handleKeyDown(character, virtualKey, shift, control, alt);
+
+	// Trigger repaint to show changes
+	update();
+	event->consume();
+}
+
+void UIPagePreviewControl::eventKeyDown(ui::KeyDownEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Convert ui::KeyDownEvent to our KeyEvent format
+	wchar_t character = event->getCharacter();
+	int virtualKey = (int)event->getVirtualKey();
+
+	// Check for modifier keys (we'd need to get key state from the event system)
+	// For now, we'll just pass false for modifiers
+	// TODO: Get actual modifier key state
+	bool shift = false;
+	bool control = false;
+	bool alt = false;
+
+	// Forward to UIPage
+	m_uiPage->handleKeyDown(character, virtualKey, shift, control, alt);
+
+	// Trigger repaint to show changes
+	update();
+	event->consume();
+}
+
+void UIPagePreviewControl::eventKeyUp(ui::KeyUpEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	int virtualKey = (int)event->getVirtualKey();
+
+	// Forward to UIPage
+	m_uiPage->handleKeyUp(virtualKey);
+
+	// Trigger repaint
+	update();
+	event->consume();
 }
 
 }
