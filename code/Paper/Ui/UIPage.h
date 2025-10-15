@@ -141,6 +141,7 @@ public:
 private:
 	UIElement* findElementByNameRecursive(UIElement* element, const std::wstring& name);
 	void updateElementRecursive(UIElement* element, double deltaTime);
+	void rebuildParentChain(UIElement* element);
 
 private:
 	Ref< UIElement > m_root;

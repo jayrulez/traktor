@@ -11,6 +11,7 @@
 #include "Paper/Ui/UIContext.h"
 #include "Paper/Ui/UIStyle.h"
 #include "Paper/Draw2D.h"
+#include "Core/Log/Log.h"
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/MemberRef.h"
 #include <algorithm>
@@ -233,47 +234,81 @@ void ScrollViewer::renderDebug(UIContext* context)
 
 UIElement* ScrollViewer::hitTest(const Vector2& position)
 {
+	log::info << L"ScrollViewer::hitTest called at position (" << position.x << L", " << position.y << L")" << Endl;
+	log::info << L"  ScrollViewer ptr: " << (int64_t)(void*)this << Endl;
+	log::info << L"  containsPoint: " << (containsPoint(position) ? L"true" : L"false") << Endl;
+	log::info << L"  m_actualPosition: (" << m_actualPosition.x << L", " << m_actualPosition.y << L")" << Endl;
+	log::info << L"  m_actualSize: (" << m_actualSize.x << L", " << m_actualSize.y << L")" << Endl;
+
 	// Check scrollbars first
 	if (m_showVerticalScrollBar && m_verticalScrollBar)
 	{
 		UIElement* hit = m_verticalScrollBar->hitTest(position);
 		if (hit)
+		{
+			log::info << L"  Hit scrollbar" << Endl;
 			return hit;
+		}
 	}
 
 	if (m_showHorizontalScrollBar && m_horizontalScrollBar)
 	{
 		UIElement* hit = m_horizontalScrollBar->hitTest(position);
 		if (hit)
+		{
+			log::info << L"  Hit scrollbar" << Endl;
 			return hit;
+		}
 	}
 
 	// Check if hit is within viewport
 	Vector2 viewportPos = getViewportPosition();
+	log::info << L"  viewportPos: (" << viewportPos.x << L", " << viewportPos.y << L")" << Endl;
+	log::info << L"  m_viewportSize: (" << m_viewportSize.x << L", " << m_viewportSize.y << L")" << Endl;
+
 	bool inViewport = position.x >= viewportPos.x &&
 	                  position.y >= viewportPos.y &&
 	                  position.x < viewportPos.x + m_viewportSize.x &&
 	                  position.y < viewportPos.y + m_viewportSize.y;
 
+	log::info << L"  inViewport: " << (inViewport ? L"true" : L"false") << Endl;
+	log::info << L"  m_content: " << (int64_t)(void*)m_content << Endl;
+
 	if (inViewport && m_content)
 	{
+		log::info << L"  Checking content hitTest..." << Endl;
 		UIElement* hit = m_content->hitTest(position);
 		if (hit)
+		{
+			log::info << L"  Content returned hit: " << type_name(hit) << L" (ptr=" << (int64_t)(void*)hit << L")" << Endl;
 			return hit;
+		}
+		log::info << L"  Content returned nullptr" << Endl;
 	}
 
 	// Check if within our bounds
 	if (containsPoint(position))
+	{
+		log::info << L"  Returning ScrollViewer itself" << Endl;
 		return this;
+	}
 
+	log::info << L"  Returning nullptr" << Endl;
 	return nullptr;
 }
 
 void ScrollViewer::onMouseWheel(MouseWheelEvent& event)
 {
+	log::info << L"ScrollViewer::onMouseWheel called" << Endl;
+	log::info << L"  m_scrollableSize.y: " << m_scrollableSize.y << Endl;
+	log::info << L"  m_showVerticalScrollBar: " << (m_showVerticalScrollBar ? L"true" : L"false") << Endl;
+	log::info << L"  event.delta: " << event.delta << Endl;
+
 	// Only handle mouse wheel if we have vertical scrollable content
 	if (m_scrollableSize.y > 0.0f && m_showVerticalScrollBar)
 	{
+		log::info << L"  Scrolling!" << Endl;
+
 		// Scroll by a fixed amount per wheel notch (e.g., 3 lines worth)
 		const float scrollAmount = 60.0f;  // pixels to scroll per wheel notch
 		const float scrollDelta = -event.delta * scrollAmount;  // Negative because wheel up = scroll up (decrease offset)
@@ -281,18 +316,40 @@ void ScrollViewer::onMouseWheel(MouseWheelEvent& event)
 		// Convert pixel delta to normalized offset delta
 		float offsetDelta = scrollDelta / m_scrollableSize.y;
 
+		log::info << L"  scrollDelta: " << scrollDelta << Endl;
+		log::info << L"  offsetDelta: " << offsetDelta << Endl;
+		log::info << L"  old m_verticalOffset: " << m_verticalOffset << Endl;
+
 		// Apply the scroll
 		float newOffset = m_verticalOffset + offsetDelta;
 		scrollToVerticalOffset(newOffset);
 
+		log::info << L"  new m_verticalOffset: " << m_verticalOffset << Endl;
+
 		event.handled = true;
+	}
+	else
+	{
+		log::info << L"  NOT scrolling (no scrollable content or scrollbar not visible)" << Endl;
 	}
 }
 
 void ScrollViewer::serialize(ISerializer& s)
 {
+	log::info << L"ScrollViewer::serialize called, direction: " << (s.getDirection() == ISerializer::Direction::Read ? L"Read" : L"Write") << Endl;
+
 	UIElement::serialize(s);
 	s >> MemberRef< UIElement >(L"content", m_content);
+
+	log::info << L"  After MemberRef, m_content = " << (int64_t)(void*)m_content << Endl;
+
+	// After deserialization, set parent pointer
+	if (s.getDirection() == ISerializer::Direction::Read && m_content)
+	{
+		log::info << L"  Setting parent on deserialized content" << Endl;
+		m_content->setParent(this);
+		log::info << L"  Content parent is now: " << (int64_t)(void*)(m_content->getParent()) << Endl;
+	}
 }
 
 void ScrollViewer::updateScrollBars()

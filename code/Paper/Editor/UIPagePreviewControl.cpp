@@ -379,11 +379,13 @@ void UIPagePreviewControl::eventMouseWheel(ui::MouseWheelEvent* event)
 	if (!m_uiPage)
 		return;
 
-	// Get mouse position in widget coordinates
-	const ui::Point pt = event->getPosition();
+	// Get current mouse position in widget client coordinates
+	// Note: We use getMousePosition() instead of event->getPosition() because
+	// mouse wheel events don't always provide accurate position information
+	ui::Point clientPos = getMousePosition(true);  // true = relative to this widget
 
 	// Convert to UI coordinates
-	Vector2 uiPosition((float)pt.x, (float)pt.y);
+	Vector2 uiPosition((float)clientPos.x, (float)clientPos.y);
 
 	// Get wheel delta
 	int32_t delta = event->getRotation();

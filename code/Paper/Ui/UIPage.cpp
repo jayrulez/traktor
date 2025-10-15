@@ -7,6 +7,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 #include <algorithm>
+#include "Core/Log/Log.h"
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/Member.h"
 #include "Core/Serialization/MemberRef.h"
@@ -28,6 +29,10 @@ void UIPage::updateLayout(UIContext* context)
 {
 	if (!m_root || !context)
 		return;
+
+	// Rebuild parent pointers in case this is a deserialized UIPage
+	// DISABLED for debugging - we want to test if serialization fixes work
+	// rebuildParentChain(m_root);
 
 	// Measure and arrange UI using page dimensions
 	Vector2 availableSize((float)m_width, (float)m_height);
@@ -317,8 +322,27 @@ void UIPage::handleMouseWheel(const Vector2& position, int32_t delta)
 	// Perform hit test to find element under mouse
 	UIElement* hitElement = m_root->hitTest(position);
 
+	log::info << L"UIPage::handleMouseWheel - position: (" << position.x << L", " << position.y << L"), delta: " << delta << Endl;
+
 	if (hitElement)
 	{
+		log::info << L"  Hit element: " << type_name(hitElement) << L" (ptr=" << (int64_t)(void*)hitElement << L")" << Endl;
+
+		// Log parent chain
+		UIElement* temp = hitElement;
+		int depth = 0;
+		while (temp)
+		{
+			log::info << L"    Parent chain[" << depth << L"]: " << type_name(temp) << Endl;
+			temp = temp->getParent();
+			depth++;
+			if (depth > 10) // Safety limit
+			{
+				log::warning << L"    Parent chain too deep, stopping" << Endl;
+				break;
+			}
+		}
+
 		MouseWheelEvent wheelEvent;
 		wheelEvent.position = position;
 		wheelEvent.delta = delta;
@@ -328,9 +352,20 @@ void UIPage::handleMouseWheel(const Vector2& position, int32_t delta)
 		UIElement* current = hitElement;
 		while (current && !wheelEvent.handled)
 		{
+			log::info << L"  Sending onMouseWheel to: " << type_name(current) << Endl;
 			current->onMouseWheel(wheelEvent);
+			log::info << L"    handled: " << (wheelEvent.handled ? L"true" : L"false") << Endl;
 			current = current->getParent();
 		}
+
+		if (wheelEvent.handled)
+			log::info << L"  Mouse wheel event was handled" << Endl;
+		else
+			log::info << L"  Mouse wheel event was NOT handled" << Endl;
+	}
+	else
+	{
+		log::info << L"  No element hit" << Endl;
 	}
 }
 
@@ -352,6 +387,43 @@ void UIPage::setFocus(UIElement* element)
 void UIPage::captureMouse(UIElement* element)
 {
 	m_capturedElement = element;
+}
+
+void UIPage::rebuildParentChain(UIElement* element)
+{
+	if (!element)
+		return;
+
+	// Rebuild parent chain for all container types
+	if (Border* border = dynamic_type_cast<Border*>(element))
+	{
+		if (border->getChild())
+		{
+			border->getChild()->setParent(border);
+			rebuildParentChain(border->getChild());
+		}
+	}
+	else if (Panel* panel = dynamic_type_cast<Panel*>(element))
+	{
+		for (auto child : panel->getChildren())
+		{
+			if (child)
+			{
+				child->setParent(panel);
+				rebuildParentChain(child);
+			}
+		}
+	}
+	else if (ScrollViewer* scrollViewer = dynamic_type_cast<ScrollViewer*>(element))
+	{
+		if (scrollViewer->getContent())
+		{
+			log::info << L"rebuildParentChain: ScrollViewer (ptr=" << (int64_t)(void*)scrollViewer << L") content (ptr=" << (int64_t)(void*)scrollViewer->getContent() << L")" << Endl;
+			scrollViewer->getContent()->setParent(scrollViewer);
+			log::info << L"  Content parent set to: " << (int64_t)(void*)(scrollViewer->getContent()->getParent()) << Endl;
+			rebuildParentChain(scrollViewer->getContent());
+		}
+	}
 }
 
 void UIPage::serialize(ISerializer& s)

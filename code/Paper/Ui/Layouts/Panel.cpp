@@ -6,6 +6,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+#include "Core/Log/Log.h"
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Serialization/MemberRefArray.h"
 #include "Paper/Ui/Layouts/Panel.h"
@@ -76,8 +77,24 @@ UIElement* Panel::hitTest(const Vector2& position)
 
 void Panel::serialize(ISerializer& s)
 {
+	log::info << L"Panel::serialize called on " << (int64_t)(void*)this << L", direction: " << (s.getDirection() == ISerializer::Direction::Read ? L"Read" : L"Write") << Endl;
+	log::info << L"  Panel parent before: " << (int64_t)(void*)getParent() << Endl;
+
 	UIElement::serialize(s);
 	s >> MemberRefArray< UIElement >(L"children", m_children);
+
+	log::info << L"  Panel parent after MemberRefArray: " << (int64_t)(void*)getParent() << Endl;
+
+	// After deserialization, set parent pointers
+	if (s.getDirection() == ISerializer::Direction::Read)
+	{
+		for (auto child : m_children)
+		{
+			if (child)
+				child->setParent(this);
+		}
+		log::info << L"  Set parent on " << m_children.size() << L" children" << Endl;
+	}
 }
 
 }

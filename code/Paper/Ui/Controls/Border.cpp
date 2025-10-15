@@ -207,6 +207,12 @@ void Border::serialize(ISerializer& s)
 	s >> Member< Color4f >(L"borderBrush", m_borderBrush);
 	s >> Member< float >(L"borderThickness", m_borderThickness);
 	s >> Member< Vector2 >(L"padding", m_padding);
+
+	// After deserialization, set parent pointer
+	if (s.getDirection() == ISerializer::Direction::Read && m_child)
+	{
+		m_child->setParent(this);
+	}
 }
 
 }
