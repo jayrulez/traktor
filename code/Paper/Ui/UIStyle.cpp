@@ -13,7 +13,7 @@
 namespace traktor::paper
 {
 
-T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.UIStyle", UIStyle, ISerializable)
+T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.UIStyle", 0, UIStyle, ISerializable)
 
 void UIStyle::setColor(const std::wstring& name, const Color4f& value)
 {

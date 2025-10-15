@@ -15,7 +15,7 @@
 namespace traktor::paper
 {
 
-T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.UITheme", UITheme, ISerializable)
+T_IMPLEMENT_RTTI_FACTORY_CLASS(L"traktor.paper.UITheme", 0, UITheme, ISerializable)
 
 void UITheme::setStyle(const std::wstring& name, UIStyle* style)
 {

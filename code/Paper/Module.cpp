@@ -11,6 +11,8 @@
 #if defined(T_STATIC)
 #	include "Paper/ClassFactory.h"
 #	include "Paper/UIPage.h"
+#	include "Paper/UITheme.h"
+#	include "Paper/UIStyle.h"
 
 namespace traktor::paper
 {
@@ -19,6 +21,8 @@ extern "C" void __module__Traktor_Paper()
 {
 	T_FORCE_LINK_REF(ClassFactory);
 	T_FORCE_LINK_REF(UIPage);
+	T_FORCE_LINK_REF(UITheme);
+	T_FORCE_LINK_REF(UIStyle);
 }
 
 }

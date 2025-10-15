@@ -11,6 +11,8 @@
 #include "Core/Class/IRuntimeDelegate.h"
 #include "Paper/ClassFactory.h"
 #include "Paper/Ui/UIPage.h"
+#include "Paper/Ui/UIStyle.h"
+#include "Paper/Ui/UITheme.h"
 
 namespace traktor::paper
 {
@@ -21,7 +23,18 @@ void ClassFactory::createClasses(IRuntimeClassRegistrar* registrar) const
 {
 	// UIPage
 	auto classUIPage = new AutoRuntimeClass< UIPage >();
+	classUIPage->addConstructor();
 	registrar->registerClass(classUIPage);
+
+	// UIStyle
+	auto classUIStyle = new AutoRuntimeClass< UIStyle >();
+	classUIStyle->addConstructor();
+	registrar->registerClass(classUIStyle);
+
+	// UITheme
+	auto classUITheme = new AutoRuntimeClass< UITheme >();
+	classUITheme->addConstructor();
+	registrar->registerClass(classUITheme);
 }
 
 }
