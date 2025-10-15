@@ -183,7 +183,7 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 			root->arrange(Vector2::zero(), availableSize);
 
 			// Render UI with debug visualization
-			root->render(&uiContext);
+			root->renderDebug(&uiContext);
 
 			m_renderer->end(0);
 

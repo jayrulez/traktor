@@ -116,6 +116,43 @@ void Border::render(UIContext* context)
 		m_child->render(context);
 }
 
+void Border::renderDebug(UIContext* context)
+{
+	// Render debug visualization from base class
+	UIElement::renderDebug(context);
+
+	// Render the actual border background and borders (without child)
+	if (context)
+	{
+		Draw2D* renderer = context->getRenderer();
+		if (renderer)
+		{
+			// Render background
+			if (m_background.getAlpha() > 0.0f)
+			{
+				renderer->drawQuad(m_actualPosition, m_actualSize, m_background);
+			}
+
+			// Render border
+			if (m_borderThickness > 0.0f && m_borderBrush.getAlpha() > 0.0f)
+			{
+				// Top border
+				renderer->drawQuad(m_actualPosition, Vector2(m_actualSize.x, m_borderThickness), m_borderBrush);
+				// Bottom border
+				renderer->drawQuad(Vector2(m_actualPosition.x, m_actualPosition.y + m_actualSize.y - m_borderThickness), Vector2(m_actualSize.x, m_borderThickness), m_borderBrush);
+				// Left border
+				renderer->drawQuad(m_actualPosition, Vector2(m_borderThickness, m_actualSize.y), m_borderBrush);
+				// Right border
+				renderer->drawQuad(Vector2(m_actualPosition.x + m_actualSize.x - m_borderThickness, m_actualPosition.y), Vector2(m_borderThickness, m_actualSize.y), m_borderBrush);
+			}
+		}
+	}
+
+	// Render child in debug mode
+	if (m_child)
+		m_child->renderDebug(context);
+}
+
 void Border::serialize(ISerializer& s)
 {
 	UIElement::serialize(s);

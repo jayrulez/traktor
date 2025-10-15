@@ -62,6 +62,15 @@ void Rectangle::render(UIContext* context)
 	}
 }
 
+void Rectangle::renderDebug(UIContext* context)
+{
+	// Render debug visualization from base class
+	UIElement::renderDebug(context);
+
+	// Also render the actual rectangle
+	render(context);
+}
+
 void Rectangle::serialize(ISerializer& s)
 {
 	UIElement::serialize(s);

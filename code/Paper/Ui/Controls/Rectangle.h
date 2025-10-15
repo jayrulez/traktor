@@ -50,6 +50,8 @@ public:
 
 	virtual void render(UIContext* context) override;
 
+	virtual void renderDebug(UIContext* context) override;
+
 	virtual void serialize(ISerializer& s) override;
 
 private:
