@@ -9,6 +9,7 @@
 #pragma once
 
 #include <functional>
+#include <limits>
 #include <string>
 #include "Core/Serialization/ISerializable.h"
 #include "Core/Ref.h"
@@ -126,6 +127,11 @@ public:
 	 */
 	virtual void onMouseLeave(MouseEvent& event);
 
+	/*! Mouse wheel scrolled over this element.
+	 * \param event Mouse wheel event data.
+	 */
+	virtual void onMouseWheel(MouseWheelEvent& event);
+
 	/*! Element gained focus.
 	 */
 	virtual void onFocus();
@@ -177,6 +183,54 @@ public:
 	 */
 	const std::wstring& getName() const { return m_name; }
 
+	/*! Set explicit width (NaN = use content-based sizing).
+	 */
+	void setWidth(float width) { m_width = width; }
+
+	/*! Get explicit width (NaN = not set).
+	 */
+	float getWidth() const { return m_width; }
+
+	/*! Set explicit height (NaN = use content-based sizing).
+	 */
+	void setHeight(float height) { m_height = height; }
+
+	/*! Get explicit height (NaN = not set).
+	 */
+	float getHeight() const { return m_height; }
+
+	/*! Set minimum width constraint.
+	 */
+	void setMinWidth(float minWidth) { m_minWidth = minWidth; }
+
+	/*! Get minimum width constraint.
+	 */
+	float getMinWidth() const { return m_minWidth; }
+
+	/*! Set minimum height constraint.
+	 */
+	void setMinHeight(float minHeight) { m_minHeight = minHeight; }
+
+	/*! Get minimum height constraint.
+	 */
+	float getMinHeight() const { return m_minHeight; }
+
+	/*! Set maximum width constraint.
+	 */
+	void setMaxWidth(float maxWidth) { m_maxWidth = maxWidth; }
+
+	/*! Get maximum width constraint.
+	 */
+	float getMaxWidth() const { return m_maxWidth; }
+
+	/*! Set maximum height constraint.
+	 */
+	void setMaxHeight(float maxHeight) { m_maxHeight = maxHeight; }
+
+	/*! Get maximum height constraint.
+	 */
+	float getMaxHeight() const { return m_maxHeight; }
+
 	virtual void serialize(ISerializer& s) override;
 
 protected:
@@ -188,6 +242,14 @@ protected:
 	bool m_isFocused = false;
 	std::wstring m_name;
 	ClickCallback m_clickCallback;
+
+	// Explicit sizing properties (NaN = not set, use content-based sizing)
+	float m_width = std::numeric_limits<float>::quiet_NaN();
+	float m_height = std::numeric_limits<float>::quiet_NaN();
+	float m_minWidth = 0.0f;
+	float m_minHeight = 0.0f;
+	float m_maxWidth = std::numeric_limits<float>::infinity();
+	float m_maxHeight = std::numeric_limits<float>::infinity();
 };
 
 }

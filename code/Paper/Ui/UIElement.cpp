@@ -6,6 +6,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+#include <algorithm>
+#include <cmath>
 #include "Core/Serialization/ISerializer.h"
 #include "Core/Math/Color4f.h"
 #include "Paper/Ui/UIElement.h"
@@ -26,7 +28,31 @@ void UIElement::applyStyle(const UIStyle* style)
 
 Vector2 UIElement::measure(const Vector2& availableSize, UIContext* context)
 {
-	m_desiredSize = Vector2::zero();
+	// Apply explicit width if set, otherwise use available width
+	float constrainedWidth = std::isnan(m_width) ? availableSize.x : m_width;
+
+	// Apply min/max width constraints
+	constrainedWidth = std::min(constrainedWidth, m_maxWidth);
+	constrainedWidth = std::max(constrainedWidth, m_minWidth);
+
+	// Apply explicit height if set, otherwise use available height
+	float constrainedHeight = std::isnan(m_height) ? availableSize.y : m_height;
+
+	// Apply min/max height constraints
+	constrainedHeight = std::min(constrainedHeight, m_maxHeight);
+	constrainedHeight = std::max(constrainedHeight, m_minHeight);
+
+	// Store the constrained desired size
+	// Base implementation: if explicit size is set, use it; otherwise zero
+	if (!std::isnan(m_width) && !std::isnan(m_height))
+		m_desiredSize = Vector2(constrainedWidth, constrainedHeight);
+	else if (!std::isnan(m_width))
+		m_desiredSize = Vector2(constrainedWidth, 0.0f);
+	else if (!std::isnan(m_height))
+		m_desiredSize = Vector2(0.0f, constrainedHeight);
+	else
+		m_desiredSize = Vector2::zero();
+
 	return m_desiredSize;
 }
 
@@ -109,6 +135,12 @@ void UIElement::onMouseLeave(MouseEvent& event)
 	// Derived classes can override to handle mouse leave
 }
 
+void UIElement::onMouseWheel(MouseWheelEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle mouse wheel
+}
+
 void UIElement::onFocus()
 {
 	m_isFocused = true;
@@ -136,6 +168,12 @@ void UIElement::onKeyUp(KeyEvent& event)
 void UIElement::serialize(ISerializer& s)
 {
 	s >> Member< std::wstring >(L"name", m_name);
+	s >> Member< float >(L"width", m_width);
+	s >> Member< float >(L"height", m_height);
+	s >> Member< float >(L"minWidth", m_minWidth);
+	s >> Member< float >(L"minHeight", m_minHeight);
+	s >> Member< float >(L"maxWidth", m_maxWidth);
+	s >> Member< float >(L"maxHeight", m_maxHeight);
 }
 
 }

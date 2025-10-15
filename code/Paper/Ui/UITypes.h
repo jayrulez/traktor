@@ -37,6 +37,16 @@ struct MouseEvent
 	Vector2 position;        // Mouse position in UI coordinates
 	MouseButton button;      // Which button caused the event
 	bool handled = false;    // Set to true to stop event propagation
+	bool capture = false;    // Set to true to request mouse capture
+};
+
+/*! Mouse wheel event data.
+ */
+struct MouseWheelEvent
+{
+	Vector2 position;        // Mouse position in UI coordinates
+	int32_t delta;           // Wheel delta (positive = scroll up, negative = scroll down)
+	bool handled = false;    // Set to true to stop event propagation
 };
 
 /*! Keyboard event data.

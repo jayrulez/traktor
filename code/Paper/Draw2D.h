@@ -84,6 +84,10 @@ public:
 
 	void popWorld();
 
+	void pushScissor(const Vector2& position, const Vector2& size);
+
+	void popScissor();
+
 	void setProjection(const Matrix44& projection);
 
 	void drawTexturedQuad(
@@ -114,6 +118,7 @@ private:
 		Ref< render::Buffer > vertexBuffer;
 		Ref< render::ITexture > texture;
 		render::Primitives primitives;
+		Vector4 scissor;  // Scissor rect as (left, top, width, height); (-1,-1,-1,-1) = no scissor
 	};
 
 	struct Frame
@@ -147,6 +152,7 @@ private:
 	AlignedVector< Matrix44 > m_view;
 	AlignedVector< Matrix44 > m_world;
 	Matrix44 m_worldView;
+	AlignedVector< Vector4 > m_scissorStack;  // Scissor rects as (left, top, width, height)
 	Vertex* m_vertexHead = nullptr;
 	Vertex* m_vertexTail = nullptr;
 

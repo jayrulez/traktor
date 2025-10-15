@@ -38,6 +38,7 @@
 #include "Ui/Events/KeyEvent.h"
 #include "Ui/Events/KeyDownEvent.h"
 #include "Ui/Events/KeyUpEvent.h"
+#include "Ui/Events/MouseWheelEvent.h"
 #include "Ui/Enums.h"
 
 namespace traktor::paper
@@ -96,6 +97,7 @@ bool UIPagePreviewControl::create(ui::Widget* parent)
 	addEventHandler< ui::MouseMoveEvent >(this, &UIPagePreviewControl::eventMouseMove);
 	addEventHandler< ui::MouseButtonDownEvent >(this, &UIPagePreviewControl::eventButtonDown);
 	addEventHandler< ui::MouseButtonUpEvent >(this, &UIPagePreviewControl::eventButtonUp);
+	addEventHandler< ui::MouseWheelEvent >(this, &UIPagePreviewControl::eventMouseWheel);
 	addEventHandler< ui::KeyEvent >(this, &UIPagePreviewControl::eventKey);
 	addEventHandler< ui::KeyDownEvent >(this, &UIPagePreviewControl::eventKeyDown);
 	addEventHandler< ui::KeyUpEvent >(this, &UIPagePreviewControl::eventKeyUp);
@@ -370,6 +372,28 @@ void UIPagePreviewControl::eventButtonUp(ui::MouseButtonUpEvent* event)
 
 	// Trigger repaint
 	update();
+}
+
+void UIPagePreviewControl::eventMouseWheel(ui::MouseWheelEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Get mouse position in widget coordinates
+	const ui::Point pt = event->getPosition();
+
+	// Convert to UI coordinates
+	Vector2 uiPosition((float)pt.x, (float)pt.y);
+
+	// Get wheel delta
+	int32_t delta = event->getRotation();
+
+	// Forward to UIPage
+	m_uiPage->handleMouseWheel(uiPosition, delta);
+
+	// Trigger repaint to show scroll changes
+	update();
+	event->consume();
 }
 
 void UIPagePreviewControl::eventKey(ui::KeyEvent* event)

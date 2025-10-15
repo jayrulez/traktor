@@ -16,6 +16,7 @@
 #include "Paper/Ui/UIContext.h"
 #include "Paper/Ui/Controls/Border.h"
 #include "Paper/Ui/Controls/TextBox.h"
+#include "Paper/Ui/Controls/ScrollViewer.h"
 #include "Paper/Ui/Layouts/Panel.h"
 
 namespace traktor::paper
@@ -65,6 +66,11 @@ void UIPage::updateElementRecursive(UIElement* element, double deltaTime)
 		for (auto child : panel->getChildren())
 			updateElementRecursive(child, deltaTime);
 	}
+	else if (ScrollViewer* scrollViewer = dynamic_type_cast<ScrollViewer*>(element))
+	{
+		if (scrollViewer->getContent())
+			updateElementRecursive(scrollViewer->getContent(), deltaTime);
+	}
 }
 
 void UIPage::render(UIContext* context, bool debugVisualization)
@@ -83,8 +89,8 @@ void UIPage::handleMouseMove(const Vector2& position)
 	if (!m_root)
 		return;
 
-	// Perform hit test to find element under mouse
-	UIElement* hitElement = m_root->hitTest(position);
+	// If an element has captured the mouse, send all events to it
+	UIElement* hitElement = m_capturedElement ? m_capturedElement : m_root->hitTest(position);
 
 	// Build ancestor chain for new hovered element (includes the element itself)
 	RefArray< UIElement > newAncestors;
@@ -155,7 +161,12 @@ void UIPage::handleMouseDown(const Vector2& position, MouseButton button)
 		MouseEvent downEvent;
 		downEvent.position = position;
 		downEvent.button = button;
+		downEvent.capture = false;
 		hitElement->onMouseDown(downEvent);
+
+		// If element requested mouse capture, grant it
+		if (downEvent.capture)
+			m_capturedElement = hitElement;
 	}
 }
 
@@ -209,6 +220,9 @@ void UIPage::handleMouseUp(const Vector2& position, MouseButton button)
 
 	// Clear pressed element
 	m_pressedElement = nullptr;
+
+	// Release mouse capture
+	m_capturedElement = nullptr;
 }
 
 UIElement* UIPage::findElementByName(const std::wstring& name)
@@ -250,6 +264,17 @@ UIElement* UIPage::findElementByNameRecursive(UIElement* element, const std::wst
 		}
 	}
 
+	// For ScrollViewer
+	if (ScrollViewer* scrollViewer = dynamic_type_cast<ScrollViewer*>(element))
+	{
+		if (scrollViewer->getContent())
+		{
+			UIElement* found = findElementByNameRecursive(scrollViewer->getContent(), name);
+			if (found)
+				return found;
+		}
+	}
+
 	return nullptr;
 }
 
@@ -284,6 +309,31 @@ void UIPage::handleKeyUp(int virtualKey)
 	m_focusedElement->onKeyUp(keyEvent);
 }
 
+void UIPage::handleMouseWheel(const Vector2& position, int32_t delta)
+{
+	if (!m_root)
+		return;
+
+	// Perform hit test to find element under mouse
+	UIElement* hitElement = m_root->hitTest(position);
+
+	if (hitElement)
+	{
+		MouseWheelEvent wheelEvent;
+		wheelEvent.position = position;
+		wheelEvent.delta = delta;
+		wheelEvent.handled = false;
+
+		// Send to hit element and bubble up until handled
+		UIElement* current = hitElement;
+		while (current && !wheelEvent.handled)
+		{
+			current->onMouseWheel(wheelEvent);
+			current = current->getParent();
+		}
+	}
+}
+
 void UIPage::setFocus(UIElement* element)
 {
 	if (m_focusedElement == element)
@@ -297,6 +347,11 @@ void UIPage::setFocus(UIElement* element)
 	m_focusedElement = element;
 	if (m_focusedElement)
 		m_focusedElement->onFocus();
+}
+
+void UIPage::captureMouse(UIElement* element)
+{
+	m_capturedElement = element;
 }
 
 void UIPage::serialize(ISerializer& s)

@@ -104,6 +104,12 @@ public:
 	 */
 	void handleKeyUp(int virtualKey);
 
+	/*! Handle mouse wheel event.
+	 * \param position Mouse position in UI coordinates.
+	 * \param delta Wheel delta (positive = scroll up).
+	 */
+	void handleMouseWheel(const Vector2& position, int32_t delta);
+
 	/*! Find element by name.
 	 * \param name Element name to search for.
 	 * \return Found element or nullptr.
@@ -120,6 +126,16 @@ public:
 	 */
 	void setFocus(UIElement* element);
 
+	/*! Capture mouse input to a specific element.
+	 * \param element Element to capture mouse, or nullptr to release capture.
+	 */
+	void captureMouse(UIElement* element);
+
+	/*! Get the element that has captured the mouse.
+	 * \return Element with mouse capture, or nullptr.
+	 */
+	UIElement* getMouseCapture() const { return m_capturedElement; }
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:
@@ -132,6 +148,7 @@ private:
 	UIElement* m_hoveredElement = nullptr;
 	UIElement* m_pressedElement = nullptr;
 	UIElement* m_focusedElement = nullptr;
+	UIElement* m_capturedElement = nullptr;
 	RefArray< UIElement > m_hoveredAncestors;
 	int32_t m_width = 1920;
 	int32_t m_height = 1080;

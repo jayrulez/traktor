@@ -65,9 +65,6 @@ void StackPanel::arrange(const Vector2& position, const Vector2& size)
 		{
 			if (child)
 			{
-				// Set parent pointer
-				child->setParent(this);
-
 				Vector2 childSize = child->getDesiredSize();
 				child->arrange(currentPos, Vector2(size.x, childSize.y));
 				currentPos.y += childSize.y;
@@ -81,9 +78,6 @@ void StackPanel::arrange(const Vector2& position, const Vector2& size)
 		{
 			if (child)
 			{
-				// Set parent pointer
-				child->setParent(this);
-
 				Vector2 childSize = child->getDesiredSize();
 				child->arrange(currentPos, Vector2(childSize.x, size.y));
 				currentPos.x += childSize.x;

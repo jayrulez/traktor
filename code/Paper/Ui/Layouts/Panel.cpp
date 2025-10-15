@@ -19,7 +19,10 @@ T_IMPLEMENT_RTTI_CLASS(L"traktor.paper.Panel", Panel, UIElement)
 void Panel::addChild(UIElement* child)
 {
 	if (child)
+	{
+		child->setParent(this);
 		m_children.push_back(child);
+	}
 }
 
 void Panel::removeChild(UIElement* child)

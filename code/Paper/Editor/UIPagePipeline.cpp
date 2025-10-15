@@ -25,6 +25,8 @@
 #include "Paper/Ui/Controls/Border.h"
 #include "Paper/Ui/Controls/Button.h"
 #include "Paper/Ui/Controls/TextBox.h"
+#include "Paper/Ui/Controls/ScrollViewer.h"
+#include "Paper/Ui/Controls/ScrollBar.h"
 
 namespace traktor::paper
 {
@@ -343,6 +345,48 @@ bool UIPagePipeline::buildOutput(
 
 	textBoxPanel->setChild(textBoxContent);
 	rootPanel->addChild(textBoxPanel);
+
+	// --- Separator ---
+	Ref< Rectangle > separator5 = new Rectangle();
+	separator5->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator5);
+
+	// --- ScrollViewer Demo Section ---
+	Ref< Border > scrollPanel = new Border();
+	scrollPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< StackPanel > scrollPanelContent = new StackPanel();
+	scrollPanelContent->setOrientation(StackPanel::Orientation::Vertical);
+
+	Ref< TextBlock > scrollLabel = new TextBlock();
+	scrollLabel->setText(L"ScrollViewer Control (drag scrollbar or click track):");
+	scrollLabel->applyStyle(theme->getStyle(L"PrimaryText"));
+	scrollPanelContent->addChild(scrollLabel);
+
+	// Create ScrollViewer with large content
+	Ref< ScrollViewer > scrollViewer = new ScrollViewer();
+	scrollViewer->setVerticalScrollBarVisibility(ScrollBarVisibility::Auto);
+	scrollViewer->setHorizontalScrollBarVisibility(ScrollBarVisibility::Auto);
+	// Set explicit height to constrain the viewport and enable scrolling
+	scrollViewer->setHeight(200.0f);
+
+	// Create content that's larger than viewport
+	Ref< StackPanel > scrollContent = new StackPanel();
+	scrollContent->setOrientation(StackPanel::Orientation::Vertical);
+
+	// Add multiple text blocks to demonstrate scrolling
+	for (int i = 1; i <= 20; ++i)
+	{
+		Ref< TextBlock > item = new TextBlock();
+		item->setText(std::wstring(L"Scrollable Item #") + std::to_wstring(i));
+		item->applyStyle(theme->getStyle(L"SecondaryText"));
+		scrollContent->addChild(item);
+	}
+
+	scrollViewer->setContent(scrollContent);
+	scrollPanelContent->addChild(scrollViewer);
+
+	scrollPanel->setChild(scrollPanelContent);
+	rootPanel->addChild(scrollPanel);
 
 	// Set root
 	uiPage->setRoot(rootPanel);

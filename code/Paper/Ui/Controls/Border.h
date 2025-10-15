@@ -33,7 +33,12 @@ class T_DLLCLASS Border : public UIElement
 	T_RTTI_CLASS;
 
 public:
-	void setChild(UIElement* child) { m_child = child; }
+	void setChild(UIElement* child)
+	{
+		m_child = child;
+		if (m_child)
+			m_child->setParent(this);
+	}
 
 	UIElement* getChild() const { return m_child; }
 

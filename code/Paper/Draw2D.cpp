@@ -130,6 +130,27 @@ void Draw2D::render(render::IRenderView* renderView, uint32_t frame)
 
 	for (const auto& batch : f.batches)
 	{
+		// Apply scissor rect if specified
+		if (batch.scissor.x() >= 0.0f)
+		{
+			render::Rectangle scissor;
+			scissor.left = (int32_t)batch.scissor.x();
+			scissor.top = (int32_t)batch.scissor.y();
+			scissor.width = (int32_t)batch.scissor.z();
+			scissor.height = (int32_t)batch.scissor.w();
+			renderView->setScissor(scissor);
+		}
+		else
+		{
+			// No scissor - set to full viewport
+			render::Rectangle scissor;
+			scissor.left = 0;
+			scissor.top = 0;
+			scissor.width = renderView->getWidth();
+			scissor.height = renderView->getHeight();
+			renderView->setScissor(scissor);
+		}
+
 		render::Shader::Permutation perm;
 		m_shader->setCombination(s_handleTexture, batch.texture != nullptr, perm);
 
@@ -189,6 +210,17 @@ void Draw2D::popWorld()
 	m_world.pop_back();
 	T_ASSERT(!m_world.empty());
 	updateTransforms();
+}
+
+void Draw2D::pushScissor(const Vector2& position, const Vector2& size)
+{
+	m_scissorStack.push_back(Vector4(position.x, position.y, size.x, size.y));
+}
+
+void Draw2D::popScissor()
+{
+	if (!m_scissorStack.empty())
+		m_scissorStack.pop_back();
 }
 
 void Draw2D::setProjection(const Matrix44& projection)
@@ -322,11 +354,14 @@ Draw2D::Vertex* Draw2D::allocBatch(uint32_t vertexCount, render::ITexture* textu
 	// Create new batch if necessary.
 	AlignedVector< Batch >& batches = m_currentFrame->batches;
 	const uint32_t projection = (uint32_t)m_currentFrame->projections.size() - 1;
+	const Vector4 currentScissor = m_scissorStack.empty() ? Vector4(-1.0f, -1.0f, -1.0f, -1.0f) : m_scissorStack.back();
+
 	if (
 		batches.empty() ||
 		batches.back().projection != projection ||
 		batches.back().vertexBuffer != m_currentFrame->vertexBuffers.back() ||
-		batches.back().texture != texture
+		batches.back().texture != texture ||
+		batches.back().scissor != currentScissor
 	)
 	{
 		Batch batch;
@@ -334,6 +369,7 @@ Draw2D::Vertex* Draw2D::allocBatch(uint32_t vertexCount, render::ITexture* textu
 		batch.vertexBuffer = m_currentFrame->vertexBuffers.back();
 		batch.texture = texture;
 		batch.primitives = render::Primitives::setNonIndexed(render::PrimitiveType::Triangles, (uint32_t)(m_vertexTail - m_vertexHead), 0);
+		batch.scissor = currentScissor;
 		batches.push_back(batch);
 	}
 	batches.back().primitives.count += vertexCount / 3;  // Increment by number of triangles
