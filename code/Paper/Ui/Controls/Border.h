@@ -63,12 +63,19 @@ public:
 
 	virtual void renderDebug(UIContext* context) override;
 
+	virtual UIElement* hitTest(const Vector2& position) override;
+
+	virtual void onMouseEnter(MouseEvent& event) override;
+
+	virtual void onMouseLeave(MouseEvent& event) override;
+
 	virtual void serialize(ISerializer& s) override;
 
 private:
 	Ref< UIElement > m_child;
 	Color4f m_background = Color4f(0.0f, 0.0f, 0.0f, 0.0f);
 	Color4f m_borderBrush = Color4f(0.0f, 0.0f, 0.0f, 0.0f);
+	Color4f m_originalBorderBrush = Color4f(0.0f, 0.0f, 0.0f, 0.0f);
 	float m_borderThickness = 0.0f;
 	Vector2 m_padding = Vector2::zero();
 };

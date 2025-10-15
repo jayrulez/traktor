@@ -58,12 +58,17 @@ public:
 
 	virtual void renderDebug(UIContext* context) override;
 
+	virtual void onMouseEnter(MouseEvent& event) override;
+
+	virtual void onMouseLeave(MouseEvent& event) override;
+
 	virtual void serialize(ISerializer& s) override;
 
 private:
 	std::wstring m_text;
 	Guid m_fontId;
 	Color4f m_foreground = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+	Color4f m_originalForeground = Color4f(1.0f, 1.0f, 1.0f, 1.0f);
 };
 
 }

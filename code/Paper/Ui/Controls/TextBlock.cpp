@@ -89,6 +89,30 @@ void TextBlock::renderDebug(UIContext* context)
 	render(context);
 }
 
+void TextBlock::onMouseEnter(MouseEvent& event)
+{
+	UIElement::onMouseEnter(event);
+
+	// Save original foreground color and brighten it on hover
+	m_originalForeground = m_foreground;
+
+	// Brighten the text color (multiply by 1.3 and clamp to 1.0)
+	m_foreground = Color4f(
+		min(m_foreground.getRed() * 1.3f, 1.0f),
+		min(m_foreground.getGreen() * 1.3f, 1.0f),
+		min(m_foreground.getBlue() * 1.3f, 1.0f),
+		m_foreground.getAlpha()
+	);
+}
+
+void TextBlock::onMouseLeave(MouseEvent& event)
+{
+	UIElement::onMouseLeave(event);
+
+	// Restore original foreground color
+	m_foreground = m_originalForeground;
+}
+
 void TextBlock::serialize(ISerializer& s)
 {
 	UIElement::serialize(s);

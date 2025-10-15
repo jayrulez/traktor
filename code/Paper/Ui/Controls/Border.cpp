@@ -71,6 +71,9 @@ void Border::arrange(const Vector2& position, const Vector2& size)
 
 	if (m_child)
 	{
+		// Set parent pointer
+		m_child->setParent(this);
+
 		// Calculate child position and size
 		float totalThickness = m_borderThickness * 2.0f;
 		Vector2 childPos = position + m_padding + Vector2(m_borderThickness, m_borderThickness);
@@ -151,6 +154,48 @@ void Border::renderDebug(UIContext* context)
 	// Render child in debug mode
 	if (m_child)
 		m_child->renderDebug(context);
+}
+
+UIElement* Border::hitTest(const Vector2& position)
+{
+	// First check if position is within this border's bounds
+	if (!containsPoint(position))
+		return nullptr;
+
+	// If we have a child, check child first (children are on top)
+	if (m_child)
+	{
+		UIElement* childHit = m_child->hitTest(position);
+		if (childHit)
+			return childHit;
+	}
+
+	// No child hit, return this border
+	return this;
+}
+
+void Border::onMouseEnter(MouseEvent& event)
+{
+	UIElement::onMouseEnter(event);
+
+	// Save original border color and brighten it on hover
+	m_originalBorderBrush = m_borderBrush;
+
+	// Brighten the border color (multiply by 1.5 and clamp to 1.0)
+	m_borderBrush = Color4f(
+		min(m_borderBrush.getRed() * 1.5f, 1.0f),
+		min(m_borderBrush.getGreen() * 1.5f, 1.0f),
+		min(m_borderBrush.getBlue() * 1.5f, 1.0f),
+		m_borderBrush.getAlpha()
+	);
+}
+
+void Border::onMouseLeave(MouseEvent& event)
+{
+	UIElement::onMouseLeave(event);
+
+	// Restore original border color
+	m_borderBrush = m_originalBorderBrush;
 }
 
 void Border::serialize(ISerializer& s)

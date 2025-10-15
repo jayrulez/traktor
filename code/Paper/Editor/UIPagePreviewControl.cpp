@@ -88,6 +88,9 @@ bool UIPagePreviewControl::create(ui::Widget* parent)
 	// Add widget event handlers.
 	addEventHandler< ui::SizeEvent >(this, &UIPagePreviewControl::eventSize);
 	addEventHandler< ui::PaintEvent >(this, &UIPagePreviewControl::eventPaint);
+	addEventHandler< ui::MouseMoveEvent >(this, &UIPagePreviewControl::eventMouseMove);
+	addEventHandler< ui::MouseButtonDownEvent >(this, &UIPagePreviewControl::eventButtonDown);
+	addEventHandler< ui::MouseButtonUpEvent >(this, &UIPagePreviewControl::eventButtonUp);
 
 	// Register idle event handler.
 	m_idleEventHandler = ui::Application::getInstance()->addEventHandler< ui::IdleEvent >(this, &UIPagePreviewControl::eventIdle);
@@ -173,17 +176,12 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 		uiPass->addBuild([=, this](const render::RenderGraph&, render::RenderContext* renderContext) {
 			m_renderer->begin(0, projection);
 
-			// Create UI context
-			UIContext uiContext(m_renderer, m_fontManager, m_fontRenderer);
+			// Create UI context (with theme from UIPage)
+			UIContext uiContext(m_renderer, m_fontManager, m_fontRenderer, m_uiPage->getTheme());
 
-			// Measure and arrange UI using UIPage dimensions
-			auto root = m_uiPage->getRoot();
-			Vector2 availableSize(pageWidth, pageHeight);
-			root->measure(availableSize, &uiContext);
-			root->arrange(Vector2::zero(), availableSize);
-
-			// Render UI with debug visualization
-			root->renderDebug(&uiContext);
+			// Update layout and render via UIPage
+			m_uiPage->updateLayout(&uiContext);
+			m_uiPage->render(&uiContext, true);  // true = debug visualization
 
 			m_renderer->end(0);
 
@@ -225,6 +223,94 @@ void UIPagePreviewControl::eventIdle(ui::IdleEvent* event)
 {
 	if (isVisible(true))
 		event->requestMore();
+}
+
+void UIPagePreviewControl::eventMouseMove(ui::MouseMoveEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Get mouse position in widget coordinates
+	const ui::Point pt = event->getPosition();
+
+	// Convert to UI coordinates (same as widget coordinates for now)
+	Vector2 uiPosition((float)pt.x, (float)pt.y);
+
+	// Forward to UIPage
+	m_uiPage->handleMouseMove(uiPosition);
+
+	// Trigger repaint to show hover effects
+	update();
+}
+
+void UIPagePreviewControl::eventButtonDown(ui::MouseButtonDownEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Get mouse position in widget coordinates
+	const ui::Point pt = event->getPosition();
+
+	// Convert to UI coordinates
+	Vector2 uiPosition((float)pt.x, (float)pt.y);
+
+	// Map UI button to our MouseButton enum
+	MouseButton button = MouseButton::Left;
+	switch (event->getButton())
+	{
+	case ui::MbtLeft:
+		button = MouseButton::Left;
+		break;
+	case ui::MbtRight:
+		button = MouseButton::Right;
+		break;
+	case ui::MbtMiddle:
+		button = MouseButton::Middle;
+		break;
+	default:
+		break;
+	}
+
+	// Forward to UIPage
+	m_uiPage->handleMouseDown(uiPosition, button);
+
+	// Trigger repaint
+	update();
+}
+
+void UIPagePreviewControl::eventButtonUp(ui::MouseButtonUpEvent* event)
+{
+	if (!m_uiPage)
+		return;
+
+	// Get mouse position in widget coordinates
+	const ui::Point pt = event->getPosition();
+
+	// Convert to UI coordinates
+	Vector2 uiPosition((float)pt.x, (float)pt.y);
+
+	// Map UI button to our MouseButton enum
+	MouseButton button = MouseButton::Left;
+	switch (event->getButton())
+	{
+	case ui::MbtLeft:
+		button = MouseButton::Left;
+		break;
+	case ui::MbtRight:
+		button = MouseButton::Right;
+		break;
+	case ui::MbtMiddle:
+		button = MouseButton::Middle;
+		break;
+	default:
+		break;
+	}
+
+	// Forward to UIPage
+	m_uiPage->handleMouseUp(uiPosition, button);
+
+	// Trigger repaint
+	update();
 }
 
 }

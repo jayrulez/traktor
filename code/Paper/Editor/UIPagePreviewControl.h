@@ -95,6 +95,12 @@ private:
 	void eventPaint(ui::PaintEvent* event);
 
 	void eventIdle(ui::IdleEvent* event);
+
+	void eventMouseMove(ui::MouseMoveEvent* event);
+
+	void eventButtonDown(ui::MouseButtonDownEvent* event);
+
+	void eventButtonUp(ui::MouseButtonUpEvent* event);
 };
 
 }

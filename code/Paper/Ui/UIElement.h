@@ -11,6 +11,7 @@
 #include "Core/Serialization/ISerializable.h"
 #include "Core/Ref.h"
 #include "Core/Math/Vector2.h"
+#include "Paper/Ui/UITypes.h"
 
 // import/export mechanism.
 #undef T_DLLCLASS
@@ -81,12 +82,63 @@ public:
 	 */
 	const Vector2& getActualPosition() const { return m_actualPosition; }
 
+	/*! Hit test to find element at given position.
+	 * \param position Position in UI coordinates.
+	 * \return The deepest element at this position, or nullptr if none.
+	 */
+	virtual UIElement* hitTest(const Vector2& position);
+
+	/*! Check if a point is within this element's bounds.
+	 * \param position Position in UI coordinates.
+	 * \return True if position is within bounds.
+	 */
+	virtual bool containsPoint(const Vector2& position) const;
+
+	/*! Mouse moved over this element.
+	 * \param event Mouse event data.
+	 */
+	virtual void onMouseMove(MouseEvent& event);
+
+	/*! Mouse button pressed on this element.
+	 * \param event Mouse event data.
+	 */
+	virtual void onMouseDown(MouseEvent& event);
+
+	/*! Mouse button released on this element.
+	 * \param event Mouse event data.
+	 */
+	virtual void onMouseUp(MouseEvent& event);
+
+	/*! Mouse entered this element's bounds.
+	 * \param event Mouse event data.
+	 */
+	virtual void onMouseEnter(MouseEvent& event);
+
+	/*! Mouse left this element's bounds.
+	 * \param event Mouse event data.
+	 */
+	virtual void onMouseLeave(MouseEvent& event);
+
+	/*! Check if mouse is currently over this element.
+	 */
+	bool isMouseOver() const { return m_isMouseOver; }
+
+	/*! Get the parent element.
+	 */
+	UIElement* getParent() const { return m_parent; }
+
+	/*! Set the parent element (called by container during arrange).
+	 */
+	void setParent(UIElement* parent) { m_parent = parent; }
+
 	virtual void serialize(ISerializer& s) override;
 
 protected:
 	Vector2 m_desiredSize = Vector2::zero();
 	Vector2 m_actualSize = Vector2::zero();
 	Vector2 m_actualPosition = Vector2::zero();
+	UIElement* m_parent = nullptr;
+	bool m_isMouseOver = false;
 };
 
 }

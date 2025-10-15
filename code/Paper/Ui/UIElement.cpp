@@ -62,6 +62,53 @@ void UIElement::renderDebug(UIContext* context)
 	renderer->drawQuad(Vector2(m_actualPosition.x + m_actualSize.x - borderThickness, m_actualPosition.y), Vector2(borderThickness, m_actualSize.y), Color4f(0.2f, 0.8f, 1.0f, 0.8f));
 }
 
+UIElement* UIElement::hitTest(const Vector2& position)
+{
+	// Default implementation: return this element if point is within bounds
+	if (containsPoint(position))
+		return this;
+	return nullptr;
+}
+
+bool UIElement::containsPoint(const Vector2& position) const
+{
+	// Check if position is within element's bounds
+	return position.x >= m_actualPosition.x &&
+	       position.y >= m_actualPosition.y &&
+	       position.x < m_actualPosition.x + m_actualSize.x &&
+	       position.y < m_actualPosition.y + m_actualSize.y;
+}
+
+void UIElement::onMouseMove(MouseEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle mouse movement
+}
+
+void UIElement::onMouseDown(MouseEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle mouse button press
+}
+
+void UIElement::onMouseUp(MouseEvent& event)
+{
+	// Base implementation does nothing
+	// Derived classes can override to handle mouse button release
+}
+
+void UIElement::onMouseEnter(MouseEvent& event)
+{
+	m_isMouseOver = true;
+	// Derived classes can override to handle mouse enter
+}
+
+void UIElement::onMouseLeave(MouseEvent& event)
+{
+	m_isMouseOver = false;
+	// Derived classes can override to handle mouse leave
+}
+
 void UIElement::serialize(ISerializer& s)
 {
 	// Base serialization - derived classes can add their own members

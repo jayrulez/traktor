@@ -49,6 +49,8 @@ public:
 
 	virtual void renderDebug(UIContext* context) override;
 
+	virtual UIElement* hitTest(const Vector2& position) override;
+
 	virtual void serialize(ISerializer& s) override;
 
 protected:

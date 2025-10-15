@@ -50,6 +50,27 @@ void Panel::renderDebug(UIContext* context)
 	}
 }
 
+UIElement* Panel::hitTest(const Vector2& position)
+{
+	// First check if position is within this panel's bounds
+	if (!containsPoint(position))
+		return nullptr;
+
+	// Check children in reverse order (last child is on top)
+	for (int32_t i = (int32_t)m_children.size() - 1; i >= 0; --i)
+	{
+		if (m_children[i])
+		{
+			UIElement* childHit = m_children[i]->hitTest(position);
+			if (childHit)
+				return childHit;
+		}
+	}
+
+	// No child hit, return this panel
+	return this;
+}
+
 void Panel::serialize(ISerializer& s)
 {
 	UIElement::serialize(s);

@@ -10,6 +10,8 @@
 
 #include "Core/Serialization/ISerializable.h"
 #include "Core/Ref.h"
+#include "Core/RefArray.h"
+#include "Paper/Ui/UITypes.h"
 
 // import/export mechanism.
 #undef T_DLLCLASS
@@ -22,6 +24,7 @@
 namespace traktor::paper
 {
 
+class UIContext;
 class UIElement;
 class UITheme;
 
@@ -54,11 +57,41 @@ public:
 
 	UITheme* getTheme() const { return m_theme; }
 
+	/*! Update UI layout (measure and arrange).
+	 * Should be called before rendering if the UI or window size has changed.
+	 */
+	void updateLayout(UIContext* context);
+
+	/*! Render the UI page.
+	 * \param context UI context with renderer, font manager, etc.
+	 * \param debugVisualization If true, renders debug overlays showing element bounds.
+	 */
+	void render(UIContext* context, bool debugVisualization = false);
+
+	/*! Handle mouse movement.
+	 * \param position Mouse position in UI coordinates.
+	 */
+	void handleMouseMove(const Vector2& position);
+
+	/*! Handle mouse button down.
+	 * \param position Mouse position in UI coordinates.
+	 * \param button Which mouse button was pressed.
+	 */
+	void handleMouseDown(const Vector2& position, MouseButton button);
+
+	/*! Handle mouse button up.
+	 * \param position Mouse position in UI coordinates.
+	 * \param button Which mouse button was released.
+	 */
+	void handleMouseUp(const Vector2& position, MouseButton button);
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:
 	Ref< UIElement > m_root;
 	Ref< UITheme > m_theme;
+	UIElement* m_hoveredElement = nullptr;
+	RefArray< UIElement > m_hoveredAncestors;
 	int32_t m_width = 1920;
 	int32_t m_height = 1080;
 };
