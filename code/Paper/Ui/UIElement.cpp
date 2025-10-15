@@ -109,6 +109,18 @@ void UIElement::onMouseLeave(MouseEvent& event)
 	// Derived classes can override to handle mouse leave
 }
 
+void UIElement::onFocus()
+{
+	m_isFocused = true;
+	// Derived classes can override to handle focus gain
+}
+
+void UIElement::onBlur()
+{
+	m_isFocused = false;
+	// Derived classes can override to handle focus loss
+}
+
 void UIElement::serialize(ISerializer& s)
 {
 	s >> Member< std::wstring >(L"name", m_name);

@@ -110,6 +110,9 @@ void UIPage::handleMouseDown(const Vector2& position, MouseButton button)
 	// Perform hit test to find element under mouse
 	UIElement* hitElement = m_root->hitTest(position);
 
+	// Set focus to the hit element (or clear focus if clicking empty space)
+	setFocus(hitElement);
+
 	// Remember which element was pressed for click detection
 	m_pressedElement = hitElement;
 
@@ -214,6 +217,21 @@ UIElement* UIPage::findElementByNameRecursive(UIElement* element, const std::wst
 	}
 
 	return nullptr;
+}
+
+void UIPage::setFocus(UIElement* element)
+{
+	if (m_focusedElement == element)
+		return;
+
+	// Blur the previously focused element
+	if (m_focusedElement)
+		m_focusedElement->onBlur();
+
+	// Focus the new element
+	m_focusedElement = element;
+	if (m_focusedElement)
+		m_focusedElement->onFocus();
 }
 
 void UIPage::serialize(ISerializer& s)

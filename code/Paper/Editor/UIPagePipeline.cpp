@@ -24,6 +24,7 @@
 #include "Paper/Ui/Controls/Rectangle.h"
 #include "Paper/Ui/Controls/Border.h"
 #include "Paper/Ui/Controls/Button.h"
+#include "Paper/Ui/Controls/TextBox.h"
 
 namespace traktor::paper
 {
@@ -103,6 +104,16 @@ Ref< UITheme > createDarkTheme(const Guid& defaultFontId)
 	statusError->setDimension(L"Width", 8.0f);
 	statusError->setDimension(L"Height", 8.0f);
 	theme->setStyle(L"StatusError", statusError);
+
+	// TextBox Style - Dark background with subtle border
+	Ref< UIStyle > textBox = new UIStyle();
+	textBox->setColor(L"Foreground", Color4f(1.0f, 1.0f, 1.0f, 1.0f));
+	textBox->setColor(L"Background", Color4f(0.08f, 0.08f, 0.10f, 1.0f));
+	textBox->setColor(L"BorderBrush", Color4f(0.3f, 0.3f, 0.35f, 1.0f));
+	textBox->setDimension(L"BorderThickness", 1.0f);
+	textBox->setVector(L"Padding", Vector2(8.0f, 6.0f));
+	textBox->setFont(L"Font", defaultFontId);
+	theme->setStyle(L"TextBox", textBox);
 
 	return theme;
 }
@@ -305,6 +316,33 @@ bool UIPagePipeline::buildOutput(
 	feedbackText->applyStyle(theme->getStyle(L"AccentText"));
 	feedbackPanel->setChild(feedbackText);
 	rootPanel->addChild(feedbackPanel);
+
+	// --- Separator ---
+	Ref< Rectangle > separator4 = new Rectangle();
+	separator4->applyStyle(theme->getStyle(L"Separator"));
+	rootPanel->addChild(separator4);
+
+	// --- TextBox Demo Section ---
+	Ref< Border > textBoxPanel = new Border();
+	textBoxPanel->applyStyle(theme->getStyle(L"Panel"));
+	Ref< StackPanel > textBoxContent = new StackPanel();
+	textBoxContent->setOrientation(StackPanel::Orientation::Vertical);
+
+	Ref< TextBlock > textBoxLabel = new TextBlock();
+	textBoxLabel->setText(L"TextBox Control (click to focus):");
+	textBoxLabel->applyStyle(theme->getStyle(L"PrimaryText"));
+	textBoxContent->addChild(textBoxLabel);
+
+	Ref< TextBox > textBox1 = new TextBox();
+	textBox1->setName(L"DemoTextBox");
+	textBox1->setText(L"Hello, World!");
+	textBox1->setPlaceholder(L"Enter text here...");
+	textBox1->setFontId(defaultFontId);
+	textBox1->applyStyle(theme->getStyle(L"TextBox"));
+	textBoxContent->addChild(textBox1);
+
+	textBoxPanel->setChild(textBoxContent);
+	rootPanel->addChild(textBoxPanel);
 
 	// Set root
 	uiPage->setRoot(rootPanel);

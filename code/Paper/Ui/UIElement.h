@@ -126,9 +126,21 @@ public:
 	 */
 	virtual void onMouseLeave(MouseEvent& event);
 
+	/*! Element gained focus.
+	 */
+	virtual void onFocus();
+
+	/*! Element lost focus.
+	 */
+	virtual void onBlur();
+
 	/*! Check if mouse is currently over this element.
 	 */
 	bool isMouseOver() const { return m_isMouseOver; }
+
+	/*! Check if this element has focus.
+	 */
+	bool isFocused() const { return m_isFocused; }
 
 	/*! Get the parent element.
 	 */
@@ -163,6 +175,7 @@ protected:
 	Vector2 m_actualPosition = Vector2::zero();
 	UIElement* m_parent = nullptr;
 	bool m_isMouseOver = false;
+	bool m_isFocused = false;
 	std::wstring m_name;
 	ClickCallback m_clickCallback;
 };

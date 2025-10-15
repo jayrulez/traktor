@@ -91,6 +91,16 @@ public:
 	 */
 	UIElement* findElementByName(const std::wstring& name);
 
+	/*! Get the currently focused element.
+	 * \return Focused element or nullptr.
+	 */
+	UIElement* getFocusedElement() const { return m_focusedElement; }
+
+	/*! Set focus to a specific element.
+	 * \param element Element to focus, or nullptr to clear focus.
+	 */
+	void setFocus(UIElement* element);
+
 	virtual void serialize(ISerializer& s) override final;
 
 private:
@@ -101,6 +111,7 @@ private:
 	Ref< UITheme > m_theme;
 	UIElement* m_hoveredElement = nullptr;
 	UIElement* m_pressedElement = nullptr;
+	UIElement* m_focusedElement = nullptr;
 	RefArray< UIElement > m_hoveredAncestors;
 	int32_t m_width = 1920;
 	int32_t m_height = 1080;
