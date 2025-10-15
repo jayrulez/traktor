@@ -240,9 +240,15 @@ void UIPagePreviewControl::eventPaint(ui::PaintEvent* event)
 			// Create UI context (with theme from UIPage)
 			UIContext uiContext(m_renderer, m_fontManager, m_fontRenderer, m_uiPage->getTheme());
 
+			// Clip rendering to UIPage bounds
+			m_renderer->pushScissor(Vector2(0.0f, 0.0f), Vector2(pageWidth, pageHeight));
+
 			// Update layout and render via UIPage
 			m_uiPage->updateLayout(&uiContext);
 			m_uiPage->render(&uiContext, m_debugVisualization);
+
+			// Pop UIPage scissor
+			m_renderer->popScissor();
 
 			m_renderer->end(0);
 

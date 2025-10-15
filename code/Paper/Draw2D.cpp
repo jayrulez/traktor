@@ -214,7 +214,27 @@ void Draw2D::popWorld()
 
 void Draw2D::pushScissor(const Vector2& position, const Vector2& size)
 {
-	m_scissorStack.push_back(Vector4(position.x, position.y, size.x, size.y));
+	Vector4 newScissor(position.x, position.y, size.x, size.y);
+
+	// If there's already a scissor rect, intersect with it
+	if (!m_scissorStack.empty())
+	{
+		const Vector4& currentScissor = m_scissorStack.back();
+
+		// Calculate intersection of current and new scissor rects
+		float x1 = std::max(currentScissor.x(), newScissor.x());
+		float y1 = std::max(currentScissor.y(), newScissor.y());
+		float x2 = std::min(currentScissor.x() + currentScissor.z(), newScissor.x() + newScissor.z());
+		float y2 = std::min(currentScissor.y() + currentScissor.w(), newScissor.y() + newScissor.w());
+
+		// Clamp to ensure non-negative dimensions
+		float width = std::max(0.0f, x2 - x1);
+		float height = std::max(0.0f, y2 - y1);
+
+		newScissor = Vector4(x1, y1, width, height);
+	}
+
+	m_scissorStack.push_back(newScissor);
 }
 
 void Draw2D::popScissor()
