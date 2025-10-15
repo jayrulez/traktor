@@ -180,8 +180,9 @@ void UIPage::handleMouseUp(const Vector2& position, MouseButton button)
 	if (!m_root)
 		return;
 
-	// Perform hit test to find element under mouse
-	UIElement* hitElement = m_root->hitTest(position);
+	// If an element has captured the mouse, send the event to it
+	// Otherwise, perform hit test to find element under mouse
+	UIElement* hitElement = m_capturedElement ? m_capturedElement : m_root->hitTest(position);
 
 	if (hitElement)
 	{

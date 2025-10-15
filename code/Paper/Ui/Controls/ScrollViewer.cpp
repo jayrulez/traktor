@@ -275,8 +275,9 @@ void ScrollViewer::onMouseWheel(MouseWheelEvent& event)
 	// Handle horizontal scrolling when Shift is held
 	if (event.shift && m_scrollableSize.x > 0.0f && m_showHorizontalScrollBar)
 	{
-		// Scroll by a fixed amount per wheel notch
-		const float scrollAmount = 60.0f;  // pixels to scroll per wheel notch
+		// Horizontal scrolling uses a larger scroll amount for smoother feel
+		// since horizontal content is often wider than vertical content is tall
+		const float scrollAmount = 120.0f;  // pixels to scroll per wheel notch (2x vertical)
 		const float scrollDelta = -event.delta * scrollAmount;  // Negative because wheel up = scroll left (decrease offset)
 
 		// Convert pixel delta to normalized offset delta
