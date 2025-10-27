@@ -14,6 +14,7 @@
 #include "Core/Misc/StringSplit.h"
 #include "Core/Misc/TString.h"
 #include "Model/Formats/Gltf/GltfConversion.h"
+#include "Model/Formats/Gltf/GltfMaterialConverter.h"
 #include "Model/Formats/Gltf/GltfMeshConverter.h"
 #include "Model/Formats/Gltf/GltfSkeletonConverter.h"
 #include "Model/Model.h"
@@ -180,6 +181,15 @@ Ref< Model > ModelFormatGltf::read(const Path& filePath, const std::wstring& fil
 
 	const std::wstring basePath = filePath.getPathOnly();
 
+	// Convert all materials upfront
+	SmallMap< cgltf_size, int32_t > materialMap;
+	if (!convertMaterials(*model, materialMap, data, basePath))
+	{
+		log::error << L"Failed to convert materials." << Endl;
+		cgltf_free(data);
+		return nullptr;
+	}
+
 	// Convert skeleton if present
 	cgltf_skin* skin = nullptr;
 	if (data->skins_count > 0)
@@ -199,7 +209,7 @@ Ref< Model > ModelFormatGltf::read(const Path& filePath, const std::wstring& fil
 			success &= traverse(data->scene->nodes[i], filter, [&](cgltf_node* node, int32_t) {
 				if (node->mesh != nullptr)
 				{
-					if (!convertMesh(*model, data, node, axisTransform, basePath))
+					if (!convertMesh(*model, materialMap, data, node, axisTransform, basePath))
 						return false;
 				}
 				return true;

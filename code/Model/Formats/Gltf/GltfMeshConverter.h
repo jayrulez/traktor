@@ -9,6 +9,7 @@
 #pragma once
 
 #include "cgltf.h"
+#include "Core/Containers/SmallMap.h"
 #include <string>
 
 namespace traktor
@@ -25,6 +26,7 @@ class Model;
 
 bool convertMesh(
 	Model& outModel,
+	const SmallMap< cgltf_size, int32_t >& materialMap,
 	cgltf_data* data,
 	cgltf_node* meshNode,
 	const Matrix44& axisTransform,

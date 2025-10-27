@@ -151,138 +151,136 @@ uint32_t getTextureCoordChannel(const cgltf_texture_view* textureView, Model& mo
 
 }
 
-bool convertMaterials(Model& outModel, SmallMap< int32_t, int32_t >& outMaterialMap, cgltf_data* data, cgltf_primitive* primitive, const std::wstring& basePath)
+bool convertMaterials(Model& outModel, SmallMap< cgltf_size, int32_t >& outMaterialMap, cgltf_data* data, const std::wstring& basePath)
 {
-	if (!primitive->material)
+	// Convert all materials in the GLTF file
+	for (cgltf_size i = 0; i < data->materials_count; ++i)
 	{
-		// No material assigned, create a default one
-		outMaterialMap[0] = c_InvalidIndex;
-		return true;
-	}
+		cgltf_material* material = &data->materials[i];
+		const std::wstring name = material->name ? mbstows(material->name) : L"Material_" + toString(i);
 
-	cgltf_material* material = primitive->material;
-	const std::wstring name = material->name ? mbstows(material->name) : L"default";
-
-	// Check if material has already been added
-	const auto& materials = outModel.getMaterials();
-	auto it = std::find_if(materials.begin(), materials.end(), [&](const Material& m) {
-		return m.getName() == name;
-	});
-	if (it != materials.end())
-	{
-		outMaterialMap[0] = std::distance(materials.begin(), it);
-		return true;
-	}
-
-	Material mm;
-	mm.setName(name);
-
-	// Handle PBR metallic-roughness workflow (glTF standard)
-	if (material->has_pbr_metallic_roughness)
-	{
-		const auto& pbr = material->pbr_metallic_roughness;
-
-		// Base color
-		mm.setColor(Color4f(
-			pbr.base_color_factor[0],
-			pbr.base_color_factor[1],
-			pbr.base_color_factor[2],
-			pbr.base_color_factor[3]));
-
-		// Metalness and roughness
-		mm.setMetalness(pbr.metallic_factor);
-		mm.setRoughness(pbr.roughness_factor);
-
-		// Base color texture (diffuse)
-		if (pbr.base_color_texture.texture)
+		// Check if material has already been added
+		const auto& materials = outModel.getMaterials();
+		auto it = std::find_if(materials.begin(), materials.end(), [&](const Material& m) {
+			return m.getName() == name;
+		});
+		if (it != materials.end())
 		{
-			const uint32_t channel = getTextureCoordChannel(&pbr.base_color_texture, outModel);
-			Ref< drawing::Image > diffuseImage = getEmbeddedTexture(pbr.base_color_texture.texture, basePath);
-			mm.setDiffuseMap(Material::Map(
-				getTextureName(pbr.base_color_texture.texture),
-				channel,
-				true,
-				Guid(),
-				diffuseImage));
+			outMaterialMap[i] = std::distance(materials.begin(), it);
+			continue;
 		}
 
-		// Metallic-roughness texture
-		if (pbr.metallic_roughness_texture.texture)
-		{
-			const uint32_t channel = getTextureCoordChannel(&pbr.metallic_roughness_texture, outModel);
-			Ref< drawing::Image > metallicRoughnessImage = getEmbeddedTexture(pbr.metallic_roughness_texture.texture, basePath);
+		Material mm;
+		mm.setName(name);
 
-			// In glTF, metallic is in B channel and roughness is in G channel
-			mm.setMetalnessMap(Material::Map(
-				getTextureName(pbr.metallic_roughness_texture.texture),
-				channel,
-				false,
-				Guid(),
-				metallicRoughnessImage));
-			mm.setRoughnessMap(Material::Map(
-				getTextureName(pbr.metallic_roughness_texture.texture),
-				channel,
-				false,
-				Guid(),
-				metallicRoughnessImage));
-			mm.setMetalness(1.0f);
-			mm.setRoughness(1.0f);
-		}
-	}
-
-	// Normal map
-	if (material->normal_texture.texture)
-	{
-		const uint32_t channel = getTextureCoordChannel(&material->normal_texture, outModel);
-		Ref< drawing::Image > normalImage = getEmbeddedTexture(material->normal_texture.texture, basePath);
-		mm.setNormalMap(Material::Map(
-			getTextureName(material->normal_texture.texture),
-			channel,
-			false,
-			Guid(),
-			normalImage));
-	}
-
-	// Emissive
-	if (material->emissive_texture.texture)
-	{
-		const uint32_t channel = getTextureCoordChannel(&material->emissive_texture, outModel);
-		Ref< drawing::Image > emissiveImage = getEmbeddedTexture(material->emissive_texture.texture, basePath);
-		mm.setEmissiveMap(Material::Map(
-			getTextureName(material->emissive_texture.texture),
-			channel,
-			false,
-			Guid(),
-			emissiveImage));
-	}
-
-	// Emissive factor
-	float emissiveFactor = std::max({ material->emissive_factor[0],
-		material->emissive_factor[1],
-		material->emissive_factor[2] });
-	if (emissiveFactor > 0.0f)
-		mm.setEmissive(emissiveFactor);
-
-	// Occlusion map - currently Traktor doesn't have direct support, could map to a custom property
-	// if (material->occlusion_texture.texture) { ... }
-
-	// Alpha mode
-	if (material->alpha_mode == cgltf_alpha_mode_blend)
-	{
-		mm.setBlendOperator(Material::BoAlpha);
+		// Handle PBR metallic-roughness workflow (glTF standard)
 		if (material->has_pbr_metallic_roughness)
-			mm.setTransparency(material->pbr_metallic_roughness.base_color_factor[3]);
-	}
-	else if (material->alpha_mode == cgltf_alpha_mode_mask)
-	{
-		mm.setBlendOperator(Material::BoAlpha);
-		// Alpha cutoff handled by material->alpha_cutoff
+		{
+			const auto& pbr = material->pbr_metallic_roughness;
+
+			// Base color
+			mm.setColor(Color4f(
+				pbr.base_color_factor[0],
+				pbr.base_color_factor[1],
+				pbr.base_color_factor[2],
+				pbr.base_color_factor[3]));
+
+			// Metalness and roughness
+			mm.setMetalness(pbr.metallic_factor);
+			mm.setRoughness(pbr.roughness_factor);
+
+			// Base color texture (diffuse)
+			if (pbr.base_color_texture.texture)
+			{
+				const uint32_t channel = getTextureCoordChannel(&pbr.base_color_texture, outModel);
+				Ref< drawing::Image > diffuseImage = getEmbeddedTexture(pbr.base_color_texture.texture, basePath);
+				mm.setDiffuseMap(Material::Map(
+					getTextureName(pbr.base_color_texture.texture),
+					channel,
+					true,
+					Guid(),
+					diffuseImage));
+			}
+
+			// Metallic-roughness texture
+			if (pbr.metallic_roughness_texture.texture)
+			{
+				const uint32_t channel = getTextureCoordChannel(&pbr.metallic_roughness_texture, outModel);
+				Ref< drawing::Image > metallicRoughnessImage = getEmbeddedTexture(pbr.metallic_roughness_texture.texture, basePath);
+
+				// In glTF, metallic is in B channel and roughness is in G channel
+				mm.setMetalnessMap(Material::Map(
+					getTextureName(pbr.metallic_roughness_texture.texture),
+					channel,
+					false,
+					Guid(),
+					metallicRoughnessImage));
+				mm.setRoughnessMap(Material::Map(
+					getTextureName(pbr.metallic_roughness_texture.texture),
+					channel,
+					false,
+					Guid(),
+					metallicRoughnessImage));
+				mm.setMetalness(1.0f);
+				mm.setRoughness(1.0f);
+			}
+		}
+
+		// Normal map
+		if (material->normal_texture.texture)
+		{
+			const uint32_t channel = getTextureCoordChannel(&material->normal_texture, outModel);
+			Ref< drawing::Image > normalImage = getEmbeddedTexture(material->normal_texture.texture, basePath);
+			mm.setNormalMap(Material::Map(
+				getTextureName(material->normal_texture.texture),
+				channel,
+				false,
+				Guid(),
+				normalImage));
+		}
+
+		// Emissive
+		if (material->emissive_texture.texture)
+		{
+			const uint32_t channel = getTextureCoordChannel(&material->emissive_texture, outModel);
+			Ref< drawing::Image > emissiveImage = getEmbeddedTexture(material->emissive_texture.texture, basePath);
+			mm.setEmissiveMap(Material::Map(
+				getTextureName(material->emissive_texture.texture),
+				channel,
+				false,
+				Guid(),
+				emissiveImage));
+		}
+
+		// Emissive factor
+		float emissiveFactor = std::max({ material->emissive_factor[0],
+			material->emissive_factor[1],
+			material->emissive_factor[2] });
+		if (emissiveFactor > 0.0f)
+			mm.setEmissive(emissiveFactor);
+
+		// Occlusion map - currently Traktor doesn't have direct support, could map to a custom property
+		// if (material->occlusion_texture.texture) { ... }
+
+		// Alpha mode
+		if (material->alpha_mode == cgltf_alpha_mode_blend)
+		{
+			mm.setBlendOperator(Material::BoAlpha);
+			if (material->has_pbr_metallic_roughness)
+				mm.setTransparency(material->pbr_metallic_roughness.base_color_factor[3]);
+		}
+		else if (material->alpha_mode == cgltf_alpha_mode_mask)
+		{
+			mm.setBlendOperator(Material::BoAlpha);
+			// Alpha cutoff handled by material->alpha_cutoff
+		}
+
+		// Double-sided rendering
+		mm.setDoubleSided(material->double_sided);
+
+		outMaterialMap[i] = outModel.addUniqueMaterial(mm);
 	}
 
-	// Double-sided rendering
-	mm.setDoubleSided(material->double_sided);
-
-	outMaterialMap[0] = outModel.addUniqueMaterial(mm);
 	return true;
 }
 

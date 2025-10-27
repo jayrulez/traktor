@@ -39,6 +39,7 @@ void getNodeTransform(cgltf_node* node, cgltf_float* outMatrix)
 
 bool convertMesh(
 	Model& outModel,
+	const SmallMap< cgltf_size, int32_t >& materialMap,
 	cgltf_data* data,
 	cgltf_node* meshNode,
 	const Matrix44& axisTransform,
@@ -134,11 +135,6 @@ bool convertMesh(
 			const uint32_t channel = outModel.addUniqueTexCoordChannel(texcoordNames[k]);
 			texCoordChannels.push_back(channel);
 		}
-
-		// Convert materials
-		SmallMap< int32_t, int32_t > materialMap;
-		if (!convertMaterials(outModel, materialMap, data, primitive, basePath))
-			return false;
 
 		// Convert vertices based on indices or direct vertex order
 		const uint32_t baseOutputVertexOffset = outModel.getVertexCount();
@@ -273,8 +269,17 @@ bool convertMesh(
 		}
 
 		// Create polygons (triangles)
-		const uint32_t materialIndex = materialMap.find(0) != materialMap.end() ? materialMap[0] : c_InvalidIndex;
 		const uint32_t vertexCount = primitive->indices ? uint32_t(primitive->indices->count) : uint32_t(positionAccessor->count);
+
+		// Look up material index using cgltf_material_index
+		int32_t materialIndex = c_InvalidIndex;
+		if (primitive->material)
+		{
+			cgltf_size gltfMaterialIndex = cgltf_material_index(data, primitive->material);
+			auto it = materialMap.find(gltfMaterialIndex);
+			if (it != materialMap.end())
+				materialIndex = it->second;
+		}
 
 		for (uint32_t i = 0; i < vertexCount; i += 3)
 		{

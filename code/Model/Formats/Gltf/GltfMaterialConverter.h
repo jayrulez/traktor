@@ -16,6 +16,6 @@ namespace traktor::model
 
 class Model;
 
-bool convertMaterials(Model& outModel, SmallMap< int32_t, int32_t >& outMaterialMap, cgltf_data* data, cgltf_primitive* primitive, const std::wstring& basePath);
+bool convertMaterials(Model& outModel, SmallMap< cgltf_size, int32_t >& outMaterialMap, cgltf_data* data, const std::wstring& basePath);
 
 }
