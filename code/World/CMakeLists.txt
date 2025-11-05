@@ -1,0 +1,173 @@
+# Traktor.World
+
+set(TRAKTOR_WORLD_SOURCES
+    AbstractEntityFactory.cpp
+    Deferred/WorldRendererDeferred.cpp
+    Entity.cpp
+    Entity/CameraComponent.cpp
+    Entity/CameraComponentData.cpp
+    Entity/CullingComponent.cpp
+    Entity/CullingRenderer.cpp
+    Entity/DecalComponent.cpp
+    Entity/DecalComponentData.cpp
+    Entity/DecalEvent.cpp
+    Entity/DecalEventData.cpp
+    Entity/DecalEventInstance.cpp
+    Entity/DecalRenderer.cpp
+    Entity/EventManagerComponent.cpp
+    Entity/EventSetComponent.cpp
+    Entity/EventSetComponentData.cpp
+    Entity/ExternalEntityData.cpp
+    Entity/FacadeComponent.cpp
+    Entity/FacadeComponentData.cpp
+    Entity/FogComponent.cpp
+    Entity/FogComponentData.cpp
+    Entity/FogRenderer.cpp
+    Entity/GroupComponent.cpp
+    Entity/GroupComponentData.cpp
+    Entity/IrradianceGridComponent.cpp
+    Entity/IrradianceGridComponentData.cpp
+    Entity/LightComponent.cpp
+    Entity/LightComponentData.cpp
+    Entity/PathComponent.cpp
+    Entity/PathComponentData.cpp
+    Entity/PersistentIdComponent.cpp
+    Entity/PersistentIdComponentData.cpp
+    Entity/ProbeComponent.cpp
+    Entity/ProbeComponentData.cpp
+    Entity/ProbeRenderer.cpp
+    Entity/RTWorldComponent.cpp
+    Entity/RTWorldRenderer.cpp
+    Entity/ScriptComponent.cpp
+    Entity/ScriptComponentData.cpp
+    Entity/VolumeComponent.cpp
+    Entity/VolumeComponentData.cpp
+    Entity/WorldEntityFactory.cpp
+    EntityBuilder.cpp
+    EntityData.cpp
+    EntityFactory.cpp
+    Forward/WorldRendererForward.cpp
+    IEntityBuilder.cpp
+    IEntityComponent.cpp
+    IEntityComponentData.cpp
+    IEntityEvent.cpp
+    IEntityEventData.cpp
+    IEntityEventInstance.cpp
+    IEntityFactory.cpp
+    IEntityRenderer.cpp
+    IShadowProjection.cpp
+    IWorldComponent.cpp
+    IWorldComponentData.cpp
+    IWorldRenderPass.cpp
+    IWorldRenderer.cpp
+    IrradianceGrid.cpp
+    IrradianceGridResource.cpp
+    Module.cpp
+    Packer.cpp
+    SMProj/TrapezoidShadowProjection.cpp
+    SMProj/UniformShadowProjection.cpp
+    Shared/Passes/AmbientOcclusionPass.cpp
+    Shared/Passes/ContactShadowsPass.cpp
+    Shared/Passes/DBufferPass.cpp
+    Shared/Passes/DownScalePass.cpp
+    Shared/Passes/GBufferPass.cpp
+    Shared/Passes/HiZPass.cpp
+    Shared/Passes/IrradiancePass.cpp
+    Shared/Passes/LightClusterPass.cpp
+    Shared/Passes/PostProcessPass.cpp
+    Shared/Passes/RTReflectionsPass.cpp
+    Shared/Passes/ReflectionsPass.cpp
+    Shared/Passes/SSReflectionsPass.cpp
+    Shared/Passes/VelocityPass.cpp
+    Shared/WorldRenderPassShared.cpp
+    Shared/WorldRendererShared.cpp
+    Simple/WorldRenderPassSimple.cpp
+    Simple/WorldRendererSimple.cpp
+    World.cpp
+    WorldBuildContext.cpp
+    WorldClassFactory.cpp
+    WorldEntityRenderers.cpp
+    WorldHandles.cpp
+    WorldRenderSettings.cpp
+    WorldRenderView.cpp
+    WorldResourceFactory.cpp
+    WorldSetupContext.cpp
+    WorldTypes.cpp
+)
+
+add_traktor_module(Traktor.World
+    SOURCES ${TRAKTOR_WORLD_SOURCES}
+    EXPORT_DEFINE T_WORLD_EXPORT
+    DEPENDENCIES
+        Traktor.Core
+        Traktor.Render
+        Traktor.Resource
+        Traktor.Database
+        Extern.stb
+)
+
+target_include_directories(Traktor.World PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
+# Traktor.World.Editor - Editor support
+
+set(TRAKTOR_WORLD_EDITOR_SOURCES
+    Editor/BrdfTextureAsset.cpp
+    Editor/BrdfTexturePipeline.cpp
+    Editor/EntityBrowsePreview.cpp
+    Editor/EntityPipeline.cpp
+    Editor/IDebugOverlay.cpp
+    Editor/IEntityReplicator.cpp
+    Editor/ILayerAttribute.cpp
+    Editor/IrradianceGridAsset.cpp
+    Editor/IrradianceGridPipeline.cpp
+    Editor/Material/MaterialShaderGenerator.cpp
+    Editor/Overlays/AmbientOcclusionOverlay.cpp
+    Editor/Overlays/BaseOverlay.cpp
+    Editor/Overlays/ContactShadowsOverlay.cpp
+    Editor/Overlays/DBufferAlbedoOverlay.cpp
+    Editor/Overlays/DBufferNormalsOverlay.cpp
+    Editor/Overlays/DBufferRoughnessOverlay.cpp
+    Editor/Overlays/GBufferAlbedoOverlay.cpp
+    Editor/Overlays/GBufferDepthOverlay.cpp
+    Editor/Overlays/GBufferMetalnessOverlay.cpp
+    Editor/Overlays/GBufferNormalsOverlay.cpp
+    Editor/Overlays/GBufferRoughnessOverlay.cpp
+    Editor/Overlays/GBufferSkyOcclusionOverlay.cpp
+    Editor/Overlays/GBufferSpecularOverlay.cpp
+    Editor/Overlays/HiZOverlay.cpp
+    Editor/Overlays/HistoryOverlay.cpp
+    Editor/Overlays/IrradianceFilteredOverlay.cpp
+    Editor/Overlays/IrradianceOverlay.cpp
+    Editor/Overlays/RTWorldOverlay.cpp
+    Editor/Overlays/ReflectionsOverlay.cpp
+    Editor/Overlays/ShadowMapOverlay.cpp
+    Editor/Overlays/ShadowMaskOverlay.cpp
+    Editor/Overlays/SliceOverlay.cpp
+    Editor/Overlays/TilesOverlay.cpp
+    Editor/Overlays/UnprocessedOverlay.cpp
+    Editor/Overlays/VelocityOverlay.cpp
+    Editor/ResolveExternal.cpp
+    Editor/WorldEntityPipeline.cpp
+)
+
+add_traktor_module(Traktor.World.Editor
+    SOURCES ${TRAKTOR_WORLD_EDITOR_SOURCES}
+    EXPORT_DEFINE T_WORLD_EDITOR_EXPORT
+    DEPENDENCIES
+        Traktor.Core
+        Traktor.World
+        Traktor.Editor
+        Traktor.I18N
+        Traktor.Ui
+        Traktor.Drawing
+        Traktor.Render
+        Traktor.Render.Editor
+        Traktor.Resource
+        Traktor.Model
+)
+
+target_include_directories(Traktor.World.Editor PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)

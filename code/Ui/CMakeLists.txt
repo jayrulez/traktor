@@ -1,0 +1,328 @@
+# Traktor.Ui
+
+set(TRAKTOR_UI_SOURCES
+    Application.cpp
+    AspectLayout.cpp
+    Associative.cpp
+    Auto/AutoWidget.cpp
+    Auto/AutoWidgetCell.cpp
+    Auto/ChildWidgetCell.cpp
+    BackgroundWorkerDialog.cpp
+    BackgroundWorkerStatus.cpp
+    Bitmap.cpp
+    BuildChart/BuildChartControl.cpp
+    Button.cpp
+    Canvas.cpp
+    CaptionBar.cpp
+    CenterLayout.cpp
+    CharacterSetEditValidator.cpp
+    CheckBox.cpp
+    Clipboard.cpp
+    ColorPicker/ColorControl.cpp
+    ColorPicker/ColorDialog.cpp
+    ColorPicker/ColorEvent.cpp
+    ColorPicker/ColorGradientControl.cpp
+    ColorPicker/ColorSliderControl.cpp
+    ColorPicker/ColorUtilities.cpp
+    ColorReference.cpp
+    ComboBox.cpp
+    Command.cpp
+    ConfigDialog.cpp
+    Container.cpp
+    Dialog.cpp
+    Dock.cpp
+    DockPane.cpp
+    DropDown.cpp
+    Edit.cpp
+    EditList.cpp
+    EditListEditEvent.cpp
+    EditValidator.cpp
+    Envelope/EnvelopeContentChangeEvent.cpp
+    Envelope/EnvelopeControl.cpp
+    Envelope/EnvelopeEvaluator.cpp
+    Envelope/EnvelopeKey.cpp
+    Event.cpp
+    EventSubject.cpp
+    Events/ActivateEvent.cpp
+    Events/ButtonClickEvent.cpp
+    Events/ChildEvent.cpp
+    Events/CloseEvent.cpp
+    Events/CommandEvent.cpp
+    Events/ContentChangeEvent.cpp
+    Events/ContentChangingEvent.cpp
+    Events/DragEvent.cpp
+    Events/FileDropEvent.cpp
+    Events/FocusEvent.cpp
+    Events/IdleEvent.cpp
+    Events/KeyDownEvent.cpp
+    Events/KeyEvent.cpp
+    Events/KeyUpEvent.cpp
+    Events/LogActivateEvent.cpp
+    Events/MenuClickEvent.cpp
+    Events/MouseButtonDownEvent.cpp
+    Events/MouseButtonUpEvent.cpp
+    Events/MouseDoubleClickEvent.cpp
+    Events/MouseMoveEvent.cpp
+    Events/MouseTrackEvent.cpp
+    Events/MouseWheelEvent.cpp
+    Events/MoveEvent.cpp
+    Events/NcMouseButtonDownEvent.cpp
+    Events/NcMouseButtonUpEvent.cpp
+    Events/NcMouseMoveEvent.cpp
+    Events/OverlayPaintEvent.cpp
+    Events/PaintEvent.cpp
+    Events/ScrollEvent.cpp
+    Events/SelectionChangeEvent.cpp
+    Events/ShortcutEvent.cpp
+    Events/ShowEvent.cpp
+    Events/SizeEvent.cpp
+    Events/TabCloseEvent.cpp
+    Events/TabSelectionChangeEvent.cpp
+    Events/TimerEvent.cpp
+    FileDialog.cpp
+    FloodLayout.cpp
+    FlowLayout.cpp
+    Font.cpp
+    FontMetric.cpp
+    Form.cpp
+    Graph/CommentNodeShape.cpp
+    Graph/DefaultNodeShape.cpp
+    Graph/Edge.cpp
+    Graph/EdgeConnectEvent.cpp
+    Graph/EdgeDisconnectEvent.cpp
+    Graph/GraphCanvas.cpp
+    Graph/GraphControl.cpp
+    Graph/Group.cpp
+    Graph/GroupMovedEvent.cpp
+    Graph/INodeShape.cpp
+    Graph/InOutNodeShape.cpp
+    Graph/InputNodeShape.cpp
+    Graph/IpolNodeShape.cpp
+    Graph/Node.cpp
+    Graph/NodeActivateEvent.cpp
+    Graph/NodeMovedEvent.cpp
+    Graph/OutputNodeShape.cpp
+    Graph/PaintSettings.cpp
+    Graph/Pin.cpp
+    Graph/SelectEvent.cpp
+    GridLayout.cpp
+    GridView/GridColumn.cpp
+    GridView/GridColumnClickEvent.cpp
+    GridView/GridHeader.cpp
+    GridView/GridItem.cpp
+    GridView/GridItemContentChangeEvent.cpp
+    GridView/GridRow.cpp
+    GridView/GridRowDoubleClickEvent.cpp
+    GridView/GridRowMouseButtonDownEvent.cpp
+    GridView/GridRowStateChangeEvent.cpp
+    GridView/GridView.cpp
+    HierarchicalState.cpp
+    IBitmap.cpp
+    Image.cpp
+    InputDialog.cpp
+    Layout.cpp
+    ListBox/ListBox.cpp
+    ListBox/ListBoxItem.cpp
+    LogList/LogList.cpp
+    Menu.cpp
+    MenuItem.cpp
+    MenuShell.cpp
+    MessageBox.cpp
+    MiniButton.cpp
+    Module.cpp
+    MultiSplitter.cpp
+    NotificationIcon.cpp
+    NumericEditValidator.cpp
+    Panel.cpp
+    PathDialog.cpp
+    PreviewList/PreviewContentChangeEvent.cpp
+    PreviewList/PreviewItem.cpp
+    PreviewList/PreviewItemMouseButtonDownEvent.cpp
+    PreviewList/PreviewItems.cpp
+    PreviewList/PreviewList.cpp
+    PreviewList/PreviewSelectionChangeEvent.cpp
+    ProgressBar.cpp
+    PropertyList/AnglesPropertyItem.cpp
+    PropertyList/ApplyReflector.cpp
+    PropertyList/ArrayPropertyItem.cpp
+    PropertyList/AutoPropertyList.cpp
+    PropertyList/BrowsePropertyItem.cpp
+    PropertyList/CheckPropertyItem.cpp
+    PropertyList/ColorPropertyItem.cpp
+    PropertyList/FilePropertyItem.cpp
+    PropertyList/InspectReflector.cpp
+    PropertyList/ListPropertyItem.cpp
+    PropertyList/NullPropertyItem.cpp
+    PropertyList/NumericPropertyItem.cpp
+    PropertyList/ObjectPropertyItem.cpp
+    PropertyList/PropertyCommandEvent.cpp
+    PropertyList/PropertyContentChangeEvent.cpp
+    PropertyList/PropertyItem.cpp
+    PropertyList/PropertyList.cpp
+    PropertyList/PropertySelectionChangeEvent.cpp
+    PropertyList/StaticPropertyItem.cpp
+    PropertyList/TextPropertyItem.cpp
+    PropertyList/VectorPropertyItem.cpp
+    QuadSplitter.cpp
+    RadioButton.cpp
+    RichEdit/CaretEvent.cpp
+    RichEdit/RichEdit.cpp
+    RichEdit/SearchControl.cpp
+    RichEdit/SearchEvent.cpp
+    ScrollBar.cpp
+    Sequencer/CursorMoveEvent.cpp
+    Sequencer/GroupVisibleEvent.cpp
+    Sequencer/Key.cpp
+    Sequencer/KeyMoveEvent.cpp
+    Sequencer/Marker.cpp
+    Sequencer/Range.cpp
+    Sequencer/Sequence.cpp
+    Sequencer/SequenceButtonClickEvent.cpp
+    Sequencer/SequenceGroup.cpp
+    Sequencer/SequenceItem.cpp
+    Sequencer/SequenceMovedEvent.cpp
+    Sequencer/SequencerControl.cpp
+    Sequencer/Tick.cpp
+    Sequencer/Track.cpp
+    ShortcutEdit.cpp
+    ShortcutTable.cpp
+    Slider.cpp
+    Splitter.cpp
+    Static.cpp
+    StatusBar/StatusBar.cpp
+    StyleBitmap.cpp
+    StyleSheet.cpp
+    SyntaxRichEdit/SyntaxLanguage.cpp
+    SyntaxRichEdit/SyntaxLanguageGlsl.cpp
+    SyntaxRichEdit/SyntaxLanguageHlsl.cpp
+    SyntaxRichEdit/SyntaxLanguageJs.cpp
+    SyntaxRichEdit/SyntaxLanguageLua.cpp
+    SyntaxRichEdit/SyntaxRichEdit.cpp
+    Tab.cpp
+    TabPage.cpp
+    TableLayout.cpp
+    ToolBar/ToolBar.cpp
+    ToolBar/ToolBarButton.cpp
+    ToolBar/ToolBarButtonClickEvent.cpp
+    ToolBar/ToolBarDropDown.cpp
+    ToolBar/ToolBarDropMenu.cpp
+    ToolBar/ToolBarEmbed.cpp
+    ToolBar/ToolBarItem.cpp
+    ToolBar/ToolBarItemGroup.cpp
+    ToolBar/ToolBarMenu.cpp
+    ToolBar/ToolBarSeparator.cpp
+    ToolForm.cpp
+    ToolTip.cpp
+    ToolTipEvent.cpp
+    TreeView/TreeView.cpp
+    TreeView/TreeViewContentChangeEvent.cpp
+    TreeView/TreeViewDragEvent.cpp
+    TreeView/TreeViewEditEvent.cpp
+    TreeView/TreeViewItem.cpp
+    TreeView/TreeViewItemActivateEvent.cpp
+    TreeView/TreeViewItemMouseButtonDownEvent.cpp
+    TreeView/TreeViewItemStateChangeEvent.cpp
+    Widget.cpp
+)
+
+add_traktor_module(Traktor.Ui
+    SOURCES ${TRAKTOR_UI_SOURCES}
+    EXPORT_DEFINE T_UI_EXPORT
+    DEPENDENCIES
+        Traktor.Core
+        Traktor.Drawing
+        Traktor.Svg
+        Traktor.Xml
+)
+
+target_include_directories(Traktor.Ui PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
+# Generate resource headers from source files (.png, .image, etc.)
+add_resource_headers(Traktor.Ui "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Traktor.Ui.Theme.App - Application
+
+set(TRAKTOR_UI_THEME_APP_SOURCES
+    Theme/App/Main.cpp
+    Theme/App/PreviewWidgetFactory.cpp
+    Theme/App/ThemeForm.cpp
+)
+
+add_traktor_module(Traktor.Ui.Theme.App
+    SOURCES ${TRAKTOR_UI_THEME_APP_SOURCES}
+    EXPORT_DEFINE T_UI_THEME_APP_EXPORT
+    IS_EXECUTABLE
+    IS_GUI
+    DEPENDENCIES
+        Traktor.Core
+        Traktor.Ui
+        Traktor.Ui.Win32
+        Traktor.Xml
+        Traktor.Drawing
+        Extern.agg
+        Extern.expat
+        Extern.jpeg
+        Extern.lpng
+        Extern.mimalloc
+        Extern.tinyexr
+        Extern.zlib
+    SYSTEM_LIBS
+        Dbghelp.lib
+        Winmm.lib
+        d2d1.lib
+        dwrite.lib
+        dxguid.lib
+        gdiplus.lib
+        shlwapi.lib
+)
+
+target_include_directories(Traktor.Ui.Theme.App PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
+# Traktor.Ui.Win32
+
+set(TRAKTOR_UI_WIN32_SOURCES
+    Win32/BitmapWin32.cpp
+    Win32/CanvasDirect2DWin32.cpp
+    Win32/CanvasGdiPlusWin32.cpp
+    Win32/CanvasGdiWin32.cpp
+    Win32/ClipboardWin32.cpp
+    Win32/DialogWin32.cpp
+    Win32/DllMain.cpp
+    Win32/EventLoopWin32.cpp
+    Win32/FormWin32.cpp
+    Win32/Module.cpp
+    Win32/NotificationIconWin32.cpp
+    Win32/PathDialogWin32.cpp
+    Win32/ToolFormWin32.cpp
+    Win32/UserWidgetWin32.cpp
+    Win32/UtilitiesWin32.cpp
+    Win32/WidgetFactoryWin32.cpp
+    Win32/Window.cpp
+)
+
+add_traktor_module(Traktor.Ui.Win32
+    SOURCES ${TRAKTOR_UI_WIN32_SOURCES}
+    EXPORT_DEFINE T_UI_WIN32_EXPORT
+    DEPENDENCIES
+        Traktor.Core
+        Traktor.Drawing
+        Traktor.Ui
+    SYSTEM_LIBS
+        d2d1.lib
+        dwrite.lib
+        dxguid.lib
+        gdiplus.lib
+)
+
+# Add Direct2D define (required for Direct2D rendering support)
+target_compile_definitions(Traktor.Ui.Win32 PUBLIC
+    T_USE_DIRECT2D
+)
+
+target_include_directories(Traktor.Ui.Win32 PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
