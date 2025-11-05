@@ -74,13 +74,12 @@ function(add_traktor_module MODULE_NAME)
                 COMMENT "Copying ${MODULE_NAME} DLL to bin/latest/win64"
                 VERBATIM
             )
-            # Copy import library
+            # Copy import library (suppress errors if file doesn't exist)
             add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "$<TARGET_LINKER_FILE:${MODULE_NAME}>"
-                    "${DEST_DIR}/"
+                    "${DEST_DIR}/" || (exit 0)
                 COMMENT "Copying ${MODULE_NAME} import lib to bin/latest/win64"
-                VERBATIM
             )
         else()
             # Copy static library
@@ -94,13 +93,12 @@ function(add_traktor_module MODULE_NAME)
             )
         endif()
 
-        # Copy PDB files (debug symbols) - only for Debug/RelWithDebInfo
+        # Copy PDB files (debug symbols) - suppress errors if file doesn't exist
         add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 "$<TARGET_PDB_FILE:${MODULE_NAME}>"
-                "${DEST_DIR}/"
+                "${DEST_DIR}/" || (exit 0)
             COMMENT "Copying ${MODULE_NAME} PDB to bin/latest/win64"
-            VERBATIM
         )
     endif()
 

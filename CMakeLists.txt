@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Set output directories
+# Set output directories - match old build system structure
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -26,6 +26,11 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_BINARY_DIR}/lib/${OUTPUTCONFIG})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_BINARY_DIR}/lib/${OUTPUTCONFIG})
 endforeach()
+
+# Set intermediate directory to match old system (simple $(Configuration)\ structure)
+# This will be overridden per-target in add_traktor_module to match old system exactly
+set(CMAKE_PDB_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Options
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -40,14 +45,15 @@ if(WIN32)
         UNICODE
         _UNICODE
     )
+    # Use Multi-Byte Character Set (not Unicode) for faster compile times
+    # This matches the original project settings
 endif()
 
 # Configuration-specific definitions
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(_DEBUG)
-else()
-    add_compile_definitions(NDEBUG)
-endif()
+add_compile_definitions(
+    $<$<CONFIG:Debug>:_DEBUG>
+    $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+)
 
 # Compiler-specific settings
 if(MSVC)
@@ -60,24 +66,26 @@ if(MSVC)
     # Disable specific warnings
     add_compile_options(/wd4251)  # DLL interface warnings
 
-    # Release optimizations
-    if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        add_compile_options(
-            /O2           # Maximum optimization
-            /Oi           # Enable intrinsic functions
-            /Ot           # Favor fast code
-            /Oy           # Omit frame pointers
-            /GS-          # Disable buffer security check
-            /fp:fast      # Fast floating point
-            /GL           # Whole program optimization
-        )
-        add_link_options(/LTCG)  # Link time code generation
-    endif()
+    # Debug settings - EditAndContinue for faster builds and hot reload
+    add_compile_options(
+        $<$<CONFIG:Debug>:/Od>          # Disable optimization
+        $<$<CONFIG:Debug>:/RTC1>        # Runtime checks
+        $<$<CONFIG:Debug>:/ZI>          # EditAndContinue debug format
+    )
 
-    # Debug settings
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(/Od /RTC1)
-    endif()
+    # Release optimizations
+    add_compile_options(
+        $<$<CONFIG:Release>:/O2>        # Maximum optimization
+        $<$<CONFIG:Release>:/Oi>        # Enable intrinsic functions
+        $<$<CONFIG:Release>:/Ot>        # Favor fast code
+        $<$<CONFIG:Release>:/Oy>        # Omit frame pointers
+        $<$<CONFIG:Release>:/GS->       # Disable buffer security check
+        $<$<CONFIG:Release>:/fp:fast>   # Fast floating point
+        $<$<CONFIG:Release>:/GL>        # Whole program optimization
+    )
+    add_link_options(
+        $<$<CONFIG:Release>:/LTCG>      # Link time code generation
+    )
 
     # Runtime library
     if(BUILD_SHARED_LIBS)
