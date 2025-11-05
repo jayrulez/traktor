@@ -1,58 +1,111 @@
 # Traktor.Input
 
 set(TRAKTOR_INPUT_SOURCES
-    Binding/CombinedInputSource.cpp
-    Binding/CombinedInputSourceData.cpp
-    Binding/ConstantInputSource.cpp
-    Binding/ConstantInputSourceData.cpp
-    Binding/ControlInputSource.cpp
-    Binding/ControlInputSourceData.cpp
-    Binding/DeviceControl.cpp
-    Binding/DeviceControlManager.cpp
-    Binding/EnumKeys.cpp
-    Binding/GenericInputSource.cpp
-    Binding/GenericInputSourceData.cpp
-    Binding/IInputNode.cpp
-    Binding/IInputSource.cpp
-    Binding/IInputSourceData.cpp
-    Binding/InBoolean.cpp
-    Binding/InClamp.cpp
-    Binding/InCombine.cpp
-    Binding/InConst.cpp
-    Binding/InDelay.cpp
-    Binding/InEnvelope.cpp
-    Binding/InGesturePinch.cpp
-    Binding/InGestureSwipe.cpp
-    Binding/InGestureTap.cpp
-    Binding/InHysteresis.cpp
-    Binding/InLowPass.cpp
-    Binding/InPulse.cpp
-    Binding/InReadValue.cpp
-    Binding/InRemapAxis.cpp
-    Binding/InThreshold.cpp
-    Binding/InTrigger.cpp
-    Binding/InputMapping.cpp
-    Binding/InputMappingResource.cpp
-    Binding/InputMappingSourceData.cpp
-    Binding/InputMappingStateData.cpp
-    Binding/InputSourceFabricator.cpp
-    Binding/InputState.cpp
-    Binding/InputStateData.cpp
-    Binding/InputValueSet.cpp
-    Binding/KeyboardInputSource.cpp
-    Binding/KeyboardInputSourceData.cpp
-    IInputDevice.cpp
-    IInputDriver.cpp
-    InputClassFactory.cpp
-    InputSystem.cpp
-    InputTypes.cpp
-    Module.cpp
-    RecordInputDevice.cpp
-    RecordInputScript.cpp
-    ReplayInputDevice.cpp
-    RumbleEffect.cpp
-    RumbleEffectFactory.cpp
-    RumbleEffectPlayer.cpp
+	Binding/CombinedInputSource.h
+	Binding/CombinedInputSourceData.h
+	Binding/ConstantInputSource.h
+	Binding/ConstantInputSourceData.h
+	Binding/ControlInputSource.h
+	Binding/ControlInputSourceData.h
+	Binding/DeviceControl.h
+	Binding/DeviceControlManager.h
+	Binding/EnumKeys.h
+	Binding/GenericInputSource.h
+	Binding/GenericInputSourceData.h
+	Binding/IInputNode.h
+	Binding/IInputSource.h
+	Binding/IInputSourceData.h
+	Binding/InBoolean.h
+	Binding/InClamp.h
+	Binding/InCombine.h
+	Binding/InConst.h
+	Binding/InDelay.h
+	Binding/InEnvelope.h
+	Binding/InGesturePinch.h
+	Binding/InGestureSwipe.h
+	Binding/InGestureTap.h
+	Binding/InHysteresis.h
+	Binding/InLowPass.h
+	Binding/InPulse.h
+	Binding/InReadValue.h
+	Binding/InRemapAxis.h
+	Binding/InThreshold.h
+	Binding/InTrigger.h
+	Binding/InputMapping.h
+	Binding/InputMappingResource.h
+	Binding/InputMappingSourceData.h
+	Binding/InputMappingStateData.h
+	Binding/InputSourceFabricator.h
+	Binding/InputState.h
+	Binding/InputStateData.h
+	Binding/InputValueSet.h
+	Binding/KeyboardInputSource.h
+	Binding/KeyboardInputSourceData.h
+	Binding/ValueDigital.h
+	IInputDevice.h
+	IInputDriver.h
+	InputClassFactory.h
+	InputSystem.h
+	InputTypes.h
+	Module.h
+	RecordInputDevice.h
+	RecordInputScript.h
+	ReplayInputDevice.h
+	RumbleEffect.h
+	RumbleEffectFactory.h
+	RumbleEffectPlayer.h
+	Binding/CombinedInputSource.cpp
+	Binding/CombinedInputSourceData.cpp
+	Binding/ConstantInputSource.cpp
+	Binding/ConstantInputSourceData.cpp
+	Binding/ControlInputSource.cpp
+	Binding/ControlInputSourceData.cpp
+	Binding/DeviceControl.cpp
+	Binding/DeviceControlManager.cpp
+	Binding/EnumKeys.cpp
+	Binding/GenericInputSource.cpp
+	Binding/GenericInputSourceData.cpp
+	Binding/IInputNode.cpp
+	Binding/IInputSource.cpp
+	Binding/IInputSourceData.cpp
+	Binding/InBoolean.cpp
+	Binding/InClamp.cpp
+	Binding/InCombine.cpp
+	Binding/InConst.cpp
+	Binding/InDelay.cpp
+	Binding/InEnvelope.cpp
+	Binding/InGesturePinch.cpp
+	Binding/InGestureSwipe.cpp
+	Binding/InGestureTap.cpp
+	Binding/InHysteresis.cpp
+	Binding/InLowPass.cpp
+	Binding/InPulse.cpp
+	Binding/InReadValue.cpp
+	Binding/InRemapAxis.cpp
+	Binding/InThreshold.cpp
+	Binding/InTrigger.cpp
+	Binding/InputMapping.cpp
+	Binding/InputMappingResource.cpp
+	Binding/InputMappingSourceData.cpp
+	Binding/InputMappingStateData.cpp
+	Binding/InputSourceFabricator.cpp
+	Binding/InputState.cpp
+	Binding/InputStateData.cpp
+	Binding/InputValueSet.cpp
+	Binding/KeyboardInputSource.cpp
+	Binding/KeyboardInputSourceData.cpp
+	IInputDevice.cpp
+	IInputDriver.cpp
+	InputClassFactory.cpp
+	InputSystem.cpp
+	InputTypes.cpp
+	Module.cpp
+	RecordInputDevice.cpp
+	RecordInputScript.cpp
+	ReplayInputDevice.cpp
+	RumbleEffect.cpp
+	RumbleEffectFactory.cpp
+	RumbleEffectPlayer.cpp
 )
 
 add_traktor_module(Traktor.Input
@@ -70,12 +123,17 @@ target_include_directories(Traktor.Input PUBLIC
 # Traktor.Input.Di8
 
 set(TRAKTOR_INPUT_DI8_SOURCES
-    Di8/InputDriverDi8.cpp
-    Di8/JoystickDeviceDi8.cpp
-    Di8/KeyboardDeviceDi8.cpp
-    Di8/Module.cpp
-    Di8/MouseDeviceDi8.cpp
-    Di8/TypesDi8.cpp
+	Di8/InputDriverDi8.h
+	Di8/JoystickDeviceDi8.h
+	Di8/KeyboardDeviceDi8.h
+	Di8/MouseDeviceDi8.h
+	Di8/TypesDi8.h
+	Di8/InputDriverDi8.cpp
+	Di8/JoystickDeviceDi8.cpp
+	Di8/KeyboardDeviceDi8.cpp
+	Di8/Module.cpp
+	Di8/MouseDeviceDi8.cpp
+	Di8/TypesDi8.cpp
 )
 
 add_traktor_module(Traktor.Input.Di8
@@ -96,26 +154,47 @@ target_include_directories(Traktor.Input.Di8 PUBLIC
 # Traktor.Input.Editor - Editor support
 
 set(TRAKTOR_INPUT_EDITOR_SOURCES
-    Editor/InBooleanTraits.cpp
-    Editor/InClampTraits.cpp
-    Editor/InCombineTraits.cpp
-    Editor/InConstTraits.cpp
-    Editor/InDelayTraits.cpp
-    Editor/InEnvelopeTraits.cpp
-    Editor/InGesturePinchTraits.cpp
-    Editor/InGestureSwipeTraits.cpp
-    Editor/InGestureTapTraits.cpp
-    Editor/InHysteresisTraits.cpp
-    Editor/InLowPassTraits.cpp
-    Editor/InPulseTraits.cpp
-    Editor/InReadValueTraits.cpp
-    Editor/InRemapAxisTraits.cpp
-    Editor/InThresholdTraits.cpp
-    Editor/InTriggerTraits.cpp
-    Editor/InputMappingAsset.cpp
-    Editor/InputMappingEditor.cpp
-    Editor/InputMappingEditorFactory.cpp
-    Editor/InputMappingPipeline.cpp
+	Editor/InBooleanTraits.h
+	Editor/InClampTraits.h
+	Editor/InCombineTraits.h
+	Editor/InConstTraits.h
+	Editor/InDelayTraits.h
+	Editor/InEnvelopeTraits.h
+	Editor/InGesturePinchTraits.h
+	Editor/InGestureSwipeTraits.h
+	Editor/InGestureTapTraits.h
+	Editor/InHysteresisTraits.h
+	Editor/InLowPassTraits.h
+	Editor/InPulseTraits.h
+	Editor/InReadValueTraits.h
+	Editor/InRemapAxisTraits.h
+	Editor/InThresholdTraits.h
+	Editor/InTriggerTraits.h
+	Editor/InputMappingAsset.h
+	Editor/InputMappingEditor.h
+	Editor/InputMappingEditorFactory.h
+	Editor/InputMappingPipeline.h
+	Editor/InputNodeTraits.h
+	Editor/InBooleanTraits.cpp
+	Editor/InClampTraits.cpp
+	Editor/InCombineTraits.cpp
+	Editor/InConstTraits.cpp
+	Editor/InDelayTraits.cpp
+	Editor/InEnvelopeTraits.cpp
+	Editor/InGesturePinchTraits.cpp
+	Editor/InGestureSwipeTraits.cpp
+	Editor/InGestureTapTraits.cpp
+	Editor/InHysteresisTraits.cpp
+	Editor/InLowPassTraits.cpp
+	Editor/InPulseTraits.cpp
+	Editor/InReadValueTraits.cpp
+	Editor/InRemapAxisTraits.cpp
+	Editor/InThresholdTraits.cpp
+	Editor/InTriggerTraits.cpp
+	Editor/InputMappingAsset.cpp
+	Editor/InputMappingEditor.cpp
+	Editor/InputMappingEditorFactory.cpp
+	Editor/InputMappingPipeline.cpp
 )
 
 add_traktor_module(Traktor.Input.Editor
@@ -140,11 +219,15 @@ add_resource_headers(Traktor.Input.Editor "${CMAKE_CURRENT_SOURCE_DIR}/Editor")
 # Traktor.Input.Win32
 
 set(TRAKTOR_INPUT_WIN32_SOURCES
-    Win32/InputDriverWin32.cpp
-    Win32/KeyboardDeviceWin32.cpp
-    Win32/Module.cpp
-    Win32/MouseDeviceWin32.cpp
-    Win32/TypesWin32.cpp
+	Win32/InputDriverWin32.h
+	Win32/KeyboardDeviceWin32.h
+	Win32/MouseDeviceWin32.h
+	Win32/TypesWin32.h
+	Win32/InputDriverWin32.cpp
+	Win32/KeyboardDeviceWin32.cpp
+	Win32/Module.cpp
+	Win32/MouseDeviceWin32.cpp
+	Win32/TypesWin32.cpp
 )
 
 add_traktor_module(Traktor.Input.Win32
@@ -162,9 +245,11 @@ target_include_directories(Traktor.Input.Win32 PUBLIC
 # Traktor.Input.Xi
 
 set(TRAKTOR_INPUT_XI_SOURCES
-    Xi/InputDeviceXi.cpp
-    Xi/InputDriverXi.cpp
-    Xi/Module.cpp
+	Xi/InputDeviceXi.h
+	Xi/InputDriverXi.h
+	Xi/InputDeviceXi.cpp
+	Xi/InputDriverXi.cpp
+	Xi/Module.cpp
 )
 
 add_traktor_module(Traktor.Input.Xi

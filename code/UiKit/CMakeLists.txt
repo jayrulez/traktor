@@ -1,11 +1,16 @@
 # Traktor.UiKit.Editor - Editor support
 
 set(TRAKTOR_UIKIT_EDITOR_SOURCES
-    Editor/PreviewControl.cpp
-    Editor/PreviewEditor.cpp
-    Editor/PreviewEditorFactory.cpp
-    Editor/Scaffolding.cpp
-    Editor/ScaffoldingPipeline.cpp
+	Editor/PreviewControl.h
+	Editor/PreviewEditor.h
+	Editor/PreviewEditorFactory.h
+	Editor/Scaffolding.h
+	Editor/ScaffoldingPipeline.h
+	Editor/PreviewControl.cpp
+	Editor/PreviewEditor.cpp
+	Editor/PreviewEditorFactory.cpp
+	Editor/Scaffolding.cpp
+	Editor/ScaffoldingPipeline.cpp
 )
 
 add_traktor_module(Traktor.UiKit.Editor

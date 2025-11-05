@@ -1,44 +1,84 @@
 # Traktor.SolutionBuilder
 
 set(TRAKTOR_SOLUTIONBUILDER_SOURCES
-    Aggregation.cpp
-    AggregationItem.cpp
-    CBlocks/SolutionBuilderCBlocks.cpp
-    ClassFactory.cpp
-    Configuration.cpp
-    Dependencies/SolutionBuilderDependencies.cpp
-    Dependency.cpp
-    Eclipse/SolutionBuilderEclipse.cpp
-    ExternalDependency.cpp
-    FBuild/SolutionBuilderFBuild.cpp
-    File.cpp
-    Filter.cpp
-    GraphViz/SolutionBuilderGraphViz.cpp
-    HeaderScanner.cpp
-    Make/SolutionBuilderMake2.cpp
-    Msvc/GeneratorContext.cpp
-    Msvc/SolutionBuilderMsvc.cpp
-    Msvc/SolutionBuilderMsvcSettings.cpp
-    Msvc/SolutionBuilderMsvcVCXBuildTool.cpp
-    Msvc/SolutionBuilderMsvcVCXClCompileBuildTool.cpp
-    Msvc/SolutionBuilderMsvcVCXCustomBuildTool.cpp
-    Msvc/SolutionBuilderMsvcVCXDefinition.cpp
-    Msvc/SolutionBuilderMsvcVCXImport.cpp
-    Msvc/SolutionBuilderMsvcVCXImportCommon.cpp
-    Msvc/SolutionBuilderMsvcVCXImportGroup.cpp
-    Msvc/SolutionBuilderMsvcVCXProj.cpp
-    Msvc/SolutionBuilderMsvcVCXPropertyGroup.cpp
-    Ninja/SolutionBuilderNinja.cpp
-    Output.cpp
-    Project.cpp
-    ProjectDependency.cpp
-    ProjectItem.cpp
-    ScriptProcessor.cpp
-    Solution.cpp
-    SolutionBuilder.cpp
-    SolutionLoader.cpp
-    Utilities.cpp
-    Xcode/SolutionBuilderXcode2.cpp
+	Aggregation.h
+	AggregationItem.h
+	CBlocks/SolutionBuilderCBlocks.h
+	ClassFactory.h
+	Configuration.h
+	Dependencies/SolutionBuilderDependencies.h
+	Dependency.h
+	Eclipse/SolutionBuilderEclipse.h
+	ExternalDependency.h
+	FBuild/SolutionBuilderFBuild.h
+	File.h
+	Filter.h
+	GraphViz/SolutionBuilderGraphViz.h
+	HeaderScanner.h
+	Make/SolutionBuilderMake2.h
+	Module.h
+	Msvc/GeneratorContext.h
+	Msvc/SolutionBuilderMsvc.h
+	Msvc/SolutionBuilderMsvcSettings.h
+	Msvc/SolutionBuilderMsvcVCXBuildTool.h
+	Msvc/SolutionBuilderMsvcVCXClCompileBuildTool.h
+	Msvc/SolutionBuilderMsvcVCXCustomBuildTool.h
+	Msvc/SolutionBuilderMsvcVCXDefinition.h
+	Msvc/SolutionBuilderMsvcVCXImport.h
+	Msvc/SolutionBuilderMsvcVCXImportCommon.h
+	Msvc/SolutionBuilderMsvcVCXImportGroup.h
+	Msvc/SolutionBuilderMsvcVCXProj.h
+	Msvc/SolutionBuilderMsvcVCXPropertyGroup.h
+	Ninja/SolutionBuilderNinja.h
+	Output.h
+	Project.h
+	ProjectDependency.h
+	ProjectItem.h
+	ScriptProcessor.h
+	Solution.h
+	SolutionBuilder.h
+	SolutionLoader.h
+	Utilities.h
+	Version.h
+	Xcode/SolutionBuilderXcode2.h
+	Aggregation.cpp
+	AggregationItem.cpp
+	CBlocks/SolutionBuilderCBlocks.cpp
+	ClassFactory.cpp
+	Configuration.cpp
+	Dependencies/SolutionBuilderDependencies.cpp
+	Dependency.cpp
+	Eclipse/SolutionBuilderEclipse.cpp
+	ExternalDependency.cpp
+	FBuild/SolutionBuilderFBuild.cpp
+	File.cpp
+	Filter.cpp
+	GraphViz/SolutionBuilderGraphViz.cpp
+	HeaderScanner.cpp
+	Make/SolutionBuilderMake2.cpp
+	Msvc/GeneratorContext.cpp
+	Msvc/SolutionBuilderMsvc.cpp
+	Msvc/SolutionBuilderMsvcSettings.cpp
+	Msvc/SolutionBuilderMsvcVCXBuildTool.cpp
+	Msvc/SolutionBuilderMsvcVCXClCompileBuildTool.cpp
+	Msvc/SolutionBuilderMsvcVCXCustomBuildTool.cpp
+	Msvc/SolutionBuilderMsvcVCXDefinition.cpp
+	Msvc/SolutionBuilderMsvcVCXImport.cpp
+	Msvc/SolutionBuilderMsvcVCXImportCommon.cpp
+	Msvc/SolutionBuilderMsvcVCXImportGroup.cpp
+	Msvc/SolutionBuilderMsvcVCXProj.cpp
+	Msvc/SolutionBuilderMsvcVCXPropertyGroup.cpp
+	Ninja/SolutionBuilderNinja.cpp
+	Output.cpp
+	Project.cpp
+	ProjectDependency.cpp
+	ProjectItem.cpp
+	ScriptProcessor.cpp
+	Solution.cpp
+	SolutionBuilder.cpp
+	SolutionLoader.cpp
+	Utilities.cpp
+	Xcode/SolutionBuilderXcode2.cpp
 )
 
 add_traktor_module(Traktor.SolutionBuilder
@@ -58,7 +98,7 @@ target_include_directories(Traktor.SolutionBuilder PUBLIC
 # Traktor.SolutionBuilder.App - Application
 
 set(TRAKTOR_SOLUTIONBUILDER_APP_SOURCES
-    App/Main.cpp
+	App/Main.cpp
 )
 
 add_traktor_module(Traktor.SolutionBuilder.App
@@ -86,23 +126,39 @@ target_include_directories(Traktor.SolutionBuilder.App PUBLIC
 # Traktor.SolutionBuilder.Editor.App - Editor support
 
 set(TRAKTOR_SOLUTIONBUILDER_EDITOR_APP_SOURCES
-    Editor/App/AddAggregatesTool.cpp
-    Editor/App/AddMultipleConfigurations.cpp
-    Editor/App/AggregationItemPropertyPage.cpp
-    Editor/App/ConfigurationPropertyPage.cpp
-    Editor/App/ConfigurationsDialog.cpp
-    Editor/App/CustomTool.cpp
-    Editor/App/EditConfigurations.cpp
-    Editor/App/ExtractSolutionDialog.cpp
-    Editor/App/ExtractSolutionTool.cpp
-    Editor/App/ImportMsvcProject.cpp
-    Editor/App/ImportProject.cpp
-    Editor/App/ImportProjectDialog.cpp
-    Editor/App/MRU.cpp
-    Editor/App/Main.cpp
-    Editor/App/ProjectPropertyPage.cpp
-    Editor/App/SolutionForm.cpp
-    Editor/App/SolutionPropertyPage.cpp
+	Editor/App/AddAggregatesTool.h
+	Editor/App/AddMultipleConfigurations.h
+	Editor/App/AggregationItemPropertyPage.h
+	Editor/App/ConfigurationPropertyPage.h
+	Editor/App/ConfigurationsDialog.h
+	Editor/App/CustomTool.h
+	Editor/App/EditConfigurations.h
+	Editor/App/ExtractSolutionDialog.h
+	Editor/App/ExtractSolutionTool.h
+	Editor/App/ImportMsvcProject.h
+	Editor/App/ImportProject.h
+	Editor/App/ImportProjectDialog.h
+	Editor/App/MRU.h
+	Editor/App/ProjectPropertyPage.h
+	Editor/App/SolutionForm.h
+	Editor/App/SolutionPropertyPage.h
+	Editor/App/AddAggregatesTool.cpp
+	Editor/App/AddMultipleConfigurations.cpp
+	Editor/App/AggregationItemPropertyPage.cpp
+	Editor/App/ConfigurationPropertyPage.cpp
+	Editor/App/ConfigurationsDialog.cpp
+	Editor/App/CustomTool.cpp
+	Editor/App/EditConfigurations.cpp
+	Editor/App/ExtractSolutionDialog.cpp
+	Editor/App/ExtractSolutionTool.cpp
+	Editor/App/ImportMsvcProject.cpp
+	Editor/App/ImportProject.cpp
+	Editor/App/ImportProjectDialog.cpp
+	Editor/App/MRU.cpp
+	Editor/App/Main.cpp
+	Editor/App/ProjectPropertyPage.cpp
+	Editor/App/SolutionForm.cpp
+	Editor/App/SolutionPropertyPage.cpp
 )
 
 add_traktor_module(Traktor.SolutionBuilder.Editor.App

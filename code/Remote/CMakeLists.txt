@@ -1,7 +1,7 @@
 # Traktor.Remote.Client.App - Application
 
 set(TRAKTOR_REMOTE_CLIENT_APP_SOURCES
-    Client/App/Main.cpp
+	Client/App/Main.cpp
 )
 
 add_traktor_module(Traktor.Remote.Client.App
@@ -30,8 +30,10 @@ target_include_directories(Traktor.Remote.Client.App PUBLIC
 # Traktor.Remote.Server
 
 set(TRAKTOR_REMOTE_SERVER_SOURCES
-    Server/Server.cpp
-    Server/ServerClassFactory.cpp
+	Server/Server.h
+	Server/ServerClassFactory.h
+	Server/Server.cpp
+	Server/ServerClassFactory.cpp
 )
 
 add_traktor_module(Traktor.Remote.Server
@@ -50,7 +52,8 @@ target_include_directories(Traktor.Remote.Server PUBLIC
 # Traktor.Remote.Server.Editor - Editor support
 
 set(TRAKTOR_REMOTE_SERVER_EDITOR_SOURCES
-    Server/Editor/RemoteEditorPlugin.cpp
+	Server/Editor/RemoteEditorPlugin.h
+	Server/Editor/RemoteEditorPlugin.cpp
 )
 
 add_traktor_module(Traktor.Remote.Server.Editor

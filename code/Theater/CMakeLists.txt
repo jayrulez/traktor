@@ -1,15 +1,24 @@
 # Traktor.Theater
 
 set(TRAKTOR_THEATER_SOURCES
-    Act.cpp
-    ActData.cpp
-    Module.cpp
-    TheaterClassFactory.cpp
-    TheaterComponent.cpp
-    TheaterComponentData.cpp
-    TheaterEntityFactory.cpp
-    Track.cpp
-    TrackData.cpp
+	Act.h
+	ActData.h
+	Module.h
+	TheaterClassFactory.h
+	TheaterComponent.h
+	TheaterComponentData.h
+	TheaterEntityFactory.h
+	Track.h
+	TrackData.h
+	Act.cpp
+	ActData.cpp
+	Module.cpp
+	TheaterClassFactory.cpp
+	TheaterComponent.cpp
+	TheaterComponentData.cpp
+	TheaterEntityFactory.cpp
+	Track.cpp
+	TrackData.cpp
 )
 
 add_traktor_module(Traktor.Theater
@@ -28,10 +37,14 @@ target_include_directories(Traktor.Theater PUBLIC
 # Traktor.Theater.Editor - Editor support
 
 set(TRAKTOR_THEATER_EDITOR_SOURCES
-    Editor/TheaterComponentEditor.cpp
-    Editor/TheaterComponentEditorFactory.cpp
-    Editor/TheaterComponentPipeline.cpp
-    Editor/TheaterEditorProfile.cpp
+	Editor/TheaterComponentEditor.h
+	Editor/TheaterComponentEditorFactory.h
+	Editor/TheaterComponentPipeline.h
+	Editor/TheaterEditorProfile.h
+	Editor/TheaterComponentEditor.cpp
+	Editor/TheaterComponentEditorFactory.cpp
+	Editor/TheaterComponentPipeline.cpp
+	Editor/TheaterEditorProfile.cpp
 )
 
 add_traktor_module(Traktor.Theater.Editor

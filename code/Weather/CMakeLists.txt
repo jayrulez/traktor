@@ -1,14 +1,22 @@
 # Traktor.Weather
 
 set(TRAKTOR_WEATHER_SOURCES
-    Module.cpp
-    Precipitation/PrecipitationComponent.cpp
-    Precipitation/PrecipitationComponentData.cpp
-    Precipitation/PrecipitationRenderer.cpp
-    Sky/SkyComponent.cpp
-    Sky/SkyComponentData.cpp
-    Sky/SkyRenderer.cpp
-    WeatherFactory.cpp
+	Module.h
+	Precipitation/PrecipitationComponent.h
+	Precipitation/PrecipitationComponentData.h
+	Precipitation/PrecipitationRenderer.h
+	Sky/SkyComponent.h
+	Sky/SkyComponentData.h
+	Sky/SkyRenderer.h
+	WeatherFactory.h
+	Module.cpp
+	Precipitation/PrecipitationComponent.cpp
+	Precipitation/PrecipitationComponentData.cpp
+	Precipitation/PrecipitationRenderer.cpp
+	Sky/SkyComponent.cpp
+	Sky/SkyComponentData.cpp
+	Sky/SkyRenderer.cpp
+	WeatherFactory.cpp
 )
 
 add_traktor_module(Traktor.Weather
@@ -29,7 +37,8 @@ target_include_directories(Traktor.Weather PUBLIC
 # Traktor.Weather.Editor - Editor support
 
 set(TRAKTOR_WEATHER_EDITOR_SOURCES
-    Editor/WeatherPipeline.cpp
+	Editor/WeatherPipeline.h
+	Editor/WeatherPipeline.cpp
 )
 
 add_traktor_module(Traktor.Weather.Editor

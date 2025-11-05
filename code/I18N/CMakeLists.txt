@@ -1,12 +1,18 @@
 # Traktor.I18N
 
 set(TRAKTOR_I18N_SOURCES
-    Dictionary.cpp
-    Format.cpp
-    I18N.cpp
-    I18NClassFactory.cpp
-    Module.cpp
-    Text.cpp
+	Dictionary.h
+	Format.h
+	I18N.h
+	I18NClassFactory.h
+	Module.h
+	Text.h
+	Dictionary.cpp
+	Format.cpp
+	I18N.cpp
+	I18NClassFactory.cpp
+	Module.cpp
+	Text.cpp
 )
 
 add_traktor_module(Traktor.I18N
@@ -23,15 +29,24 @@ target_include_directories(Traktor.I18N PUBLIC
 # Traktor.I18N.Editor - Editor support
 
 set(TRAKTOR_I18N_EDITOR_SOURCES
-    Editor/DictionaryAsset.cpp
-    Editor/DictionaryEditorPage.cpp
-    Editor/DictionaryEditorPageFactory.cpp
-    Editor/DictionaryFormatCSV.cpp
-    Editor/DictionaryFormatXLSX.cpp
-    Editor/DictionaryPipeline.cpp
-    Editor/IDictionaryFormat.cpp
-    Editor/ImportDictionaryWizardTool.cpp
-    Editor/Translator.cpp
+	Editor/DictionaryAsset.h
+	Editor/DictionaryEditorPage.h
+	Editor/DictionaryEditorPageFactory.h
+	Editor/DictionaryFormatCSV.h
+	Editor/DictionaryFormatXLSX.h
+	Editor/DictionaryPipeline.h
+	Editor/IDictionaryFormat.h
+	Editor/ImportDictionaryWizardTool.h
+	Editor/Translator.h
+	Editor/DictionaryAsset.cpp
+	Editor/DictionaryEditorPage.cpp
+	Editor/DictionaryEditorPageFactory.cpp
+	Editor/DictionaryFormatCSV.cpp
+	Editor/DictionaryFormatXLSX.cpp
+	Editor/DictionaryPipeline.cpp
+	Editor/IDictionaryFormat.cpp
+	Editor/ImportDictionaryWizardTool.cpp
+	Editor/Translator.cpp
 )
 
 add_traktor_module(Traktor.I18N.Editor

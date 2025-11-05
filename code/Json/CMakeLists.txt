@@ -1,13 +1,20 @@
 # Traktor.Json
 
 set(TRAKTOR_JSON_SOURCES
-    JsonArray.cpp
-    JsonClassFactory.cpp
-    JsonDocument.cpp
-    JsonMember.cpp
-    JsonNode.cpp
-    JsonObject.cpp
-    Module.cpp
+	JsonArray.h
+	JsonClassFactory.h
+	JsonDocument.h
+	JsonMember.h
+	JsonNode.h
+	JsonObject.h
+	Module.h
+	JsonArray.cpp
+	JsonClassFactory.cpp
+	JsonDocument.cpp
+	JsonMember.cpp
+	JsonNode.cpp
+	JsonObject.cpp
+	Module.cpp
 )
 
 add_traktor_module(Traktor.Json

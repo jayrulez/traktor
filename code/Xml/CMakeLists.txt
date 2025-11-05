@@ -1,16 +1,26 @@
 # Traktor.Xml
 
 set(TRAKTOR_XML_SOURCES
-    Attribute.cpp
-    Document.cpp
-    Element.cpp
-    Module.cpp
-    Node.cpp
-    Text.cpp
-    XmlClassFactory.cpp
-    XmlDeserializer.cpp
-    XmlPullParser.cpp
-    XmlSerializer.cpp
+	Attribute.h
+	Document.h
+	Element.h
+	Module.h
+	Node.h
+	Text.h
+	XmlClassFactory.h
+	XmlDeserializer.h
+	XmlPullParser.h
+	XmlSerializer.h
+	Attribute.cpp
+	Document.cpp
+	Element.cpp
+	Module.cpp
+	Node.cpp
+	Text.cpp
+	XmlClassFactory.cpp
+	XmlDeserializer.cpp
+	XmlPullParser.cpp
+	XmlSerializer.cpp
 )
 
 add_traktor_module(Traktor.Xml

@@ -50,6 +50,60 @@ function(add_traktor_module MODULE_NAME)
         )
     endif()
 
+    # Add post-build copy commands to match old build system
+    # Copy binaries to bin/latest/win64/<config> for non-executables
+    if(WIN32 AND NOT ARG_IS_EXECUTABLE)
+        # Determine library type suffix
+        if(ARG_IS_SHARED OR BUILD_SHARED_LIBS)
+            set(CONFIG_SUFFIX "shared")
+        else()
+            set(CONFIG_SUFFIX "static")
+        endif()
+
+        # Use generator expressions to copy to the appropriate configuration directory
+        # Convert configuration to lowercase for directory name
+        set(DEST_DIR "${TRAKTOR_HOME}/bin/latest/win64/$<LOWER_CASE:$<CONFIG>>${CONFIG_SUFFIX}")
+
+        # Copy DLL (for shared libraries)
+        if(ARG_IS_SHARED OR BUILD_SHARED_LIBS)
+            add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${MODULE_NAME}>"
+                    "${DEST_DIR}/"
+                COMMENT "Copying ${MODULE_NAME} DLL to bin/latest/win64"
+                VERBATIM
+            )
+            # Copy import library
+            add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_LINKER_FILE:${MODULE_NAME}>"
+                    "${DEST_DIR}/"
+                COMMENT "Copying ${MODULE_NAME} import lib to bin/latest/win64"
+                VERBATIM
+            )
+        else()
+            # Copy static library
+            add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "${DEST_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${MODULE_NAME}>"
+                    "${DEST_DIR}/"
+                COMMENT "Copying ${MODULE_NAME} lib to bin/latest/win64"
+                VERBATIM
+            )
+        endif()
+
+        # Copy PDB files (debug symbols) - only for Debug/RelWithDebInfo
+        add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_PDB_FILE:${MODULE_NAME}>"
+                "${DEST_DIR}/"
+            COMMENT "Copying ${MODULE_NAME} PDB to bin/latest/win64"
+            VERBATIM
+        )
+    endif()
+
     # Install target
     if(ARG_IS_EXECUTABLE)
         install(TARGETS ${MODULE_NAME} RUNTIME DESTINATION bin)

@@ -1,18 +1,31 @@
 # Traktor.Avalanche
 
 set(TRAKTOR_AVALANCHE_SOURCES
-    BlobFile.cpp
-    BlobMemory.cpp
-    Client/Client.cpp
-    Client/ClientGetStream.cpp
-    Client/ClientPutStream.cpp
-    Dictionary.cpp
-    IBlob.cpp
-    Server/Connection.cpp
-    Server/Peer.cpp
-    Server/Server.cpp
-    Server/ServerClassFactory.cpp
-    Test/CaseServer.cpp
+	BlobFile.h
+	BlobMemory.h
+	Client/Client.h
+	Client/ClientGetStream.h
+	Client/ClientPutStream.h
+	Dictionary.h
+	IBlob.h
+	Protocol.h
+	Server/Connection.h
+	Server/Peer.h
+	Server/Server.h
+	Server/ServerClassFactory.h
+	Test/CaseServer.h
+	BlobFile.cpp
+	BlobMemory.cpp
+	Client/Client.cpp
+	Client/ClientGetStream.cpp
+	Client/ClientPutStream.cpp
+	Dictionary.cpp
+	IBlob.cpp
+	Server/Connection.cpp
+	Server/Peer.cpp
+	Server/Server.cpp
+	Server/ServerClassFactory.cpp
+	Test/CaseServer.cpp
 )
 
 add_traktor_module(Traktor.Avalanche
@@ -30,7 +43,7 @@ target_include_directories(Traktor.Avalanche PUBLIC
 # Traktor.Avalanche.Server.App - Application
 
 set(TRAKTOR_AVALANCHE_SERVER_APP_SOURCES
-    Server/App/Main.cpp
+	Server/App/Main.cpp
 )
 
 add_traktor_module(Traktor.Avalanche.Server.App

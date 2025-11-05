@@ -1,19 +1,32 @@
 # Traktor.Svg
 
 set(TRAKTOR_SVG_SOURCES
-    ClassFactory.cpp
-    Document.cpp
-    Gradient.cpp
-    IShapeVisitor.cpp
-    ImageShape.cpp
-    Module.cpp
-    Parser.cpp
-    Path.cpp
-    PathShape.cpp
-    Rasterizer.cpp
-    Shape.cpp
-    Style.cpp
-    TextShape.cpp
+	ClassFactory.h
+	Document.h
+	Gradient.h
+	IShapeVisitor.h
+	ImageShape.h
+	Module.h
+	Parser.h
+	Path.h
+	PathShape.h
+	Rasterizer.h
+	Shape.h
+	Style.h
+	TextShape.h
+	ClassFactory.cpp
+	Document.cpp
+	Gradient.cpp
+	IShapeVisitor.cpp
+	ImageShape.cpp
+	Module.cpp
+	Parser.cpp
+	Path.cpp
+	PathShape.cpp
+	Rasterizer.cpp
+	Shape.cpp
+	Style.cpp
+	TextShape.cpp
 )
 
 add_traktor_module(Traktor.Svg

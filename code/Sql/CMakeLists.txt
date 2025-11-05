@@ -1,10 +1,14 @@
 # Traktor.Sql
 
 set(TRAKTOR_SQL_SOURCES
-    IConnection.cpp
-    IResultSet.cpp
-    Module.cpp
-    SqlClassFactory.cpp
+	IConnection.h
+	IResultSet.h
+	Module.h
+	SqlClassFactory.h
+	IConnection.cpp
+	IResultSet.cpp
+	Module.cpp
+	SqlClassFactory.cpp
 )
 
 add_traktor_module(Traktor.Sql
@@ -21,10 +25,13 @@ target_include_directories(Traktor.Sql PUBLIC
 # Traktor.Sql.Sqlite3
 
 set(TRAKTOR_SQL_SQLITE3_SOURCES
-    Sqlite3/ConnectionSqlite3.cpp
-    Sqlite3/Module.cpp
-    Sqlite3/ResultSetSqlite3.cpp
-    Sqlite3/Sqlite3ClassFactory.cpp
+	Sqlite3/ConnectionSqlite3.h
+	Sqlite3/ResultSetSqlite3.h
+	Sqlite3/Sqlite3ClassFactory.h
+	Sqlite3/ConnectionSqlite3.cpp
+	Sqlite3/Module.cpp
+	Sqlite3/ResultSetSqlite3.cpp
+	Sqlite3/Sqlite3ClassFactory.cpp
 )
 
 add_traktor_module(Traktor.Sql.Sqlite3

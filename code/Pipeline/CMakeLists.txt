@@ -1,9 +1,11 @@
 # Traktor.Pipeline.App - Application
 
 set(TRAKTOR_PIPELINE_APP_SOURCES
-    App/Main.cpp
-    App/PipelineParameters.cpp
-    App/Win32/StackWalker.cpp
+	App/PipelineParameters.h
+	App/Win32/StackWalker.h
+	App/Main.cpp
+	App/PipelineParameters.cpp
+	App/Win32/StackWalker.cpp
 )
 
 add_traktor_module(Traktor.Pipeline.App

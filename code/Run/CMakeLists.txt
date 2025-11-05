@@ -1,14 +1,21 @@
 # Traktor.Run.App - Application
 
 set(TRAKTOR_RUN_APP_SOURCES
-    App/IInput.cpp
-    App/IOutput.cpp
-    App/Main.cpp
-    App/ProduceOutput.cpp
-    App/Run.cpp
-    App/StdOutput.cpp
-    App/StreamInput.cpp
-    App/StreamOutput.cpp
+	App/IInput.h
+	App/IOutput.h
+	App/ProduceOutput.h
+	App/Run.h
+	App/StdOutput.h
+	App/StreamInput.h
+	App/StreamOutput.h
+	App/IInput.cpp
+	App/IOutput.cpp
+	App/Main.cpp
+	App/ProduceOutput.cpp
+	App/Run.cpp
+	App/StdOutput.cpp
+	App/StreamInput.cpp
+	App/StreamOutput.cpp
 )
 
 add_traktor_module(Traktor.Run.App

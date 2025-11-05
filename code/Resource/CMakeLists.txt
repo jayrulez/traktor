@@ -1,17 +1,34 @@
 # Traktor.Resource
 
 set(TRAKTOR_RESOURCE_SOURCES
-    ExclusiveResourceHandle.cpp
-    ExplicitResourceHandle.cpp
-    FileBundle.cpp
-    IResourceFactory.cpp
-    IResourceManager.cpp
-    Module.cpp
-    ResidentResourceHandle.cpp
-    ResourceBundle.cpp
-    ResourceClassFactory.cpp
-    ResourceHandle.cpp
-    ResourceManager.cpp
+	ExclusiveResourceHandle.h
+	ExplicitResourceHandle.h
+	FileBundle.h
+	IResourceFactory.h
+	IResourceManager.h
+	Id.h
+	IdProxy.h
+	Member.h
+	MemberIdProxy.h
+	Module.h
+	Proxy.h
+	ResidentResourceHandle.h
+	ResourceBundle.h
+	ResourceCast.h
+	ResourceClassFactory.h
+	ResourceHandle.h
+	ResourceManager.h
+	ExclusiveResourceHandle.cpp
+	ExplicitResourceHandle.cpp
+	FileBundle.cpp
+	IResourceFactory.cpp
+	IResourceManager.cpp
+	Module.cpp
+	ResidentResourceHandle.cpp
+	ResourceBundle.cpp
+	ResourceClassFactory.cpp
+	ResourceHandle.cpp
+	ResourceManager.cpp
 )
 
 add_traktor_module(Traktor.Resource
@@ -28,10 +45,14 @@ target_include_directories(Traktor.Resource PUBLIC
 # Traktor.Resource.Editor - Editor support
 
 set(TRAKTOR_RESOURCE_EDITOR_SOURCES
-    Editor/FileBundleAsset.cpp
-    Editor/FileBundlePipeline.cpp
-    Editor/ResourceBundleAsset.cpp
-    Editor/ResourceBundlePipeline.cpp
+	Editor/FileBundleAsset.h
+	Editor/FileBundlePipeline.h
+	Editor/ResourceBundleAsset.h
+	Editor/ResourceBundlePipeline.h
+	Editor/FileBundleAsset.cpp
+	Editor/FileBundlePipeline.cpp
+	Editor/ResourceBundleAsset.cpp
+	Editor/ResourceBundlePipeline.cpp
 )
 
 add_traktor_module(Traktor.Resource.Editor

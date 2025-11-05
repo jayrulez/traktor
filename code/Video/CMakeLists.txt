@@ -1,14 +1,22 @@
 # Traktor.Video
 
 set(TRAKTOR_VIDEO_SOURCES
-    Decoders/VideoDecoderTheora.cpp
-    IVideoDecoder.cpp
-    Module.cpp
-    Video.cpp
-    VideoClassFactory.cpp
-    VideoFactory.cpp
-    VideoResource.cpp
-    VideoTexture.cpp
+	Decoders/VideoDecoderTheora.h
+	IVideoDecoder.h
+	Module.h
+	Video.h
+	VideoClassFactory.h
+	VideoFactory.h
+	VideoResource.h
+	VideoTexture.h
+	Decoders/VideoDecoderTheora.cpp
+	IVideoDecoder.cpp
+	Module.cpp
+	Video.cpp
+	VideoClassFactory.cpp
+	VideoFactory.cpp
+	VideoResource.cpp
+	VideoTexture.cpp
 )
 
 add_traktor_module(Traktor.Video
@@ -30,10 +38,14 @@ target_include_directories(Traktor.Video PUBLIC
 # Traktor.Video.Editor - Editor support
 
 set(TRAKTOR_VIDEO_EDITOR_SOURCES
-    Editor/VideoAsset.cpp
-    Editor/VideoEditorPage.cpp
-    Editor/VideoEditorPageFactory.cpp
-    Editor/VideoPipeline.cpp
+	Editor/VideoAsset.h
+	Editor/VideoEditorPage.h
+	Editor/VideoEditorPageFactory.h
+	Editor/VideoPipeline.h
+	Editor/VideoAsset.cpp
+	Editor/VideoEditorPage.cpp
+	Editor/VideoEditorPageFactory.cpp
+	Editor/VideoPipeline.cpp
 )
 
 add_traktor_module(Traktor.Video.Editor

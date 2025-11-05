@@ -1,16 +1,26 @@
 # Traktor.Ai
 
 set(TRAKTOR_AI_SOURCES
-    AiClassFactory.cpp
-    Module.cpp
-    MoveQuery.cpp
-    MoveQueryResult.cpp
-    NavMesh.cpp
-    NavMeshComponent.cpp
-    NavMeshComponentData.cpp
-    NavMeshEntityFactory.cpp
-    NavMeshFactory.cpp
-    NavMeshResource.cpp
+	AiClassFactory.h
+	Module.h
+	MoveQuery.h
+	MoveQueryResult.h
+	NavMesh.h
+	NavMeshComponent.h
+	NavMeshComponentData.h
+	NavMeshEntityFactory.h
+	NavMeshFactory.h
+	NavMeshResource.h
+	AiClassFactory.cpp
+	Module.cpp
+	MoveQuery.cpp
+	MoveQueryResult.cpp
+	NavMesh.cpp
+	NavMeshComponent.cpp
+	NavMeshComponentData.cpp
+	NavMeshEntityFactory.cpp
+	NavMeshFactory.cpp
+	NavMeshResource.cpp
 )
 
 add_traktor_module(Traktor.Ai
@@ -30,12 +40,18 @@ target_include_directories(Traktor.Ai PUBLIC
 # Traktor.Ai.Editor - Editor support
 
 set(TRAKTOR_AI_EDITOR_SOURCES
-    Editor/AiEditorProfile.cpp
-    Editor/NavMeshAsset.cpp
-    Editor/NavMeshComponentEditor.cpp
-    Editor/NavMeshComponentEditorFactory.cpp
-    Editor/NavMeshEntityPipeline.cpp
-    Editor/NavMeshPipeline.cpp
+	Editor/AiEditorProfile.h
+	Editor/NavMeshAsset.h
+	Editor/NavMeshComponentEditor.h
+	Editor/NavMeshComponentEditorFactory.h
+	Editor/NavMeshEntityPipeline.h
+	Editor/NavMeshPipeline.h
+	Editor/AiEditorProfile.cpp
+	Editor/NavMeshAsset.cpp
+	Editor/NavMeshComponentEditor.cpp
+	Editor/NavMeshComponentEditorFactory.cpp
+	Editor/NavMeshEntityPipeline.cpp
+	Editor/NavMeshPipeline.cpp
 )
 
 add_traktor_module(Traktor.Ai.Editor
